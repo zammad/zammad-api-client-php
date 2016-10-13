@@ -7,8 +7,8 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Znuny GmbH",
-            "homepage": "https://znuny.com"
+            "name": "Zammad GmbH",
+            "homepage": "https://zammad.com"
         }
     ],
     "require": {
