@@ -1,4 +1,6 @@
-# Zammad API Client (PHP)
+# Zammad API Client for PHP
+
+This client can be used to access the API of the open source helpdesk [Zammad](http://www.zammad.org) via PHP.
 
 ## API version support
 This client supports API version 1.0.
