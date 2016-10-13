@@ -1,5 +1,5 @@
 {
-    "name": "martini/zammad_api_client_php",
+    "name": "zammad/zammad-api-client-php",
     "type": "library",
     "description": "Zammad API client",
     "homepage": "https://github.com/zammad/zammad-api-client-php",
