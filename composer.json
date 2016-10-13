@@ -1,0 +1,24 @@
+{
+    "name": "martini/zammad_api_client_php",
+    "type": "library",
+    "description": "Zammad API client",
+    "homepage": "https://github.com/martini/zammad_api_client_php",
+    "keywords": ["zammad", "api"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Znuny GmbH",
+            "homepage": "https://znuny.com"
+        }
+    ],
+    "require": {
+        "php":               ">=5.6",
+        "guzzlehttp/guzzle": "~6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "5.6.*"
+    },
+    "autoload": {
+        "psr-4": {"ZammadAPIClient\\": "src/"}
+    }
+}
