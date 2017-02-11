@@ -85,7 +85,7 @@ class TicketTest extends AbstractBaseTest
                         'body'    => 'Unit test article 5... ' . $this->getUniqueID(),
                     ],
                 ],
-                'expected_success' => false,
+                'expected_success' => true,
             ],
             // Missing article data.
             [
