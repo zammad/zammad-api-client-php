@@ -57,36 +57,6 @@ class TicketTest extends AbstractBaseTest
                 ],
                 'expected_success' => false,
             ],
-            // Missing required fields 'group_id' and 'priority_id'.
-            [
-                'values' => [
-                    // 'group_id'    => 1,
-                    // 'priority_id' => 1,
-                    'state_id'    => 1,
-                    'title'       => 'Unit test ticket 4 ' . $this->getUniqueID(),
-                    'customer_id' => 1,
-                    'article'     => [
-                        'subject' => 'Unit test article 4 ' . $this->getUniqueID(),
-                        'body'    => 'Unit test article 4... ' . $this->getUniqueID(),
-                    ],
-                ],
-                'expected_success' => false,
-            ],
-            // Missing required field 'priority_id'.
-            [
-                'values' => [
-                    'group_id'    => 1,
-                    // 'priority_id' => 1,
-                    'state_id'    => 1,
-                    'title'       => 'Unit test ticket 5 ' . $this->getUniqueID(),
-                    'customer_id' => 1,
-                    'article'     => [
-                        'subject' => 'Unit test article 5 ' . $this->getUniqueID(),
-                        'body'    => 'Unit test article 5... ' . $this->getUniqueID(),
-                    ],
-                ],
-                'expected_success' => true,
-            ],
             // Missing article data.
             [
                 'values' => [

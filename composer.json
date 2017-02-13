@@ -4,7 +4,7 @@
     "description": "Zammad API client for PHP",
     "homepage": "https://github.com/zammad/zammad-api-client-php",
     "keywords": ["zammad", "api"],
-    "license": "MIT",
+    "license": "AGPL-3.0",
     "authors": [
         {
             "name": "Zammad GmbH",
