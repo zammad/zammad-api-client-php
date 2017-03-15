@@ -79,6 +79,14 @@ Additionally you can have a look at the REST interface documentation of Zammad:
 [Ticket priorities](https://github.com/zammad/zammad-documentation/blob/master/api-ticket-priority.rst)
 [Ticket states](https://github.com/zammad/zammad-documentation/blob/master/api-ticket-state.rst)
 
+#### Fetching content of ticket article attachments
+The content of ticket article attachments can be fetched with a call of `getAttachmentContent()` of the ticket article resource object:
+```php
+$attachment_content = $ticket_article->getAttachmentContent(23);
+```
+
+In the above example 23 is the ID of the attachment. This ID can be found within the `attachments` array of the ticket article data. Usually you want to loop over this array to fetch the content of all attachments.
+
 ### Updating Resource objects
 If you fetched a `Resource` object and changed some values, you have to send your changes to Zammad. You do this with a simple call:
 ```php

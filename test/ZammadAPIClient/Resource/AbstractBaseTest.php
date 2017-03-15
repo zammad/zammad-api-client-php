@@ -54,6 +54,16 @@ abstract class AbstractBaseTest extends TestCase
         return self::$unique_id;
     }
 
+    protected function getTestFileContent($filename)
+    {
+        return file_get_contents( __DIR__ . "/$filename" );
+    }
+
+    protected function getTestFileContentBase64($filename)
+    {
+        return base64_encode( $this->getTestFileContent($filename) );
+    }
+
     abstract public function objectCreateProvider();
 
     /**

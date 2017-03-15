@@ -23,10 +23,10 @@ class Response
         array  $headers = []
     )
     {
-        $this->status_code = intval($status_code);
+        $this->status_code   = intval($status_code);
         $this->reason_phrase = $reason_phrase;
-        $this->body = $body;
-        $this->headers = $headers;
+        $this->body          = $body;
+        $this->headers       = $headers;
 
         // Store decoded JSON data, if present
         if (
