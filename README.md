@@ -30,6 +30,9 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 
 ## How to use the API client
 
+### Example code
+You can find example code within the directory `examples`.
+
 ### The Client object
 Your starting point is the `Client` object:
 ```php
@@ -65,6 +68,16 @@ $all_values = $ticket->getValues();
 Please note that the API client does not provide checks for nor does it know about the available fields of the `Resource` objects. If you set or get a value of a non-existing field or set an invalid value, Zammad will ignore it or return an error.
 
 So, how can you know which fields are available? Just fetch an existing `Resource` object and have a look at the returned fields. A fresh Zammad system always contains an object with ID 1 for every resource type.
+
+Additionally you can have a look at the REST interface documentation of Zammad:
+[Introduction to the REST interface](https://github.com/zammad/zammad-documentation/blob/master/api-intro.rst)
+[Users](https://github.com/zammad/zammad-documentation/blob/master/api-user.rst)
+[Groups](https://github.com/zammad/zammad-documentation/blob/master/api-group.rst)
+[Organizations](https://github.com/zammad/zammad-documentation/blob/master/api-organization.rst)
+[Tickets](https://github.com/zammad/zammad-documentation/blob/master/api-ticket.rst)
+[Ticket articles](https://github.com/zammad/zammad-documentation/blob/master/api-ticket-article.rst)
+[Ticket priorities](https://github.com/zammad/zammad-documentation/blob/master/api-ticket-priority.rst)
+[Ticket states](https://github.com/zammad/zammad-documentation/blob/master/api-ticket-state.rst)
 
 ### Updating Resource objects
 If you fetched a `Resource` object and changed some values, you have to send your changes to Zammad. You do this with a simple call:

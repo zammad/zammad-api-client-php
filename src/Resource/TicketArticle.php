@@ -24,7 +24,7 @@ class TicketArticle extends AbstractResource
      *
      * @return array                Array of TicketArticle objects.
      */
-    public function getForTicket( $ticket_id )
+    public function getForTicket($ticket_id)
     {
         if ( !empty( $this->getValues() ) ) {
             throw new \RuntimeException('Object already contains values, getForTicket() not possible, use a new object');

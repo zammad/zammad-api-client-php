@@ -1,0 +1,15 @@
+<?php
+
+// Copy this file to config.php and insert your credentials.
+// Note that you have to activate API access within your Zammad (Settings => System => API)
+
+$zammad_api_client_config = [
+    'url' => 'https://myzammad.example.com',
+
+    // with username and password
+    'username' => 'master@example.com',
+    'password' => 'test',
+
+    // or with token:
+    'http_token' => '...',
+];
