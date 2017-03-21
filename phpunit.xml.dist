@@ -17,6 +17,7 @@
         </testsuite>
     </testsuites>
     <php>
+        <!-- Note: unit tests are only possible via username and password -->
         <!--
         <env name="ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL" value="https://...." />
         <env name="ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_USERNAME" value="..." />

@@ -10,6 +10,9 @@ $zammad_api_client_config = [
     'username' => 'master@example.com',
     'password' => 'test',
 
-    // or with token:
+    // or with HTTP token:
     'http_token' => '...',
+
+    // or with OAuth2 token:
+    'oauth2_token' => '...',
 ];

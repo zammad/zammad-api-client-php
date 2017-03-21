@@ -82,8 +82,6 @@ class HTTPClient extends \GuzzleHttp\Client
             $this->authentication_options = [
                 'oauth2_token' => $options['oauth2_token'],
             ];
-
-            throw new \RuntimeException('Authentication via OAuth2 token is not implemented yet');
         }
 
         if ( $number_of_authentication_types_given != 1 ) {
@@ -126,7 +124,8 @@ class HTTPClient extends \GuzzleHttp\Client
         }
         // OAuth2 token
         else if ( !empty( $this->authentication_options['oauth2_token'] ) ) {
-            throw new \RuntimeException('Authentication via OAuth2 token is not implemented yet');
+            $options['headers']['Authorization']
+                = 'Bearer ' . $this->authentication_options['oauth2_token'];
         }
         else {
             throw new \RuntimeException('No authentication options available');
