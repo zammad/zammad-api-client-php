@@ -40,6 +40,14 @@ exitOnError($ticket);
 print_r( $ticket->getValues() );
 
 //
+// Fetch ticket articles
+//
+$ticket_articles = $ticket->getTicketArticles();
+foreach ( $ticket_articles as $ticket_article ) {
+    print_r($ticket_article);
+}
+
+//
 // Search ticket
 //
 $tickets = $client->resource( ResourceType::TICKET )->search($ticket_text);
