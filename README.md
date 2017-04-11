@@ -38,9 +38,10 @@ Your starting point is the `Client` object:
 ```php
 use ZammadAPIClient\Client;
 $client = new Client([
-    'url'           => 'https://myzammad.com', # URL to your Zammad installation
-    'username'      => 'myuser@myzammad.com',  # Username to use for authentication
-    'password'      => 'mypassword',           # Password to use for authentication
+    'url'           => 'https://myzammad.com', // URL to your Zammad installation
+    'username'      => 'myuser@myzammad.com',  // Username to use for authentication
+    'password'      => 'mypassword',           // Password to use for authentication
+    // 'debug'         => true,                // Enables debug output
 ]);
 ```
 Besides using a combination of `username` and `password`, you can alternatively give an `http_token` or an `oauth2_token`.
@@ -78,6 +79,12 @@ Additionally you can have a look at the REST interface documentation of Zammad:
 [Ticket articles](https://github.com/zammad/zammad-documentation/blob/master/api-ticket-article.rst)
 [Ticket priorities](https://github.com/zammad/zammad-documentation/blob/master/api-ticket-priority.rst)
 [Ticket states](https://github.com/zammad/zammad-documentation/blob/master/api-ticket-state.rst)
+
+#### Fetching a ticket's articles
+If you already have a ticket object, you can easily fetch its articles:
+```php
+$ticket_articles = $ticket->getTicketArticles();
+```
 
 #### Fetching content of ticket article attachments
 The content of ticket article attachments can be fetched with a call of `getAttachmentContent()` of the ticket article resource object:

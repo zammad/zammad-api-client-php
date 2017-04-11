@@ -15,6 +15,7 @@ class Client
 
     private $http_client;
     private $last_response;
+    private $options;
 
     /**
      * Creates a Client object.
@@ -37,6 +38,7 @@ class Client
      */
     public function __construct( array $options = [] )
     {
+        $this->options     = $options;
         $this->http_client = new HTTPClient($options);
     }
 
@@ -65,7 +67,15 @@ class Client
         $options['headers']['Accept']       = 'application/json';
         $options['headers']['Content-Type'] = 'application/json; charset=utf-8';
 
+        // Activate debug mode
+        if ( array_key_exists( 'debug', $this->options ) ) {
+            $options['debug'] = $this->options['debug'];
+        }
+
         $http_client_response = $this->http_client->request( $method, $url, $options );
+        if ( !is_object($http_client_response) ) {
+            throw new \RuntimeException('Unable to create HTTP client request.');
+        }
 
         // Turn HTTP client's response into our own.
         $response = new Response(
