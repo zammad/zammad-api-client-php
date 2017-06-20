@@ -14,7 +14,7 @@ Additionally, the API client needs PHP 5.6 or newer.
 ### Integration into your project
 Add the following to the "require" section of your project's composer.json file:
 ```json
-"zammad/zammad-api-client-php": "1.0.*"
+"zammad/zammad-api-client-php": "^1.1.*"
 ```
 
 ### Installing the API client's dependencies
@@ -42,10 +42,13 @@ $client = new Client([
     'username'      => 'myuser@myzammad.com',  // Username to use for authentication
     'password'      => 'mypassword',           // Password to use for authentication
     // 'debug'         => true,                // Enables debug output
+    // 'guzzle_options' => [],                 // Add GuzzleClient options
 ]);
 ```
 Besides using a combination of `username` and `password`, you can alternatively give an `http_token` or an `oauth2_token`.
 **Important:** You have to activate API access in Zammad.
+
+You can also add custom options to the guzzle client [GuzzleClient options](http://docs.guzzlephp.org/en/stable/quickstart.html#creating-a-client). 
 
 ### Fetching a single Resource object
 To fetch a `Resource` object by ID, e. g. a ticket with ID 34, use the `Client` object:

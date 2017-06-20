@@ -32,6 +32,9 @@ class Client
      *                                              'http_token' => 'my-token',
      *                                              // OR: authentication via OAuth2 token
      *                                              'oauth2_token' => 'my-token',
+     *
+     *                                              // Specify guzzle client options
+     *                                              'guzzle_options' => []
      *                                          ];
      *
      * @return Object                           Client object
