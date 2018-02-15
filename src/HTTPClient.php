@@ -27,6 +27,9 @@ class HTTPClient extends \GuzzleHttp\Client
      *                                              'http_token' => 'my-token',
      *                                              // OR: authentication via OAuth2 token
      *                                              'oauth2_token' => 'my-token',
+     *
+     *                                              // Specify guzzle client options
+     *                                              'guzzle_options' => []
      *                                          ];
      *
      * @return Object                           HTTPClient object
@@ -91,11 +94,12 @@ class HTTPClient extends \GuzzleHttp\Client
         // Assemble base URL
         $this->base_url = $options['url'] . '/api/' . Client::API_VERSION . '/';
 
+        $guzzleOptions = isset($options['guzzle_options']) && is_array($options['guzzle_options']) ? $options['guzzle_options'] : [];
+        $guzzleOptions['base_uri'] = $this->base_url;
+        $guzzleOptions['timeout'] = 5;
+
         // Execute constructor of base class
-        parent::__construct([
-            'base_uri' => $this->base_url,
-            'timeout'  => 5,
-        ]);
+        parent::__construct($guzzleOptions);
     }
 
     /**
