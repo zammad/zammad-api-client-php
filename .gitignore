@@ -2,5 +2,6 @@
 /phpunit.xml
 /composer.lock
 /examples/config.php
+/examples/test.php
 /test.php
 *~

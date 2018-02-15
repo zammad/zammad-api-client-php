@@ -16,6 +16,7 @@ class Client
     private $http_client;
     private $last_response;
     private $options;
+    private $on_behalf_of_user;
 
     /**
      * Creates a Client object.
@@ -66,6 +67,11 @@ class Client
         // Set JSON headers
         $options['headers']['Accept']       = 'application/json';
         $options['headers']['Content-Type'] = 'application/json; charset=utf-8';
+
+        // Set "on behalf of user" header
+        if ( mb_strlen($this->on_behalf_of_user) ) {
+            $options['headers']['X-On-Behalf-Of'] = $this->on_behalf_of_user;
+        }
 
         // Activate debug mode
         if ( array_key_exists( 'debug', $this->options ) ) {
@@ -177,10 +183,30 @@ class Client
      *
      * @return Object                       Resource object
      */
-    public function resource( $resource_type )
+    public function resource($resource_type)
     {
         $resource_object = new $resource_type($this);
         return $resource_object;
+    }
+
+    /**
+     * Sets user on behalf of which API calls will be executed.
+     *
+     * @param String $user         User ID, login or email address
+     */
+    public function setOnBehalfOfUser($user)
+    {
+        $this->on_behalf_of_user = $user;
+    }
+
+    /**
+     * Unsets user on behalf of which API calls will be executed.
+     * API calls will then be called again by the user who is being used
+     * for authentication.
+     */
+    public function unsetOnBehalfOfUser()
+    {
+        $this->on_behalf_of_user = null;
     }
 
     /**

@@ -205,11 +205,23 @@ if ( $ticket->hasError() ) {
 }
 ```
 
-If you additionally need more detailed information about connection/request errors, you can access the `Response` object of the `Client` object. It holds the response to the last request that was made.
+If you additionally need more detailed information about connection/request errors, you can access the `Response` object of the `Client` object. It holds the response of the last request that was made.
 ```php
 $last_response = $client->getLastResponse();
 ```
 With this object, you can e. g. get the HTTP status code and the body of the last response.
+
+### Executing an API call on behalf of another user (since Zammad 2.4)
+If you want Zammad to execute an API call on behalf of another user than the one you used for authentication, use the following code before executing the API call(s):
+```php
+$client->setOnBehalfOfUser('myuser');
+```
+Any API call after above code will use this setting. If you want to return to using the user you used for authentication, call:
+```php
+$client->unsetOnBehalfOfUser();
+```
+
+Using this setting will be ignored by Zammad before version 2.4.
 
 ## Available resource types and their access methods
 

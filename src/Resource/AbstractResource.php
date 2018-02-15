@@ -302,7 +302,7 @@ abstract class AbstractResource
             ( isset($page) && !isset($objects_per_page) )
             || ( !isset($page) && isset($objects_per_page) )
         ) {
-            throw new \RuntimeException('Parameters page and objects_per_page must both be given.');
+            throw new \RuntimeException('Parameters page and objects_per_page must both be given');
         }
 
         $url_parameters = [
@@ -365,7 +365,7 @@ abstract class AbstractResource
             ( !empty($page) && empty($objects_per_page) )
             || ( empty($page) && !empty($objects_per_page) )
         ) {
-            throw new \RuntimeException('Parameters page and objects_per_page must both be given.');
+            throw new \RuntimeException('Parameters page and objects_per_page must both be given');
         }
 
         $url_parameters = [
