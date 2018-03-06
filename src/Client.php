@@ -56,13 +56,9 @@ class Client
     {
         $method = mb_strtoupper($method);
 
-        $url_parameter_string = '';
-        foreach ( $url_parameters as $url_parameter => $value ) {
-            $url_parameter_string .= mb_strlen($url_parameter_string) ? ';' : '?';
-            $url_parameter_string .= $url_parameter . '=' . urlencode($value);
+        if (!empty($url_parameters)) {
+          $options['query'] = $url_parameters;
         }
-
-        $url .= $url_parameter_string;
 
         // Set JSON headers
         $options['headers']['Accept']       = 'application/json';
