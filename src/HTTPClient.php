@@ -101,7 +101,7 @@ class HTTPClient extends \GuzzleHttp\Client
     /**
      * Overrides base class request method to automatically add authentication options to request.
      */
-    public function request( $method, $uri, array $options = [] )
+    public function request( $method, $uri = '', array $options = [] )
     {
         //
         // Add authentication options
