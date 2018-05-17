@@ -31,6 +31,9 @@ class HTTPClient extends \GuzzleHttp\Client
      *                                              // Optional: timeout (in seconds) for requests, defaults to 5
      *                                              // 0: no timeout
      *                                              timeout => 10,
+     *
+     *                                              // Optional: Enable debug output
+     *                                              debug => true,
      *                                          ];
      *
      * @return Object                           HTTPClient object
@@ -104,10 +107,17 @@ class HTTPClient extends \GuzzleHttp\Client
             }
         }
 
+        // Debug flag
+        $debug = false;
+        if ( array_key_exists( 'debug', $options ) ) {
+            $debug = $options['debug'] ? true : false;
+        }
+
         // Execute constructor of base class
         parent::__construct([
             'base_uri' => $this->base_url,
             'timeout'  => $timeout,
+            'debug'    => $debug,
         ]);
     }
 

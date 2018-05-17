@@ -37,6 +37,9 @@ class Client
      *                                              // Optional: timeout (in seconds) for requests, defaults to 5
      *                                              // 0: no timeout
      *                                              timeout => 10,
+     *
+     *                                              // Optional: Enable debug output
+     *                                              debug => true,
      *                                          ];
      *
      * @return Object                           Client object
@@ -71,11 +74,6 @@ class Client
         // Set "on behalf of user" header
         if ( mb_strlen($this->on_behalf_of_user) ) {
             $options['headers']['X-On-Behalf-Of'] = $this->on_behalf_of_user;
-        }
-
-        // Activate debug mode
-        if ( array_key_exists( 'debug', $this->options ) ) {
-            $options['debug'] = $this->options['debug'];
         }
 
         $http_client_response = $this->http_client->request( $method, $url, $options );
