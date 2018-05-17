@@ -33,6 +33,10 @@ class Client
      *                                              'http_token' => 'my-token',
      *                                              // OR: authentication via OAuth2 token
      *                                              'oauth2_token' => 'my-token',
+     *
+     *                                              // Optional: timeout (in seconds) for requests, defaults to 5
+     *                                              // 0: no timeout
+     *                                              timeout => 10,
      *                                          ];
      *
      * @return Object                           Client object
