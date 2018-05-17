@@ -41,6 +41,7 @@ $client = new Client([
     'url'           => 'https://myzammad.com', // URL to your Zammad installation
     'username'      => 'myuser@myzammad.com',  // Username to use for authentication
     'password'      => 'mypassword',           // Password to use for authentication
+    // 'timeout'       => 15,                  // Sets timeout for requests, defaults to 5 seconds, 0: no timeout
     // 'debug'         => true,                // Enables debug output
 ]);
 ```
