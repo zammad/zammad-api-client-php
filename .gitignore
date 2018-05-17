@@ -3,5 +3,5 @@
 /composer.lock
 /examples/config.php
 /examples/test.php
-/test.php
+/test*.php
 *~
