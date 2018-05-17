@@ -91,10 +91,16 @@ class HTTPClient extends \GuzzleHttp\Client
         // Assemble base URL
         $this->base_url = $options['url'] . '/api/' . Client::API_VERSION . '/';
 
+        // Optional: override timeout
+        $timeout = 5;
+        if ( !empty( $options['timeout'] ) ) {
+            $timeout = intval($options['timeout']);
+        }
+
         // Execute constructor of base class
         parent::__construct([
             'base_uri' => $this->base_url,
-            'timeout'  => 5,
+            'timeout'  => $timeout,
         ]);
     }
 
