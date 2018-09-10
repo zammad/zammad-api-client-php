@@ -112,7 +112,7 @@ To create a new `Resource` object, use the following code (example):
 use ZammadAPIClient\ResourceType;
 
 $ticket = $client->resource( ResourceType::TICKET );
-$ticket-setValue( 'title', 'My new ticket' );
+$ticket->setValue( 'title', 'My new ticket' );
 // ...
 // Set additional values
 // ...
