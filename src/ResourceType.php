@@ -16,4 +16,5 @@ class ResourceType
     const TICKET_PRIORITY = '\\ZammadAPIClient\\Resource\\TicketPriority';
     const TICKET          = '\\ZammadAPIClient\\Resource\\Ticket';
     const TICKET_ARTICLE  = '\\ZammadAPIClient\\Resource\\TicketArticle';
+    const TAG             = '\\ZammadAPIClient\\Resource\\Tag';
 }

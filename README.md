@@ -72,14 +72,16 @@ Please note that the API client does not provide checks for nor does it know abo
 So, how can you know which fields are available? Just fetch an existing `Resource` object and have a look at the returned fields. A fresh Zammad system always contains an object with ID 1 for every resource type.
 
 Additionally you can have a look at the REST interface documentation of Zammad:
+
 [Introduction to the REST interface](https://github.com/zammad/zammad-documentation/blob/master/api-intro.rst)
-[Users](https://github.com/zammad/zammad-documentation/blob/master/api-user.rst)
-[Groups](https://github.com/zammad/zammad-documentation/blob/master/api-group.rst)
-[Organizations](https://github.com/zammad/zammad-documentation/blob/master/api-organization.rst)
-[Tickets](https://github.com/zammad/zammad-documentation/blob/master/api-ticket.rst)
-[Ticket articles](https://github.com/zammad/zammad-documentation/blob/master/api-ticket-article.rst)
-[Ticket priorities](https://github.com/zammad/zammad-documentation/blob/master/api-ticket-priority.rst)
-[Ticket states](https://github.com/zammad/zammad-documentation/blob/master/api-ticket-state.rst)
+* [Users](https://github.com/zammad/zammad-documentation/blob/master/api-user.rst)
+* [Groups](https://github.com/zammad/zammad-documentation/blob/master/api-group.rst)
+* [Organizations](https://github.com/zammad/zammad-documentation/blob/master/api-organization.rst)
+* [Tickets](https://github.com/zammad/zammad-documentation/blob/master/api-ticket.rst)
+* [Ticket articles](https://github.com/zammad/zammad-documentation/blob/master/api-ticket-article.rst)
+* [Ticket priorities](https://github.com/zammad/zammad-documentation/blob/master/api-ticket-priority.rst)
+* [Ticket states](https://github.com/zammad/zammad-documentation/blob/master/api-ticket-state.rst)
+* [Tags](https://github.com/zammad/zammad-documentation/blob/master/api-tags.rst)
 
 #### Fetching a ticket's articles
 If you already have a ticket object, you can easily fetch its articles:
@@ -198,6 +200,43 @@ $ticket->delete();
 
 This clears the object from all data and if possible deletes it in Zammad. The PHP object itself remains. You can reuse it for another `Resource` object or simply drop it.
 
+### Working with Tags
+
+#### Adding a Tag to a Ticket
+
+```php
+use ZammadAPIClient\ResourceType;
+
+$client->resource( ResourceType::TAG )->add($ticket_id, 'tag 1', 'Ticket');
+```
+
+#### Remove a Tag from a Ticket
+
+```php
+use ZammadAPIClient\ResourceType;
+
+$client->resource( ResourceType::TAG )->remove($ticket_id, 'tag 1', 'Ticket');
+```
+
+#### Getting all Tags from a Ticket
+
+```php
+use ZammadAPIClient\ResourceType;
+
+$tag = $client->resource( ResourceType::TAG )->get($ticket_id);
+
+// ['tag 1', 'tag 2']
+$tags = $tag->getValue('tags')
+```
+
+#### Search for Tags
+
+```php
+use ZammadAPIClient\ResourceType;
+
+$tags = $client->resource( ResourceType::TAG )->search('tag');
+```
+
 ### Handling Zammad errors
 When you access Zammad, you **always** will get a `Resource` object (or an array of such objects) in return, regardless if Zammad returned data or executed your request. In case of errors (e. g. that above ticket with ID 34 does not exist in Zammad), you will get a `Resource` object with a set error which can be checked with the following code:
 ```php
@@ -245,3 +284,7 @@ $client->resource( ResourceType::TICKET );
 | ORGANIZATION|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|
 | GROUP|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|
 | USER|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|
+
+|Resource type|get|add|search|remove|
+|-------------|:-:|:-:|:----:|:--:|:----:|
+| TAG|&#10004;|&#10004;|&#10004;|&#10004;|
