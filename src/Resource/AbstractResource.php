@@ -119,7 +119,7 @@ abstract class AbstractResource
      *
      * @return mixed            Value or null if not found. Null could also be the set value.
      */
-    public function getValue( $key )
+    public function getValue($key)
     {
         if ( array_key_exists( $key, $this->values ) ) {
             return $this->values[$key];
@@ -239,7 +239,7 @@ abstract class AbstractResource
      *
      * @param mixed $object_id      ID of object to fetch, false value or omit to fetch all objects.
      *
-     * @return object               This object
+     * @return object               This object.
      */
     public function get($object_id)
     {
@@ -280,8 +280,8 @@ abstract class AbstractResource
      * Fetches object data for all objects of this type.
      * Pagination available.
      *
-     * @param integer $page                 Page of objects, optional, if given, $objects_per_page must also be given
-     * @param integer $objects_per_page     Number of objects per page, optional, if given, $page must also be given
+     * @param integer $page                 Page of objects, optional, if given, $objects_per_page must also be given.
+     * @param integer $objects_per_page     Number of objects per page, optional, if given, $page must also be given.
      *
      * @return mixed                        Returns array of ZammadAPIClient\Resource\... objects
      *                                          or this object on failure.
@@ -343,8 +343,9 @@ abstract class AbstractResource
      * Fetches object data for given search term.
      * Pagination available.
      *
-     * @param integer $page                 Page of objects, optional, if given, $objects_per_page must also be given
-     * @param integer $objects_per_page     Number of objects per page, optional, if given, $page must also be given
+     * @param string  $search_term          Search term.
+     * @param integer $page                 Page of objects, optional, if given, $objects_per_page must also be given.
+     * @param integer $objects_per_page     Number of objects per page, optional, if given, $page must also be given.
      *
      * @return mixed                        Returns array of ZammadAPIClient\Resource\... objects
      *                                          or this object on failure.
@@ -393,7 +394,7 @@ abstract class AbstractResource
 
         // Return array of resource objects if no $object_id was given.
         // Note: the resource object (this object) used to execute get() will be left empty in this case.
-        $objects       = [];
+        $objects = [];
         foreach ( $response->getData() as $object_data ) {
             $object = $this->getClient()->resource( get_class($this) );
             $object->setRemoteData($object_data);
