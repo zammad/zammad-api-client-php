@@ -8,14 +8,7 @@ use ZammadAPIClient\ResourceType;
 
 class TagTest extends TestCase
 {
-    /**
-     * @var Client
-     */
     private static $client;
-
-    /**
-     * @var Ticket
-     */
     private static $ticket;
 
     protected $resource_type = ResourceType::TAG;
@@ -60,11 +53,9 @@ class TagTest extends TestCase
 
     public function testAdd()
     {
-        $tag = self::getUniqueID();
-
-        /* @var $object Tag */
-        $object = self::getClient()->resource( $this->resource_type );
-        $saved_object = $object->add(self::$ticket->getID(), $tag, 'Ticket');
+        $tag          = self::getUniqueID();
+        $object       = self::getClient()->resource( $this->resource_type );
+        $saved_object = $object->add( self::$ticket->getID(), $tag, 'Ticket' );
 
         $this->assertSame(
             $object,
@@ -87,10 +78,9 @@ class TagTest extends TestCase
     {
         $tag = self::getUniqueID();
 
-        /* @var $object Tag */
         $object = self::getClient()->resource( $this->resource_type )
-            ->add(self::$ticket->getID(), $tag, 'Ticket')
-            ->get(self::$ticket->getID());
+            ->add( self::$ticket->getID(), $tag, 'Ticket' )
+            ->get( self::$ticket->getID() );
 
         $this->assertInstanceOf(
             $this->resource_type,
@@ -109,9 +99,9 @@ class TagTest extends TestCase
     {
         $tag = self::getUniqueID();
 
-        self::getClient()->resource( $this->resource_type )->add(self::$ticket->getID(), $tag, 'Ticket');
+        self::getClient()->resource( $this->resource_type )->add( self::$ticket->getID(), $tag, 'Ticket' );
 
-        $objects = self::getClient()->resource( $this->resource_type )->search( $tag );
+        $objects = self::getClient()->resource( $this->resource_type )->search($tag);
 
         $this->assertCount(
             1,
@@ -126,8 +116,8 @@ class TagTest extends TestCase
 
         $deleted_object = self::getClient()
             ->resource( $this->resource_type )
-            ->add(self::$ticket->getID(), $tag, 'Ticket')
-            ->remove(self::$ticket->getID(), $tag, 'Ticket');
+            ->add( self::$ticket->getID(), $tag, 'Ticket' )
+            ->remove( self::$ticket->getID(), $tag, 'Ticket' );
 
         $this->assertInstanceOf(
             $this->resource_type,
@@ -135,10 +125,9 @@ class TagTest extends TestCase
         );
 
         $object = self::getClient()
-            ->resource($this->resource_type)
-            ->get(self::$ticket->getID(), 'Ticket');
+            ->resource( $this->resource_type )
+            ->get( self::$ticket->getID(), 'Ticket' );
 
-        /* @var $object Ticket */
         $this->assertCount(
             0,
             $object->getValue('tags'),
@@ -146,7 +135,7 @@ class TagTest extends TestCase
         );
     }
 
-    public static function createTicket()
+    private static function createTicket()
     {
         self::$ticket = self::getClient()->resource( ResourceType::TICKET );
         self::$ticket->setValues([
@@ -163,7 +152,7 @@ class TagTest extends TestCase
         self::$ticket->save();
     }
 
-    public static function deleteTicket()
+    private static function deleteTicket()
     {
         self::$ticket->delete();
     }

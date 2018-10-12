@@ -200,32 +200,37 @@ $ticket->delete();
 
 This clears the object from all data and if possible deletes it in Zammad. The PHP object itself remains. You can reuse it for another `Resource` object or simply drop it.
 
-### Working with Tags
+### Working with tags
 
-#### Adding a Tag to a Ticket
+#### Adding a tag to an object
+
+Zammad can assign tags to an object. Currently this is only supported for ticket objects.
 
 ```php
 use ZammadAPIClient\ResourceType;
 
-$client->resource( ResourceType::TAG )->add($ticket_id, 'tag 1', 'Ticket');
+// The third parameter 'Ticket' is the object type for which the ID will be given as first parameter.
+$client->resource( ResourceType::TAG )->add( $ticket_id, 'tag 1', 'Ticket' );
 ```
 
-#### Remove a Tag from a Ticket
+
+#### Remove a tag from an object
 
 ```php
 use ZammadAPIClient\ResourceType;
 
-$client->resource( ResourceType::TAG )->remove($ticket_id, 'tag 1', 'Ticket');
+$client->resource( ResourceType::TAG )->remove( $ticket_id, 'tag 1', 'Ticket' );
 ```
 
-#### Getting all Tags from a Ticket
+#### Getting all tags assigned to an object
 
 ```php
 use ZammadAPIClient\ResourceType;
 
-$tag = $client->resource( ResourceType::TAG )->get($ticket_id);
+// The second parameter 'Ticket' is the object type for which the ID will be given as first parameter.
+$tag = $client->resource( ResourceType::TAG )->get( $ticket_id, 'Ticket' );
 
-// ['tag 1', 'tag 2']
+// [ 'tag 1', 'tag 2' ]
 $tags = $tag->getValue('tags')
 ```
 
@@ -234,7 +239,7 @@ $tags = $tag->getValue('tags')
 ```php
 use ZammadAPIClient\ResourceType;
 
-$tags = $client->resource( ResourceType::TAG )->search('tag');
+$tags = $client->resource( ResourceType::TAG )->search('my tag');
 ```
 
 ### Handling Zammad errors
@@ -275,17 +280,13 @@ to your code. You then can reference the resource type like
 $client->resource( ResourceType::TICKET );
 ```
 
-|Resource type|get|all|search|save|delete|
-|-------------|:-:|:-:|:----:|:--:|:----:|
-| TICKET|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|
-| TICKET_ARTICLE|&#10004;|&ndash;|&#10004;|&#10004;|&#10004;|
-| TICKET_STATE|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|
-| TICKET_PRIORITY|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|
-| ORGANIZATION|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|
-| GROUP|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|
-| USER|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|
-
-
-|Resource type|get|add|search|remove|
-|-------------|:-:|:-:|:----:|:----:|
-| TAG|&#10004;|&#10004;|&#10004;|&#10004;|
+|Resource type|get|all|search|save|delete|add|remove|
+|-------------|:-:|:-:|:----:|:--:|:----:|:-:|:----:|
+| TICKET|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|&ndash;|
+| TICKET_ARTICLE|&#10004;|&ndash;|&#10004;|&#10004;|&#10004;|&ndash;|&ndash;|
+| TICKET_STATE|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|&ndash;|&ndash;|
+| TICKET_PRIORITY|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|&ndash;|&ndash;|
+| ORGANIZATION|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|&ndash;|
+| GROUP|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|&ndash;|&ndash;|
+| USER|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|&ndash;|
+| TAG|&#10004;|&ndash;|&#10004;|&ndash;|&ndash;|&#10004;|&#10004;|
