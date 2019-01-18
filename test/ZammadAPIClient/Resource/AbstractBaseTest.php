@@ -256,6 +256,9 @@ abstract class AbstractBaseTest extends TestCase
     public function testAll()
     {
         if ( !self::getClient()->resource( $this->resource_type )->can('all') ) {
+
+            // Skip test without warnings
+            $this->assertTrue(true);
             return;
         }
 
@@ -292,6 +295,9 @@ abstract class AbstractBaseTest extends TestCase
     public function testAllPagination()
     {
         if ( !self::getClient()->resource( $this->resource_type )->can('all') ) {
+
+            // Skip test without warnings
+            $this->assertTrue(true);
             return;
         }
 
@@ -339,6 +345,9 @@ abstract class AbstractBaseTest extends TestCase
     public function testSearch()
     {
         if ( !self::getClient()->resource( $this->resource_type )->can('search') ) {
+
+            // Skip test without warnings
+            $this->assertTrue(true);
             return;
         }
 
@@ -356,6 +365,9 @@ abstract class AbstractBaseTest extends TestCase
     public function testSearchPagination()
     {
         if ( !self::getClient()->resource( $this->resource_type )->can('search') ) {
+
+            // Skip test without warnings
+            $this->assertTrue(true);
             return;
         }
 
