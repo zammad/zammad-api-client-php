@@ -305,11 +305,15 @@ abstract class AbstractResource
             throw new \RuntimeException('Parameters page and objects_per_page must both be given');
         }
 
+        if ( !isset($page) || !isset($objects_per_page) ) {
+            return $this->allWithoutPagination();
+        }
+
         $url_parameters = [
             'expand' => true,
         ];
 
-        if ( !empty($page) && !empty($objects_per_page) ) {
+        if ( isset($page) && isset($objects_per_page) ) {
             $url_parameters['page']     = $page;
             $url_parameters['per_page'] = $objects_per_page;
         }
@@ -340,6 +344,38 @@ abstract class AbstractResource
     }
 
     /**
+     * Fetches object data for all objects of this type.
+     * This method will be used internally and automatically by all() to automate pagination
+     * to retrieve all available objects, ignoring the server side limit of fetchable objects.
+     *
+     * @return mixed                        Returns array of ZammadAPIClient\Resource\... objects
+     *                                          or this object on failure.
+     */
+    private function allWithoutPagination()
+    {
+        $page             = 1;
+        $objects_per_page = 100;
+        $objects          = [];
+        $objects_of_page  = [];
+
+        do {
+            $objects_of_page = $this->all( $page, $objects_per_page );
+            if ( !is_array($objects_of_page) ) {
+                return $this;
+            }
+
+            $objects = array_merge( $objects, $objects_of_page );
+
+            $is_last_page = count($objects_of_page) < $objects_per_page
+                || !count($objects_of_page);
+
+            $page++;
+        } while ( !$is_last_page );
+
+        return $objects;
+    }
+
+    /**
      * Fetches object data for given search term.
      * Pagination available.
      *
@@ -356,17 +392,21 @@ abstract class AbstractResource
             throw new AlreadyFetchedObjectException('Object already contains values, search() not possible, use a new object');
         }
 
-        if ( !empty($page) && $page <= 0 ) {
+        if ( isset($page) && $page <= 0 ) {
             throw new \RuntimeException('Parameter page must be a > 0');
         }
-        if ( !empty($objects_per_page) && $objects_per_page <= 0 ) {
+        if ( isset($objects_per_page) && $objects_per_page <= 0 ) {
             throw new \RuntimeException('Parameter objects_per_page must be a > 0');
         }
         if (
-            ( !empty($page) && empty($objects_per_page) )
-            || ( empty($page) && !empty($objects_per_page) )
+            ( isset($page) && !isset($objects_per_page) )
+            || ( !isset($page) && isset($objects_per_page) )
         ) {
             throw new \RuntimeException('Parameters page and objects_per_page must both be given');
+        }
+
+        if ( !isset($page) || !isset($objects_per_page) ) {
+            return $this->searchWithoutPagination($search_term);
         }
 
         $url_parameters = [
@@ -374,7 +414,7 @@ abstract class AbstractResource
             'query'  => $search_term,
         ];
 
-        if ( !empty($page) && !empty($objects_per_page) ) {
+        if ( isset($page) && isset($objects_per_page) ) {
             $url_parameters['page']     = $page;
             $url_parameters['per_page'] = $objects_per_page;
         }
@@ -400,6 +440,38 @@ abstract class AbstractResource
             $object->setRemoteData($object_data);
             $objects[] = $object;
         }
+
+        return $objects;
+    }
+
+    /**
+     * Fetches object data for searched objects of this type.
+     * This method will be used internally and automatically by search() to automate pagination
+     * to retrieve all available objects, ignoring the server side limit of fetchable objects.
+     *
+     * @return mixed                        Returns array of ZammadAPIClient\Resource\... objects
+     *                                          or this object on failure.
+     */
+    private function searchWithoutPagination($search_term)
+    {
+        $page             = 1;
+        $objects_per_page = 100;
+        $objects          = [];
+        $objects_of_page  = [];
+
+        do {
+            $objects_of_page = $this->search( $search_term, $page, $objects_per_page );
+            if ( !is_array($objects_of_page) ) {
+                return $this;
+            }
+
+            $objects = array_merge( $objects, $objects_of_page );
+
+            $is_last_page = count($objects_of_page) < $objects_per_page
+                || !count($objects_of_page);
+
+            $page++;
+        } while ( !$is_last_page );
 
         return $objects;
     }
