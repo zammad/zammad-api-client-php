@@ -414,7 +414,9 @@ abstract class AbstractBaseTest extends TestCase
 
             $this->assertFalse(
                 $deleted_object->hasError(),
-                'Error must not be set after deleting object.'
+                'Error must not be set after deleting object'
+                    . ($deleted_object->hasError() ? ' (is: ' . $deleted_object->getError() . ')' : '')
+                    . '.'
             );
 
             $fetched_object = self::getClient()->resource( $this->resource_type )->get($created_object_id);
