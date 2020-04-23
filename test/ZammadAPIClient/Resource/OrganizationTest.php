@@ -38,4 +38,56 @@ class OrganizationTest extends AbstractBaseTest
 
         return $configs;
     }
+
+    public function testImport()
+    {
+        $organizations_csv_string = $this->getTestFileContent('organizations_import.csv');
+
+        $object = self::getClient()->resource( $this->resource_type )
+            ->import($organizations_csv_string);
+
+        $this->assertInstanceOf(
+            $this->resource_type,
+            $object
+        );
+
+        $objects = self::getClient()->resource( $this->resource_type )->all();
+        $this->assertTrue(
+            is_array($objects) && count($objects),
+            'Requesting all organizations must return data.'
+        );
+
+        $changed_object_found = false;
+        $created_object_found = false;
+
+        foreach ($objects as $object) {
+            if (
+                $object->getID() == 1
+                && $object->getValue('name') == 'Zammad Foundation'
+                && $object->getValue('note') == 'ut1 note'
+            ) {
+                $changed_object_found = true;
+                continue;
+            }
+
+            if (
+                $object->getValue('name') == 'ut2 - Unit test 2'
+                && $object->getValue('note') == 'ut2 note'
+            ) {
+                $created_object_found = true;
+                continue;
+            }
+
+        }
+
+        $this->assertTrue(
+            $changed_object_found,
+            'Changed organization with ID 1 must be found and have correct values set.'
+        );
+
+        $this->assertTrue(
+            $created_object_found,
+            'Newly created organization must be found and have correct values set.'
+        );
+    }
 }

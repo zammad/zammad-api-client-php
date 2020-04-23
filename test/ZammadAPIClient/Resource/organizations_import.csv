@@ -1,0 +1,3 @@
+id,name,shared,domain,domain_assignment,active,note,members
+1,Zammad Foundation,true,"",false,true,"ut1 note",nicole.braun@zammad.org
+,ut2 - Unit test 2,true,"",false,true,"ut2 note",nicole.braun@zammad.org

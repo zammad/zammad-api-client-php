@@ -1,0 +1,3 @@
+id,login,firstname,lastname,email,web,phone,fax,mobile,department,street,zip,city,country,address,vip,verified,active,note,last_login,out_of_office,out_of_office_start_at,out_of_office_end_at,roles,organization
+2,nicole.braun@zammad.org,Nicole,Braun,nicole.braun@zammad.org,"","","","","ut1 - Unit test 1","","","","","",false,false,true,"",,false,,,Customer,Zammad Foundation
+,ut2user@example.com,Unit,Test 2,ut2user@example.com,"","","","","ut2 - Unit test 2","","","","","",false,false,true,"",,false,,,Customer,Zammad Foundation

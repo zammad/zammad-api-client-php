@@ -241,9 +241,9 @@ use ZammadAPIClient\ResourceType;
 
 $tags = $client->resource( ResourceType::TAG )->search('my tag');
 ```
-### Text module import
+### Object import
 
-Besides the usual methods available for text modules there is also a method available to import these via CSV:
+Besides the usual methods available for objects, there is also a method available to import these via CSV. Example for text module CSV import:
 
 ```php
 use ZammadAPIClient\ResourceType;
@@ -253,6 +253,8 @@ $text_modules_csv_string = file_get_contents('text_modules.csv');
 $client->resource( ResourceType::TEXT_MODULE )->import($text_modules_csv_string);
 
 ```
+
+See __Available resource types and their access methods__ below for resource types that support CSV import.
 
 ### Handling Zammad errors
 When you access Zammad, you **always** will get a `Resource` object (or an array of such objects) in return, regardless if Zammad returned data or executed your request. In case of errors (e. g. that above ticket with ID 34 does not exist in Zammad), you will get a `Resource` object with a set error which can be checked with the following code:
@@ -299,7 +301,7 @@ $client->resource( ResourceType::TICKET );
 | TICKET_STATE|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|&ndash;|&ndash;|&ndash;|
 | TICKET_PRIORITY|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|&ndash;|&ndash;|&ndash;|
 | TEXT_MODULE|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|&ndash;|&ndash;|&#10004;|
-| ORGANIZATION|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|&ndash;|&ndash;|
+| ORGANIZATION|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|&ndash;|&#10004;|
 | GROUP|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|&ndash;|&ndash;|&ndash;|
-| USER|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|&ndash;|&ndash;|
+| USER|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|&ndash;|&#10004;|
 | TAG|&#10004;|&ndash;|&#10004;|&ndash;|&ndash;|&#10004;|&#10004;|&ndash;|
