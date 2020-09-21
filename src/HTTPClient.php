@@ -7,6 +7,8 @@
 
 namespace ZammadAPIClient;
 
+use Psr\Http\Message\ResponseInterface;
+
 class HTTPClient extends \GuzzleHttp\Client
 {
     private $base_url;
@@ -124,7 +126,7 @@ class HTTPClient extends \GuzzleHttp\Client
     /**
      * Overrides base class request method to automatically add authentication options to request.
      */
-    public function request( $method, $uri = '', array $options = [] )
+    public function request(string $method, $uri = '', array $options = [] ): ResponseInterface
     {
         //
         // Add authentication options
