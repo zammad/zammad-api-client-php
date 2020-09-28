@@ -2,8 +2,8 @@
 
 This client can be used to access the API of the open source helpdesk [Zammad](http://www.zammad.org) via PHP.
 
-## API version support
-This client supports API version 1.0.
+## Zammad version support
+This client supports Zammad 3.4 and newer.
 
 ## Installation
 
@@ -270,7 +270,7 @@ $last_response = $client->getLastResponse();
 ```
 With this object, you can e. g. get the HTTP status code and the body of the last response.
 
-### Executing an API call on behalf of another user (since Zammad 2.4)
+### Executing an API call on behalf of another user
 If you want Zammad to execute an API call on behalf of another user than the one you used for authentication, use the following code before executing the API call(s):
 ```php
 $client->setOnBehalfOfUser('myuser');

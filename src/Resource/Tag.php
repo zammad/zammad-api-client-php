@@ -74,7 +74,7 @@ class Tag extends AbstractResource
             throw new \RuntimeException('Missing tag');
         }
 
-        $response = $this->getClient()->get(
+        $response = $this->getClient()->post(
             $this->getURL('add'),
             [
                 'object' => $object_type,
@@ -156,7 +156,7 @@ class Tag extends AbstractResource
         }
 
         // Delete object in Zammad.
-        $response = $this->getClient()->get(
+        $response = $this->getClient()->delete(
             $this->getURL('remove'),
             [
                 'object' => $object_type,
