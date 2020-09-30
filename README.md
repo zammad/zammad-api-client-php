@@ -14,7 +14,7 @@ Additionally, the API client needs PHP 7.2 or newer.
 ### Integration into your project
 Add the following to the "require" section of your project's composer.json file:
 ```json
-"zammad/zammad-api-client-php": "1.6.*"
+"zammad/zammad-api-client-php": "2.0.*"
 ```
 
 ### Installing the API client's dependencies
