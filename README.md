@@ -9,12 +9,12 @@ This client supports Zammad 3.4 and newer.
 
 ### Requirements
 The API client needs [composer](https://getcomposer.org/). For installation have a look at its [documentation](https://getcomposer.org/download/).
-Additionally, the API client needs PHP 5.6 or newer.
+Additionally, the API client needs PHP 7.2 or newer.
 
 ### Integration into your project
 Add the following to the "require" section of your project's composer.json file:
 ```json
-"zammad/zammad-api-client-php": "1.6.*"
+"zammad/zammad-api-client-php": "2.0.*"
 ```
 
 ### Installing the API client's dependencies
