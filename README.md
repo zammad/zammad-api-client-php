@@ -3,7 +3,7 @@
 This client can be used to access the API of the open source helpdesk [Zammad](http://www.zammad.org) via PHP.
 
 ## Zammad version support
-This client supports Zammad 3.4 and newer.
+This client supports Zammad 3.4.1 and newer.
 
 ## Installation
 
