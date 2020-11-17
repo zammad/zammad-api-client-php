@@ -73,15 +73,15 @@ So, how can you know which fields are available? Just fetch an existing `Resourc
 
 Additionally you can have a look at the REST interface documentation of Zammad:
 
-[Introduction to the REST interface](https://github.com/zammad/zammad-documentation/blob/master/api-intro.rst)
-* [Users](https://github.com/zammad/zammad-documentation/blob/master/api-user.rst)
-* [Groups](https://github.com/zammad/zammad-documentation/blob/master/api-group.rst)
-* [Organizations](https://github.com/zammad/zammad-documentation/blob/master/api-organization.rst)
-* [Tickets](https://github.com/zammad/zammad-documentation/blob/master/api-ticket.rst)
-* [Ticket articles](https://github.com/zammad/zammad-documentation/blob/master/api-ticket-article.rst)
-* [Ticket priorities](https://github.com/zammad/zammad-documentation/blob/master/api-ticket-priority.rst)
-* [Ticket states](https://github.com/zammad/zammad-documentation/blob/master/api-ticket-state.rst)
-* [Tags](https://github.com/zammad/zammad-documentation/blob/master/api-tags.rst)
+[Introduction to the REST interface](https://docs.zammad.org/en/latest/api/intro.html)
+* [Users](https://docs.zammad.org/en/latest/api/user.html)
+* [Groups](https://docs.zammad.org/en/latest/api/group.html)
+* [Organizations](https://docs.zammad.org/en/latest/api/organization.html)
+* [Tickets](https://docs.zammad.org/en/latest/api/ticket.html)
+   * [Ticket articles](https://docs.zammad.org/en/latest/api/ticket-article.html)
+   * [Ticket priorities](https://docs.zammad.org/en/latest/api/ticket-priority.html)
+   * [Ticket states](https://docs.zammad.org/en/latest/api/ticket-state.html)
+* [Tags](https://docs.zammad.org/en/latest/api/tags.html)
 
 #### Fetching a ticket's articles
 If you already have a ticket object, you can easily fetch its articles:
