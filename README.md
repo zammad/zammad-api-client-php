@@ -108,6 +108,8 @@ $ticket->save();
 if ( $ticket->isDirty() ) {...}
 ```
 
+Note: Some resource types don't support updating the values of certain fields. Please refer to the API documentation (see links above).
+
 ### Creating Resource objects
 To create a new `Resource` object, use the following code (example):
 ```php
