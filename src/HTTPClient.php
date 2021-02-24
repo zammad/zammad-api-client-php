@@ -93,7 +93,7 @@ class HTTPClient extends \GuzzleHttp\Client
             ];
         }
 
-        if ( $number_of_authentication_types_given != 1 ) {
+        if ( $number_of_authentication_types_given === 0 ) {
             throw new \RuntimeException('Missing authentication options: Either give username/password, http_token or oauth2_token');
         }
 
