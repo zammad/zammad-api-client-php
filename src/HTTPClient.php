@@ -114,12 +114,21 @@ class HTTPClient extends \GuzzleHttp\Client
         if ( array_key_exists( 'debug', $options ) ) {
             $debug = $options['debug'] ? true : false;
         }
+        
+        // Verify ssl
+        $verifySsl = true;
+        if (array_key_exists('verify', $options)) {
+            if(is_bool($options['verify']) || (is_string($options['verify']) && file_exists($options['verify']))) {
+                $verifySsl = $options['verify'];
+            }
+        }
 
         // Execute constructor of base class
         parent::__construct([
             'base_uri' => $this->base_url,
             'timeout'  => $timeout,
             'debug'    => $debug,
+            'verify'   => $verifySsl,
         ]);
     }
 
