@@ -118,7 +118,9 @@ class HTTPClient extends \GuzzleHttp\Client
         // Verify ssl
         $verifySsl = true;
         if (array_key_exists('verify', $options)) {
-            $verifySsl = $options['verify'] ? true : false;
+            if(is_bool($options['verify']) || (is_string($options['verify']) && file_exists($options['verify']))) {
+                $verifySsl = $options['verify'];
+            }
         }
 
         // Execute constructor of base class
