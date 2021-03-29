@@ -32,10 +32,14 @@ class HTTPClient extends \GuzzleHttp\Client
      *
      *                                              // Optional: timeout (in seconds) for requests, defaults to 5
      *                                              // 0: no timeout
-     *                                              timeout => 10,
+     *                                              'timeout' => 10,
      *
      *                                              // Optional: Enable debug output
-     *                                              debug => true,
+     *                                              'debug' => true,
+     *
+     *                                              // Optional: Enable SSL verification (defaults to true).
+     *                                              // You can also give a path to a CA bundle file.
+     *                                              'verifySsl' => true,
      *                                          ];
      *
      * @return Object                           HTTPClient object
@@ -114,13 +118,20 @@ class HTTPClient extends \GuzzleHttp\Client
         if ( array_key_exists( 'debug', $options ) ) {
             $debug = $options['debug'] ? true : false;
         }
-        
+
         // Verify ssl
         $verifySsl = true;
-        if (array_key_exists('verify', $options)) {
-            if(is_bool($options['verify']) || (is_string($options['verify']) && file_exists($options['verify']))) {
-                $verifySsl = $options['verify'];
-            }
+        if (
+            array_key_exists('verify', $options)
+            && (
+                is_bool($options['verify'])
+                || (
+                    is_string($options['verify'])
+                    && file_exists($options['verify'])
+                )
+            )
+        ) {
+            $verifySsl = $options['verify'];
         }
 
         // Execute constructor of base class
