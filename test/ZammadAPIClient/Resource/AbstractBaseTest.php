@@ -384,6 +384,9 @@ abstract class AbstractBaseTest extends TestCase
      */
     public function testDelete()
     {
+        # Avoid problems with background jobs writing referential data while records are being deleted.
+        sleep(5);
+
         foreach ( self::$created_objects as $created_object ) {
             $created_object_id = $created_object->getID();
             if ( empty( $created_object_id ) ) {
