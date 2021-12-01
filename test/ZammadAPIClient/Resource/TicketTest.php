@@ -85,7 +85,7 @@ class TicketTest extends AbstractBaseTest
                     //     'body'    => 'Unit test article 6... ' . $this->getUniqueID(),
                     // ],
                 ],
-                'expected_success' => true,
+                'expected_success' => 'no_articles',
             ],
         ];
 
@@ -191,11 +191,14 @@ class TicketTest extends AbstractBaseTest
             $articles,
             'Articles of ticket object must be returned as array.'
         );
-        $this->assertCount(
-            1,
-            $articles,
-            'Ticket object must have exactly one article.'
-        );
+
+        if($expected_success === true){
+          $this->assertCount(
+              1,
+              $articles,
+              'Ticket object must have exactly one article.'
+          );
+        }
 
         $article = array_shift($articles);
         foreach ( $values['article'] as $field => $expected_value ) {
