@@ -198,17 +198,17 @@ class TicketTest extends AbstractBaseTest
               $articles,
               'Ticket object must have exactly one article.'
           );
-        }
 
-        $article = array_shift($articles);
-        foreach ( $values['article'] as $field => $expected_value ) {
+          $article = array_shift($articles);
+          foreach ( $values['article'] as $field => $expected_value ) {
 
-            // Compare via value from getValue()
-            $this->assertEquals(
-                $expected_value,
-                $article->getValue($field),
-                "Value of article must match expected value (field $field)."
-            );
+              // Compare via value from getValue()
+              $this->assertEquals(
+                  $expected_value,
+                  $article->getValue($field),
+                  "Value of article must match expected value (field $field)."
+              );
+          }
         }
     }
 
