@@ -42,6 +42,21 @@ class TicketTest extends AbstractBaseTest
                 ],
                 'expected_success' => true,
             ],
+            // Missing required field 'body'.
+            [
+                'values' => [
+                    'group_id'    => 1,
+                    'priority_id' => 1,
+                    'state_id'    => 1,
+                    'title'       => 'Unit test ticket 2 ' . $this->getUniqueID(),
+                    'customer_id' => 1,
+                    'article'     => [
+                        'subject' => 'Unit test article 2 ' . $this->getUniqueID(),
+                        'body'    => '',
+                    ],
+                ],
+                'expected_success' => false,
+            ],
             // Missing required field 'group_id'.
             [
                 'values' => [
@@ -57,7 +72,7 @@ class TicketTest extends AbstractBaseTest
                 ],
                 'expected_success' => false,
             ],
-            // Missing article data.
+            // Allows to create a stub ticket without an article.
             [
                 'values' => [
                     'group_id'    => 1,
@@ -70,7 +85,7 @@ class TicketTest extends AbstractBaseTest
                     //     'body'    => 'Unit test article 6... ' . $this->getUniqueID(),
                     // ],
                 ],
-                'expected_success' => false,
+                'expected_success' => true,
             ],
         ];
 
