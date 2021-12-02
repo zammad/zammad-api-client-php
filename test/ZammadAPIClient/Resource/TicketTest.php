@@ -25,7 +25,8 @@ class TicketTest extends AbstractBaseTest
                         'body'    => 'Unit test article 1... ' . $this->getUniqueID(),
                     ],
                 ],
-                'expected_success' => true,
+                'expected_success'       => true,
+                'expected_article_count' => 1,
             ],
             // Another object with valid data.
             [
@@ -40,7 +41,8 @@ class TicketTest extends AbstractBaseTest
                         'body'    => 'Unit test article 2... ' . $this->getUniqueID(),
                     ],
                 ],
-                'expected_success' => true,
+                'expected_success'       => true,
+                'expected_article_count' => 1,
             ],
             // Missing required field 'body'.
             [
@@ -85,7 +87,8 @@ class TicketTest extends AbstractBaseTest
                     //     'body'    => 'Unit test article 6... ' . $this->getUniqueID(),
                     // ],
                 ],
-                'expected_success' => 'no_articles',
+                'expected_success'       => true,
+                'expected_article_count' => 0,
             ],
         ];
 
@@ -95,7 +98,7 @@ class TicketTest extends AbstractBaseTest
     /**
      * @dataProvider objectCreateProvider
      */
-    public function testCreate( $values, $expected_success )
+    public function testCreate( $values, $expected_success, $expected_article_count = 0 )
     {
         $object = self::getClient()->resource( $this->resource_type );
         $this->assertInstanceOf(
@@ -192,23 +195,25 @@ class TicketTest extends AbstractBaseTest
             'Articles of ticket object must be returned as array.'
         );
 
-        if($expected_success === true){
-          $this->assertCount(
-              1,
-              $articles,
-              'Ticket object must have exactly one article.'
-          );
+        $this->assertCount(
+            $expected_article_count,
+            $articles,
+            'Ticket object must have exactly one article.'
+        );
 
-          $article = array_shift($articles);
-          foreach ( $values['article'] as $field => $expected_value ) {
+        if (!$expected_article_count) {
+            return;
+        }
 
-              // Compare via value from getValue()
-              $this->assertEquals(
-                  $expected_value,
-                  $article->getValue($field),
-                  "Value of article must match expected value (field $field)."
-              );
-          }
+        $article = array_shift($articles);
+        foreach ( $values['article'] as $field => $expected_value ) {
+
+            // Compare via value from getValue()
+            $this->assertEquals(
+                $expected_value,
+                $article->getValue($field),
+                "Value of article must match expected value (field $field)."
+            );
         }
     }
 
