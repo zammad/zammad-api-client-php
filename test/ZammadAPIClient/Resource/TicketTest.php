@@ -198,7 +198,7 @@ class TicketTest extends AbstractBaseTest
         $this->assertCount(
             $expected_article_count,
             $articles,
-            'Ticket object must have exactly one article.'
+            'Ticket object must have exactly '.$expected_article_count.' article(s).'
         );
 
         if (!$expected_article_count) {
