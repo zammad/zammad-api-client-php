@@ -25,7 +25,8 @@ class TicketTest extends AbstractBaseTest
                         'body'    => 'Unit test article 1... ' . $this->getUniqueID(),
                     ],
                 ],
-                'expected_success' => true,
+                'expected_success'       => true,
+                'expected_article_count' => 1,
             ],
             // Another object with valid data.
             [
@@ -40,7 +41,23 @@ class TicketTest extends AbstractBaseTest
                         'body'    => 'Unit test article 2... ' . $this->getUniqueID(),
                     ],
                 ],
-                'expected_success' => true,
+                'expected_success'       => true,
+                'expected_article_count' => 1,
+            ],
+            // Missing required field 'body'.
+            [
+                'values' => [
+                    'group_id'    => 1,
+                    'priority_id' => 1,
+                    'state_id'    => 1,
+                    'title'       => 'Unit test ticket 2 ' . $this->getUniqueID(),
+                    'customer_id' => 1,
+                    'article'     => [
+                        'subject' => 'Unit test article 2 ' . $this->getUniqueID(),
+                        'body'    => '',
+                    ],
+                ],
+                'expected_success' => false,
             ],
             // Missing required field 'group_id'.
             [
@@ -57,7 +74,7 @@ class TicketTest extends AbstractBaseTest
                 ],
                 'expected_success' => false,
             ],
-            // Missing article data.
+            // Allows to create a stub ticket without an article.
             [
                 'values' => [
                     'group_id'    => 1,
@@ -70,7 +87,8 @@ class TicketTest extends AbstractBaseTest
                     //     'body'    => 'Unit test article 6... ' . $this->getUniqueID(),
                     // ],
                 ],
-                'expected_success' => false,
+                'expected_success'       => true,
+                'expected_article_count' => 0,
             ],
         ];
 
@@ -80,7 +98,7 @@ class TicketTest extends AbstractBaseTest
     /**
      * @dataProvider objectCreateProvider
      */
-    public function testCreate( $values, $expected_success )
+    public function testCreate( $values, $expected_success, $expected_article_count = 0 )
     {
         $object = self::getClient()->resource( $this->resource_type );
         $this->assertInstanceOf(
@@ -176,11 +194,16 @@ class TicketTest extends AbstractBaseTest
             $articles,
             'Articles of ticket object must be returned as array.'
         );
+
         $this->assertCount(
-            1,
+            $expected_article_count,
             $articles,
-            'Ticket object must have exactly one article.'
+            'Ticket object must have exactly '.$expected_article_count.' article(s).'
         );
+
+        if (!$expected_article_count) {
+            return;
+        }
 
         $article = array_shift($articles);
         foreach ( $values['article'] as $field => $expected_value ) {
