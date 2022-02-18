@@ -16,7 +16,10 @@ abstract class AbstractBaseTest extends TestCase
 
     public static function setUpBeforeClass()
     {
-        $client_config = [];
+        $client_config = [
+            # Set a high timeout for tests to work with slow CI.
+            'timeout' => 30,
+        ];
 
         $env_keys = [
             'url'      => 'ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL',
