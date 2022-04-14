@@ -308,3 +308,13 @@ $client->resource( ResourceType::TICKET );
 | GROUP|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|&ndash;|&ndash;|&ndash;|
 | USER|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|&ndash;|&#10004;|
 | TAG|&#10004;|&ndash;|&#10004;|&ndash;|&ndash;|&#10004;|&#10004;|&ndash;|
+
+## Publishing
+
+1. Add release to [CHANGELOG.md](CHANGELOG.md)
+2. Commit, tag and push.
+3. As a logged-in user, use the "update" button on the [packagist.org page of zammad-api-client-php](https://packagist.org/packages/zammad/zammad-api-client-php) to create the new version automatically from the git tag.
+
+## Contributing
+
+Bug reports and pull requests are welcome on [GitHub](https://github.com/zammad/zammad-api-client-php). This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
