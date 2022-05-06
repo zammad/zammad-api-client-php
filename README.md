@@ -43,7 +43,7 @@ $client = new Client([
     'password'      => 'mypassword',           // Password to use for authentication
     // 'timeout'       => 15,                  // Sets timeout for requests, defaults to 5 seconds, 0: no timeout
     // 'debug'         => true,                // Enables debug output
-    // 'verifySsl'     => true,                // Enabled SSL verification. You can also give a path to a CA bundle file. Default is true.
+    // 'verify'        => true,                // Enabled SSL verification. You can also give a path to a CA bundle file. Default is true.
 ]);
 ```
 Besides using a combination of `username` and `password`, you can alternatively give an `http_token` or an `oauth2_token`.

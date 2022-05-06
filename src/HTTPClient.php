@@ -39,7 +39,7 @@ class HTTPClient extends \GuzzleHttp\Client
      *
      *                                              // Optional: Enable SSL verification (defaults to true).
      *                                              // You can also give a path to a CA bundle file.
-     *                                              'verifySsl' => true,
+     *                                              'verify' => true,
      *                                          ];
      *
      * @return Object                           HTTPClient object
