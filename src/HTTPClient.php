@@ -9,7 +9,7 @@ namespace ZammadAPIClient;
 
 use Psr\Http\Message\ResponseInterface;
 
-class HTTPClient extends \GuzzleHttp\Client
+class HTTPClient extends \GuzzleHttp\Client implements HTTPClientInterface
 {
     private $base_url;
     private $authentication_options;

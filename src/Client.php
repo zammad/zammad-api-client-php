@@ -44,10 +44,10 @@ class Client
      *
      * @return Object                           Client object
      */
-    public function __construct( array $options = [] )
+    public function __construct( array $options = [], HTTPClientInterface $client = null)
     {
         $this->options     = $options;
-        $this->http_client = new HTTPClient($options);
+        $this->http_client = $client ?? new HTTPClient($options);
     }
 
     /**
