@@ -72,7 +72,7 @@ class Client
         $options['headers']['Content-Type'] = 'application/json; charset=utf-8';
 
         // Set "on behalf of user" header
-        if ( mb_strlen($this->on_behalf_of_user) ) {
+        if ( !empty($this->on_behalf_of_user) ) {
             $options['headers']['X-On-Behalf-Of'] = $this->on_behalf_of_user;
         }
 
