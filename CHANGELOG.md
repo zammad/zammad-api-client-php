@@ -1,4 +1,6 @@
-## [2.0.4] - 2022-??-??
+## [2.0.4] - 2022-07-29
+- Fixed [#49](https://github.com/zammad/zammad-api-client-php/issues/49) - "on_behalf_of_user" never gets initialized, which leads to conflicts.
+- Fixed [#47](https://github.com/zammad/zammad-api-client-php/issues/47) - Make Guzzles HTTP connect_timeout configurable or set a decent default.
 - Fixed [#46](https://github.com/zammad/zammad-api-client-php/issues/46) - Wrong documentation for SSL verification switch.
 
 ## [2.0.3] - 2022-04-14
