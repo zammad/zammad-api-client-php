@@ -1,0 +1,46 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  CI:
+    runs-on: ubuntu-20.04
+    container:
+      image: registry.zammad.com/docker/zammad-ci:stable
+      credentials:
+        username: ${{ secrets.ZAMMAD_DOCKER_REGISTRY_USERNAME }}
+        password: ${{ secrets.ZAMMAD_DOCKER_REGISTRY_PASSWORD }}
+    services:
+      postgresql:
+        image: registry.zammad.com/docker/zammad-postgresql:stable
+        credentials:
+          username: ${{ secrets.ZAMMAD_DOCKER_REGISTRY_USERNAME }}
+          password: ${{ secrets.ZAMMAD_DOCKER_REGISTRY_PASSWORD }}
+    env:
+      ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL: "http://localhost:3000"
+      ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_USERNAME: "admin@example.com"
+      ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_PASSWORD: "test"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up PHP
+        shell: bash
+        run: |
+          php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+          php composer-setup.php --install-dir=/usr/local/bin
+          ln -s /usr/local/bin/composer.phar /usr/local/bin/composer
+          composer install
+      - name: Set up Zammad
+        shell: bash
+        run: |
+          git clone https://github.com/zammad/zammad.git
+          cd zammad
+          source /etc/profile.d/rvm.sh # ensure RVM is loaded
+          bundle config set --local frozen 'true'
+          bundle config set --local path 'vendor'
+          bundle install -j $(nproc)
+          bundle exec ruby .gitlab/configure_environment.rb
+          source .gitlab/environment.env
+          RAILS_ENV=test bundle exec rake db:create
+          RAILS_ENV=test bundle exec rake zammad:ci:test:start zammad:setup:auto_wizard
+      - name: Run PHP API integration tests
+        shell: bash
+        run: |
+          vendor/bin/phpunit
