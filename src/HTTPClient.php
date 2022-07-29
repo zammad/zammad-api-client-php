@@ -136,10 +136,11 @@ class HTTPClient extends \GuzzleHttp\Client
 
         // Execute constructor of base class
         parent::__construct([
-            'base_uri' => $this->base_url,
-            'timeout'  => $timeout,
-            'debug'    => $debug,
-            'verify'   => $verifySsl,
+            'base_uri'         => $this->base_url,
+            'timeout'          => $timeout,
+            'connect_timeout'  => $timeout,
+            'debug'            => $debug,
+            'verify'           => $verifySsl,
         ]);
     }
 
