@@ -181,7 +181,10 @@ class HTTPClient extends \GuzzleHttp\Client
             $response = parent::request( $method, $uri, $options );
         }
         catch ( \GuzzleHttp\Exception\TransferException $e ) {
-            $response = $e->getResponse();
+            if (method_exists($e, 'hasResponse') && $e->hasResponse()) {
+                return $e->getResponse();
+            }
+            throw $e;
         }
 
         return $response;
