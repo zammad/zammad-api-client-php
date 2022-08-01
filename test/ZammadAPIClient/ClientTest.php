@@ -1,13 +1,13 @@
 <?php
 
-namespace ZammadAPIClient\Client;
+namespace ZammadAPIClient;
 
 use PHPUnit\Framework\TestCase;
 
 use ZammadAPIClient\Client;
 use GuzzleHttp\Exception\ConnectException;
 
-class ResponseTest extends TestCase
+class ClientTest extends TestCase
 {
     public function testNetworkError()
     {
