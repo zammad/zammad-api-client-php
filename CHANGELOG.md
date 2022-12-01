@@ -1,3 +1,6 @@
+## [2.1.0] - 2022-12-01
+- Added [#48](https://github.com/zammad/zammad-api-client-php/pull/48) - Allowing injection of custom client.
+
 ## [2.0.5] - 2022-09-02
 - Fixed [#42](https://github.com/zammad/zammad-api-client-php/issues/42) - Call to undefined method GuzzleHttp\Exception\ConnectException::getResponse().
 

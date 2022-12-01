@@ -42,6 +42,8 @@ class Client
      *                                              debug => true,
      *                                          ];
      *
+     * @param HTTPClientInterface $client       Optional, pass in custom HTTP client.
+     *
      * @return Object                           Client object
      */
     public function __construct( array $options = [], HTTPClientInterface $client = null)
