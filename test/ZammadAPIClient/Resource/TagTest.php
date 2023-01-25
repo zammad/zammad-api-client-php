@@ -13,7 +13,7 @@ class TagTest extends TestCase
 
     protected $resource_type = ResourceType::TAG;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $client_config = [];
 
@@ -34,13 +34,13 @@ class TagTest extends TestCase
         self::$client = new Client($client_config);
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         self::createTicket();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
         self::deleteTicket();

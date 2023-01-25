@@ -14,7 +14,7 @@ abstract class AbstractBaseTest extends TestCase
     protected $update_field;
     protected static $unique_id;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $client_config = [
             # Set a high timeout for tests to work with slow CI.
