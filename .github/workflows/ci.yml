@@ -1,5 +1,10 @@
 name: CI
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  schedule:
+    # Run every on Friday to ensure everything works as expected.
+    - cron:  '0 6 * * 5'
 jobs:
   CI:
     runs-on: ubuntu-latest
@@ -40,7 +45,7 @@ jobs:
       - name: Set up Zammad
         shell: bash
         run: |
-          git clone https://github.com/zammad/zammad.git
+          git clone --depth 1 https://github.com/zammad/zammad.git
           cd zammad
           source /etc/profile.d/rvm.sh # ensure RVM is loaded
           bundle config set --local frozen 'true'
