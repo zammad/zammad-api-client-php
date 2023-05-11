@@ -1,3 +1,6 @@
+## [2.2.0] - 2023-05-11
+- Switch to dual licensing under AGPL-3.0 or MIT licenses.
+
 ## [2.1.0] - 2022-12-01
 - Added [#48](https://github.com/zammad/zammad-api-client-php/pull/48) - Allowing injection of custom client.
 
