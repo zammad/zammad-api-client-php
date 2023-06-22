@@ -19,6 +19,8 @@ abstract class AbstractBaseTest extends TestCase
         $client_config = [
             # Set a high timeout for tests to work with slow CI.
             'timeout' => 30,
+            # TODO: configure via ENV?
+            'debug' => true,
         ];
 
         $env_keys = [
