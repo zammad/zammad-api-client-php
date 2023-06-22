@@ -187,6 +187,8 @@ class HTTPClient extends \GuzzleHttp\Client implements HTTPClientInterface
             throw $e;
         }
 
+        var_dump($response->getBody())
+
         return $response;
     }
 }
