@@ -19,6 +19,7 @@ abstract class AbstractBaseTest extends TestCase
         $client_config = [
             # Set a high timeout for tests to work with slow CI.
             'timeout' => 30,
+            'debug' => getenv('ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_DEBUG'),
         ];
 
         $env_keys = [
