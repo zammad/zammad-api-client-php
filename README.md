@@ -11,21 +11,10 @@ This client supports Zammad 3.4.1 and newer.
 The API client needs [composer](https://getcomposer.org/). For installation have a look at its [documentation](https://getcomposer.org/download/).
 Additionally, the API client needs PHP 7.2 or newer.
 
-### Integration into your project
-Add the following to the "require" section of your project's composer.json file:
-```json
-"zammad/zammad-api-client-php": "2.0.*"
-```
-
 ### Installing the API client's dependencies
-Fetch the API client's code and its dependencies by updating your project's dependencies with composer:
+:
 ```
-$ composer update
-```
-
-Once installed, you have to include the generated autoload.php into your project's code:
-```php
-require_once dirname(__DIR__).'/vendor/autoload.php';
+$ composer require zammad/zammad-api-client-php
 ```
 
 ## How to use the API client
@@ -47,7 +36,7 @@ $client = new Client([
 ]);
 ```
 Besides using a combination of `username` and `password`, you can alternatively give an `http_token` or an `oauth2_token`.
-**Important:** You have to activate API access in Zammad.
+**Important:** You have to activate API access in Zammad. Should be active by default.
 
 ### Fetching a single Resource object
 To fetch a `Resource` object by ID, e. g. a ticket with ID 34, use the `Client` object:
@@ -83,6 +72,7 @@ Additionally you can have a look at the REST interface documentation of Zammad:
    * [Ticket priorities](https://docs.zammad.org/en/latest/api/ticket-priority.html)
    * [Ticket states](https://docs.zammad.org/en/latest/api/ticket-state.html)
 * [Tags](https://docs.zammad.org/en/latest/api/tags.html)
+* [Linking Tickets](https://docs.zammad.org/en/latest/api/ticket/links.html)
 
 #### Fetching a ticket's articles
 If you already have a ticket object, you can easily fetch its articles:
@@ -244,6 +234,23 @@ use ZammadAPIClient\ResourceType;
 
 $tags = $client->resource( ResourceType::TAG )->search('my tag');
 ```
+### Linking Tickets
+
+#### Linking two Tickets
+
+Zammad can link two or more Ticket objects. Allowed Link Types are `normal`, `parent` or `child`.
+
+```php
+use ZammadAPIClient\ResourceType;
+
+// First parameter $sourceTicket is the Ticket that should be linked
+// Second parameter $targetTicket is the Ticket that $sourceTicket should be linked to
+// Third parameter is the LinkType the $sourceTicket will be linked to $targetTicket with.
+$client->resource( ResourceType::LINKS )->add( $sourceTicket, $targetTicket, 'normal' );
+```
+
+
+
 ### Object import
 
 Besides the usual methods available for objects, there is also a method available to import these via CSV. Example for text module CSV import:
