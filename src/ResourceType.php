@@ -18,4 +18,5 @@ class ResourceType
     const TICKET          = '\\ZammadAPIClient\\Resource\\Ticket';
     const TICKET_ARTICLE  = '\\ZammadAPIClient\\Resource\\TicketArticle';
     const TAG             = '\\ZammadAPIClient\\Resource\\Tag';
+    const LINKS           = '\\ZammadAPIClient\\Resource\\LINKS';
 }
