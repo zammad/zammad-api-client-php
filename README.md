@@ -315,6 +315,7 @@ $client->resource( ResourceType::TICKET );
 | GROUP|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|&ndash;|&ndash;|&ndash;|
 | USER|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|&ndash;|&#10004;|
 | TAG|&#10004;|&ndash;|&#10004;|&ndash;|&ndash;|&#10004;|&#10004;|&ndash;|
+|LINKS|&#10004;|&ndash;|&ndash;|&ndash;|&ndash;|&#10004;|&ndash;|&ndash;|
 
 ## Publishing
 
