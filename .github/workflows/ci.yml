@@ -17,8 +17,7 @@ jobs:
           POSTGRES_USER: zammad
           POSTGRES_PASSWORD: zammad
       redis:
-        # Use Redis 5 which is shipped in Debian 10.
-        image: redis:5
+        image: redis:7
     env:
       ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL: "http://localhost:3000"
       ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_USERNAME: "admin@example.com"
