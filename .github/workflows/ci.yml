@@ -1,6 +1,7 @@
 name: CI
 on:
   push:
+    branches: [master]
   pull_request:
   schedule:
     # Run every on Friday to ensure everything works as expected.
