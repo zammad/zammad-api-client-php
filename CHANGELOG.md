@@ -1,3 +1,6 @@
+## [2.2.1] - 2025-09-10
+- Improve handling of lowercase HTTP response headers.
+
 ## [2.2.0] - 2023-05-11
 - Switch to dual licensing under AGPL-3.0 or MIT licenses.
 
