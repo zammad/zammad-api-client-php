@@ -29,6 +29,8 @@ class Response
         $this->headers       = $headers;
 
         var_dump('response body decoding'); // Debug
+        var_dump($this->headers); // Debug
+        var_dump($this->headers['content-type']); // Debug
         var_dump($this->headers['Content-Type']); // Debug
         var_dump($this->headers['Content-Type'][0]); // Debug
         var_dump(json_decode( $this->body, true )); // Debug
