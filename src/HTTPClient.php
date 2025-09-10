@@ -198,6 +198,10 @@ class HTTPClient extends \GuzzleHttp\Client implements HTTPClientInterface
     {
         $body = parent::getBody();
 
+        var_dump('getBody called'); // Debug
+        var_dump('body steam check'); // Debug
+        var_dump($body instanceof StreamInterface); // Debug
+
         if ($body instanceof StreamInterface) {
             return $body->getContents();
         }
