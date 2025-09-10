@@ -513,7 +513,6 @@ abstract class AbstractResource
                 'expand' => true,
             ]
          );
-
         if ( $response->hasError() ) {
             $this->setError( $response->getError() );
             return $this;
