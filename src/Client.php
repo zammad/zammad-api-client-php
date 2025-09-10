@@ -84,14 +84,14 @@ class Client
             throw new \RuntimeException('Unable to create HTTP client request.');
         }
 
-        $response_body = $http_client_response->getBody();
-        $response_body_content = ($response_body instanceof StreamInterface) ? $response_body->getContents() : $response_body;
+        // $response_body = $http_client_response->getBody();
+        // $response_body_content = ($response_body instanceof StreamInterface) ? $response_body->getContents() : $response_body;
 
         // Turn HTTP client's response into our own.
         $response = new Response(
             $http_client_response->getStatusCode(),
             $http_client_response->getReasonPhrase(),
-            $response_body_content,
+            $http_client_response->getBody(),
             $http_client_response->getHeaders()
         );
 

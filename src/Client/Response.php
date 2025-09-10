@@ -30,8 +30,6 @@ class Response
 
         // Support case insensitve HTTP header names (Content-Type vs content-type)
         $lowercase_headers = array_change_key_case($this->headers, CASE_LOWER);
-        var_dump('content type header'); // Debug
-        var_dump($lowercase_headers); // Debug
 
         // Store decoded JSON data, if present
         if (
