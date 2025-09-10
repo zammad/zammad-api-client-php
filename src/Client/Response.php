@@ -28,6 +28,11 @@ class Response
         $this->body          = $body;
         $this->headers       = $headers;
 
+        var_dump('response body decoding'); // Debug
+        var_dump($this->headers['Content-Type']); // Debug
+        var_dump($this->headers['Content-Type'][0]); // Debug
+        var_dump(json_decode( $this->body, true )); // Debug
+
         // Store decoded JSON data, if present
         if (
             !empty( $this->headers['Content-Type'] )
