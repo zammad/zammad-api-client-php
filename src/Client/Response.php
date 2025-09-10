@@ -28,17 +28,13 @@ class Response
         $this->body          = $body;
         $this->headers       = $headers;
 
-        var_dump('response body decoding'); // Debug
-        var_dump($this->headers); // Debug
-        var_dump($this->headers['content-type']); // Debug
-        var_dump($this->headers['Content-Type']); // Debug
-        var_dump($this->headers['Content-Type'][0]); // Debug
-        var_dump(json_decode( $this->body, true )); // Debug
+        $content_type_header = $this->headers['Content-Type'] || $this->headers['content-type']
+        var_dump('content type header'); // Debug
 
         // Store decoded JSON data, if present
         if (
-            !empty( $this->headers['Content-Type'] )
-            && mb_strpos( $this->headers['Content-Type'][0], 'application/json;' ) !== false
+            !empty( $content_type_header )
+            && mb_strpos( $content_type_header[0], 'application/json;' ) !== false
         ) {
             $this->data = json_decode( $this->body, true );
 
