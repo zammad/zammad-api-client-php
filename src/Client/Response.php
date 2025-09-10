@@ -28,13 +28,15 @@ class Response
         $this->body          = $body;
         $this->headers       = $headers;
 
-        $content_type_header = $this->headers['Content-Type'] ? $this->headers['Content-Type'] : $this->headers['content-type'];
+        // Support case insensitve HTTP header names (Content-Type vs content-type)
+        $lowercase_headers = array_change_key_case($this->headers, CASE_LOWER);
         var_dump('content type header'); // Debug
+        var_dump($lowercase_headers); // Debug
 
         // Store decoded JSON data, if present
         if (
-            !empty( $content_type_header )
-            && mb_strpos( $content_type_header[0], 'application/json;' ) !== false
+            !empty( $this->headers['content-type'] )
+            && mb_strpos( $this->headers['content-type'][0], 'application/json;' ) !== false
         ) {
             $this->data = json_decode( $this->body, true );
 
