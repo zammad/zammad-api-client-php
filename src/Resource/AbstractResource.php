@@ -266,6 +266,7 @@ abstract class AbstractResource
         );
 
         # dump response body for debugging
+        var_dump($response); // Debug
         var_dump($response->getBody()); // Debug
 
         if ( $response->hasError() ) {
@@ -518,6 +519,7 @@ abstract class AbstractResource
          );
 
         # dump response body for debugging
+        var_dump($response); // Debug
         var_dump($response->getBody()); // Debug
 
         if ( $response->hasError() ) {
