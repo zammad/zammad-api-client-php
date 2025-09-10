@@ -85,7 +85,10 @@ class Client
         }
 
         $response_body = $http_client_response->getBody();
-        $response_body_content = $response_body instanceof StreamInterface ? $response_body->getContents() : $response_body;
+        $response_body_content = ($response_body instanceof StreamInterface) ? $response_body->getContents() : $response_body;
+
+        var_dump('response body content'); // Debug
+        var_dump($response_body_content); // Debug
 
         // Turn HTTP client's response into our own.
         $response = new Response(
