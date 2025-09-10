@@ -28,7 +28,7 @@ class Response
         $this->body          = $body;
         $this->headers       = $headers;
 
-        $content_type_header = $this->headers['Content-Type'] || $this->headers['content-type']
+        $content_type_header = $this->headers['Content-Type'] || $this->headers['content-type'];
         var_dump('content type header'); // Debug
 
         // Store decoded JSON data, if present
