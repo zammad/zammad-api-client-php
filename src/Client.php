@@ -8,7 +8,6 @@
 namespace ZammadAPIClient;
 
 use ZammadAPIClient\Client\Response;
-use Psr\Http\Message\StreamInterface;
 
 class Client
 {
@@ -83,9 +82,6 @@ class Client
         if ( !is_object($http_client_response) ) {
             throw new \RuntimeException('Unable to create HTTP client request.');
         }
-
-        // $response_body = $http_client_response->getBody();
-        // $response_body_content = ($response_body instanceof StreamInterface) ? $response_body->getContents() : $response_body;
 
         // Turn HTTP client's response into our own.
         $response = new Response(
