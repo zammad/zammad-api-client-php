@@ -81,4 +81,3 @@ class Response
         return !empty( $this->getError() );
     }
 }
-

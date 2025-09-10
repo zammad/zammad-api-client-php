@@ -85,12 +85,7 @@ class Client
         }
 
         $response_body = $http_client_response->getBody();
-        var_dump('body steam check'); // Debug
-        var_dump($response_body instanceof StreamInterface); // Debug
-
-        if ($response_body instanceof StreamInterface) {
-            $response_body = $response_body->getContents();
-        }
+        $response_body_content = $response_body instanceof StreamInterface ? $response_body->getContents() : $response_body;
 
         // Turn HTTP client's response into our own.
         $response = new Response(
