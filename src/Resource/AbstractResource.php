@@ -516,6 +516,10 @@ abstract class AbstractResource
                 'expand' => true,
             ]
          );
+
+        # dump response body for debugging
+        var_dump($response->getBody()); // Debug
+
         if ( $response->hasError() ) {
             $this->setError( $response->getError() );
             return $this;
