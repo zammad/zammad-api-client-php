@@ -8,6 +8,7 @@
 namespace ZammadAPIClient;
 
 use ZammadAPIClient\Client\Response;
+use Psr\Http\Message\StreamInterface;
 
 class Client
 {
