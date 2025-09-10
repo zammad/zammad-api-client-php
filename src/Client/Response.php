@@ -35,8 +35,8 @@ class Response
 
         // Store decoded JSON data, if present
         if (
-            !empty( $this->headers['content-type'] )
-            && mb_strpos( $this->headers['content-type'][0], 'application/json;' ) !== false
+            !empty( $lowercase_headers['content-type'] )
+            && mb_strpos( $lowercase_headers['content-type'][0], 'application/json;' ) !== false
         ) {
             $this->data = json_decode( $this->body, true );
 
