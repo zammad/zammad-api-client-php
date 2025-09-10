@@ -8,7 +8,6 @@
 namespace ZammadAPIClient;
 
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
 
 class HTTPClient extends \GuzzleHttp\Client implements HTTPClientInterface
 {
@@ -189,23 +188,5 @@ class HTTPClient extends \GuzzleHttp\Client implements HTTPClientInterface
         }
 
         return $response;
-    }
-
-    /**
-     * Override getBody method to handle Stream objects by returning their content.
-     */
-    public function getBody()
-    {
-        $body = parent::getBody();
-
-        var_dump('getBody called'); // Debug
-        var_dump('body steam check'); // Debug
-        var_dump($body instanceof StreamInterface); // Debug
-
-        if ($body instanceof StreamInterface) {
-            return $body->getContents();
-        }
-
-        return $body;
     }
 }
