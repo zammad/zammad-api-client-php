@@ -2,6 +2,7 @@
 
 namespace ZammadAPIClient\Resource;
 
+use ZammadAPIClient\Exception\AlreadyFetchedObjectException;
 use ZammadAPIClient\ResourceType;
 
 class TicketTest extends AbstractBaseTest
@@ -189,11 +190,7 @@ class TicketTest extends AbstractBaseTest
 
         // Compare article data.
         $articles = $object->getTicketArticles();
-        $this->assertInternalType(
-            'array',
-            $articles,
-            'Articles of ticket object must be returned as array.'
-        );
+        $this->assertIsArray($articles);
 
         $this->assertCount(
             $expected_article_count,
@@ -226,11 +223,12 @@ class TicketTest extends AbstractBaseTest
     }
 
     /**
-     * @expectedException \ZammadAPIClient\Exception\AlreadyFetchedObjectException
      * @depends testCreate
      */
     public function testGetOnFilledObjects()
     {
+        $this->expectException(AlreadyFetchedObjectException::class);
+
         return parent::testGetOnFilledObjects();
     }
 
@@ -259,11 +257,12 @@ class TicketTest extends AbstractBaseTest
     }
 
     /**
-     * @expectedException \ZammadAPIClient\Exception\AlreadyFetchedObjectException
      * @depends testCreate
      */
     public function testAllOnFilledObjects()
     {
+        $this->expectException(AlreadyFetchedObjectException::class);
+
         return parent::testAllOnFilledObjects();
     }
 
