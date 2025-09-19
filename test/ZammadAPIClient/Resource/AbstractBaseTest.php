@@ -5,6 +5,7 @@ namespace ZammadAPIClient\Resource;
 use PHPUnit\Framework\TestCase;
 
 use ZammadAPIClient\Client;
+use ZammadAPIClient\Exception\AlreadyFetchedObjectException;
 
 abstract class AbstractBaseTest extends TestCase
 {
@@ -190,11 +191,12 @@ abstract class AbstractBaseTest extends TestCase
     }
 
     /**
-     * @expectedException \ZammadAPIClient\Exception\AlreadyFetchedObjectException
      * @depends testCreate
      */
     public function testGetOnFilledObjects()
     {
+        $this->expectException(AlreadyFetchedObjectException::class);
+
         foreach ( self::$created_objects as $created_object ) {
             $created_object_id = $created_object->getID();
             if ( empty( $created_object_id) ) {
@@ -328,11 +330,12 @@ abstract class AbstractBaseTest extends TestCase
     }
 
     /**
-     * @expectedException \ZammadAPIClient\Exception\AlreadyFetchedObjectException
      * @depends testCreate
      */
     public function testAllOnFilledObjects()
     {
+        $this->expectException(AlreadyFetchedObjectException::class);
+
         foreach ( self::$created_objects as $created_object ) {
             $created_object_id = $created_object->getID();
             if ( empty( $created_object_id) ) {
