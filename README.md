@@ -79,7 +79,7 @@ Additionally you can have a look at the REST interface documentation of Zammad:
 * [Groups](https://docs.zammad.org/en/latest/api/group.html)
 * [Organizations](https://docs.zammad.org/en/latest/api/organization.html)
 * [Tickets](https://docs.zammad.org/en/latest/api/ticket.html)
-   * [Ticket articles](https://docs.zammad.org/en/latest/api/ticket-article.html)
+   * [Ticket articles](https://docs.zammad.org/en/latest/api/ticket/articles.html)
    * [Ticket priorities](https://docs.zammad.org/en/latest/api/ticket-priority.html)
    * [Ticket states](https://docs.zammad.org/en/latest/api/ticket-state.html)
 * [Tags](https://docs.zammad.org/en/latest/api/tags.html)
