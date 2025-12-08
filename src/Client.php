@@ -42,11 +42,11 @@ class Client
      *                                              debug => true,
      *                                          ];
      *
-     * @param ?HTTPClientInterface $client      Optional, pass in custom HTTP client.
+     * @param HTTPClientInterface $client       Optional, pass in custom HTTP client.
      *
      * @return Object                           Client object
      */
-    public function __construct( array $options = [], ?HTTPClientInterface $client = null)
+    public function __construct( array $options = [], HTTPClientInterface $client = null)
     {
         $this->options     = $options;
         $this->http_client = $client ?? new HTTPClient($options);
