@@ -5,13 +5,12 @@
 
 $zammad_api_client_config = [
     'url' => 'https://myzammad.example.com',
+    // with HTTP token:
+    'http_token' => '...',
 
-    // with username and password
-    'username' => 'master@example.com',
-    'password' => 'test',
-
-    // or with HTTP token:
-    // 'http_token' => '...',
+    // or with username and password
+    // 'username' => 'master@example.com',
+    // 'password' => 'test',
 
     // or with OAuth2 token:
     //'oauth2_token' => '...',
