@@ -1,3 +1,6 @@
+## [2.2.2] - 2026-04-27
+- Fix PHP deprecation warnings.
+
 ## [2.2.1] - 2025-09-10
 - Improve handling of lowercase HTTP response headers.
 
