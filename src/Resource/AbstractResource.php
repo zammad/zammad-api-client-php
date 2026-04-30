@@ -177,7 +177,8 @@ abstract class AbstractResource
      */
     public function getID()
     {
-        return $this->getValue('id');
+        $value = $this->getValue('id');
+        return $value === null ? null : (string) $value;
     }
 
     /**
