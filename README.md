@@ -11,10 +11,10 @@ This client supports Zammad 3.4.1 and newer.
 The API client needs [composer](https://getcomposer.org/). For installation have a look at its [documentation](https://getcomposer.org/download/).
 Additionally, the API client needs PHP 7.2 or newer.
 
-### Integration into your project
-Add the following to the "require" section of your project's composer.json file:
-```json
-"zammad/zammad-api-client-php": "^2.0"
+### Installing the API client's dependencies
+:
+```
+$ composer require zammad/zammad-api-client-php
 ```
 
 ## How to use the API client
@@ -68,7 +68,7 @@ Additionally you can have a look at the REST interface documentation of Zammad:
 * [Groups](https://docs.zammad.org/en/latest/api/group.html)
 * [Organizations](https://docs.zammad.org/en/latest/api/organization.html)
 * [Tickets](https://docs.zammad.org/en/latest/api/ticket.html)
-   * [Ticket articles](https://docs.zammad.org/en/latest/api/ticket/articles.html)
+   * [Ticket articles](https://docs.zammad.org/en/latest/api/ticket-article.html)
    * [Ticket priorities](https://docs.zammad.org/en/latest/api/ticket-priority.html)
    * [Ticket states](https://docs.zammad.org/en/latest/api/ticket-state.html)
 * [Tags](https://docs.zammad.org/en/latest/api/tags.html)
