@@ -165,12 +165,18 @@ class Client
      *
      * @return Response object
      */
-    public function delete( $url, array $url_parameters = [] )
+    public function delete( $url, array $url_parameters = [], array $data = [] )
     {
+        $options = [];
+        if ( !empty($data) ) {
+            $options['json'] = $data;
+        }
+
         $response = $this->request(
             'DELETE',
             $url,
-            $url_parameters
+            $url_parameters,
+            $options
         );
 
         return $response;
