@@ -101,8 +101,8 @@ class Link extends AbstractResource
      * Removes a link between two tickets.
      *
      * @param Ticket $source        Source ticket object.
-     * @param Ticket $target       Target ticket object.
-     * @param string $type         Link type (default: 'normal').
+     * @param Ticket $target        Target ticket object.
+     * @param string $type          Link type (default: 'normal').
      *
      * @return object               This object.
      */
@@ -124,7 +124,7 @@ class Link extends AbstractResource
             [
                 'link_type'                => $type,
                 'link_object_source'       => 'Ticket',
-                'link_object_source_value' => $source->getID(),
+                'link_object_source_value' => $source->getValue('number'),
                 'link_object_target'       => 'Ticket',
                 'link_object_target_value' => $target->getID()
             ]
