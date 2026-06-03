@@ -257,10 +257,8 @@ use ZammadAPIClient\ResourceType;
 // First parameter $sourceTicket is the Ticket that should be linked
 // Second parameter $targetTicket is the Ticket that $sourceTicket should be linked to
 // Third parameter is the LinkType the $sourceTicket will be linked to $targetTicket with.
-$client->resource( ResourceType::LINKS )->add( $sourceTicket, $targetTicket, 'normal' );
+$client->resource( ResourceType::LINK )->add( $sourceTicket, $targetTicket, 'normal' );
 ```
-
-
 
 ### Object import
 
@@ -326,6 +324,7 @@ $client->resource( ResourceType::TICKET );
 | GROUP|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|&ndash;|&ndash;|&ndash;|
 | USER|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|&ndash;|&#10004;|
 | TAG|&#10004;|&ndash;|&#10004;|&ndash;|&ndash;|&#10004;|&#10004;|&ndash;|
+| LINK|&#10004;|&ndash;|&ndash;|&ndash;|&ndash;|&#10004;|&#10004;|&ndash;|
 
 ## Publishing
 

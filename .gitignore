@@ -5,3 +5,4 @@
 /examples/test.php
 /test*.php
 *~
+.phpunit.result.cache
