@@ -119,12 +119,13 @@ class Link extends AbstractResource
             return $this;
         }
 
-        $response = $this->getClient()->post(
+        $response = $this->getClient()->delete(
             $this->getURL('remove'),
+            [],
             [
                 'link_type'                => $type,
                 'link_object_source'       => 'Ticket',
-                'link_object_source_value' => $source->getValue('number'),
+                'link_object_source_value' => $source->getID(),
                 'link_object_target'       => 'Ticket',
                 'link_object_target_value' => $target->getID()
             ]
