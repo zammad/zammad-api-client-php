@@ -119,7 +119,7 @@ class Link extends AbstractResource
             return $this;
         }
 
-        $response = $this->getClient()->delete(
+        $response = $this->getClient()->post(
             $this->getURL('remove'),
             [
                 'link_type'                => $type,
