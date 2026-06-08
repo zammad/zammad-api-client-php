@@ -166,7 +166,7 @@ class TicketArticleTest extends AbstractBaseTest
 
                     // Fetch attachment content
                     $content = $object->getAttachmentContent( $attachment['id'] );
-                    $this->assertEquals(
+                    $this->assertSame(
                         $expected_content,
                         $content,
                         "Content of file $filename must match expected one."
