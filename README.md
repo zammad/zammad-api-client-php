@@ -297,7 +297,7 @@ If you want Zammad to execute an API call on behalf of another user than the one
 ```php
 $client->setOnBehalfOfUser('myuser');
 ```
-Any API call after above code will use this setting. If you want to return to using the user you used for authentication, call:
+This sets the `From` HTTP header. Any API call after above code will use this setting. If you want to return to using the user you used for authentication, call:
 ```php
 $client->unsetOnBehalfOfUser();
 ```

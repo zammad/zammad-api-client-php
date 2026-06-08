@@ -73,9 +73,9 @@ class Client
         $options['headers']['Accept']       = 'application/json';
         $options['headers']['Content-Type'] = 'application/json; charset=utf-8';
 
-        // Set "on behalf of user" header
+        // Set "on behalf of user" header (X-On-Behalf-Of was deprecated in Zammad 6.5 in favor of From)
         if ( !empty($this->on_behalf_of_user) ) {
-            $options['headers']['X-On-Behalf-Of'] = $this->on_behalf_of_user;
+            $options['headers']['From'] = $this->on_behalf_of_user;
         }
 
         $http_client_response = $this->http_client->request( $method, $url, $options );
