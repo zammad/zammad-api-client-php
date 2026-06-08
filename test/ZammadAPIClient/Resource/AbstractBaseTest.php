@@ -5,10 +5,13 @@ namespace ZammadAPIClient\Resource;
 use PHPUnit\Framework\TestCase;
 
 use ZammadAPIClient\Client;
+use ZammadAPIClient\EnvConfigTrait;
 use ZammadAPIClient\Exception\AlreadyFetchedObjectException;
 
 abstract class AbstractBaseTest extends TestCase
 {
+    use EnvConfigTrait;
+
     private static $client;
     protected $resource_type;
     protected static $created_objects = [];
@@ -17,25 +20,10 @@ abstract class AbstractBaseTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        $client_config = [
-            # Set a high timeout for tests to work with slow CI.
+        $client_config = self::getZammadConfig([
             'timeout' => 30,
-            'debug' => getenv('ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_DEBUG'),
-        ];
-
-        $env_keys = [
-            'url'      => 'ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL',
-            'username' => 'ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_USERNAME',
-            'password' => 'ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_PASSWORD',
-        ];
-        foreach ( $env_keys as $config_key => $env_key ) {
-            $value = getenv($env_key);
-            if ( empty($value) ) {
-                throw new \RuntimeException("Missing environment variable $env_key");
-            }
-
-            $client_config[$config_key] = $value;
-        }
+            'debug'   => getenv('ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_DEBUG'),
+        ]);
 
         self::$client = new Client($client_config);
     }
