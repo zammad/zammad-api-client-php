@@ -21,6 +21,7 @@
         <env name="ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL" value="https://...." />
         <env name="ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_USERNAME" value="..." />
         <env name="ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_PASSWORD" value="..." />
+        <env name="ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_TIMEOUT" value="30" />
         -->
     </php>
 </phpunit>
