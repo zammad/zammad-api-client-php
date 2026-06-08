@@ -173,7 +173,7 @@ abstract class AbstractResource
      * Gets the ID of the object.
      * This is a convenience method for getValue('id')
      *
-     * @return string       ID of this object, if available.
+     * @return string|null       ID of this object as string, or null if not available.
      */
     public function getID()
     {
