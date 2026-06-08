@@ -117,6 +117,9 @@ class TicketArticle extends AbstractResource
         }
 
         $content = $response->getBody();
+        if ( $content instanceof \Psr\Http\Message\StreamInterface ) {
+            $content = $content->getContents();
+        }
         return $content;
     }
 }

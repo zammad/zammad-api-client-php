@@ -99,6 +99,8 @@ $attachment_content = $ticket_article->getAttachmentContent(23);
 
 In the above example 23 is the ID of the attachment. This ID can be found within the `attachments` array of the ticket article data. Usually you want to loop over this array to fetch the content of all attachments.
 
+`getAttachmentContent()` returns the attachment content as a string, ready to use.
+
 ### Updating Resource objects
 If you fetched a `Resource` object and changed some values, you have to send your changes to Zammad. You do this with a simple call:
 ```php
