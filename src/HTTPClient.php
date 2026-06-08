@@ -136,7 +136,7 @@ class HTTPClient extends \GuzzleHttp\Client implements HTTPClientInterface
 
         // Optional: pass additional Guzzle options (e.g. headers, curl options)
         $connection_options = [];
-        if (array_key_exists('connection_options', $options) && is_array($options['connection_options'])) {
+        if (is_array($options['connection_options'] ?? null)) {
             $connection_options = $options['connection_options'];
         }
 
