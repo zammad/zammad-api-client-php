@@ -1,3 +1,6 @@
+## [2.2.3] - 2026-06-08
+- Fixed [#64](https://github.com/zammad/zammad-api-client-php/issues/64) - Use `From` header instead of deprecated `X-On-Behalf-Of`.
+
 ## [2.2.2] - 2026-04-27
 - Fix PHP deprecation warnings.
 
