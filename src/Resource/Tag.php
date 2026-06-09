@@ -101,7 +101,7 @@ class Tag extends AbstractResource
      * @return mixed                        Returns array of ZammadAPIClient\Resource\... objects
      *                                          or this object on failure.
      */
-    public function search($search_term, $page = null, $objects_per_page = null)
+    public function search($search_term, $page = null, $objects_per_page = null, $sort_by = null, $order_by = null)
     {
         $this->clearError();
 
