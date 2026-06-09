@@ -383,6 +383,8 @@ abstract class AbstractResource
      * @param string  $search_term          Search term.
      * @param integer $page                 Page of objects, optional, if given, $objects_per_page must also be given.
      * @param integer $objects_per_page     Number of objects per page, optional, if given, $page must also be given.
+     * @param string  $sort_by              Sort by field name, optional (e.g. 'created_at', 'title', 'number').
+     * @param string  $order_by             Sort order, optional, must be 'asc' or 'desc'.
      *
      * @return mixed                        Returns array of ZammadAPIClient\Resource\... objects
      *                                          or this object on failure.
@@ -404,6 +406,10 @@ abstract class AbstractResource
             || ( !isset($page) && isset($objects_per_page) )
         ) {
             throw new \RuntimeException('Parameters page and objects_per_page must both be given');
+        }
+
+        if ( isset($order_by) && !in_array( mb_strtolower($order_by), [ 'asc', 'desc' ] ) ) {
+            throw new \RuntimeException('Parameter order_by must be "asc" or "desc"');
         }
 
         if ( !isset($page) || !isset($objects_per_page) ) {
@@ -456,6 +462,10 @@ abstract class AbstractResource
      * Fetches object data for searched objects of this type.
      * This method will be used internally and automatically by search() to automate pagination
      * to retrieve all available objects, ignoring the server side limit of fetchable objects.
+     *
+     * @param string $search_term          Search term.
+     * @param string $sort_by              Sort by field name, optional.
+     * @param string $order_by             Sort order, optional.
      *
      * @return mixed                        Returns array of ZammadAPIClient\Resource\... objects
      *                                          or this object on failure.
