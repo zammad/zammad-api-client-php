@@ -135,6 +135,168 @@ class TagTest extends TestCase
         );
     }
 
+    public function testAdminAll()
+    {
+        $tags = self::getClient()->resource( $this->resource_type )->all();
+
+        $this->assertIsArray(
+            $tags,
+            'all() must return an array.'
+        );
+
+        if ( count($tags) > 0 ) {
+            $tag = $tags[0];
+            $this->assertInstanceOf(
+                $this->resource_type,
+                $tag,
+                'Elements must be Tag instances.'
+            );
+            $this->assertNotNull(
+                $tag->getValue('id'),
+                'Tag must have an id field.'
+            );
+            $this->assertNotNull(
+                $tag->getValue('name'),
+                'Tag must have a name field.'
+            );
+        }
+    }
+
+    public function testAdminCreate()
+    {
+        $tag_name = self::getUniqueID();
+
+        $tag = self::getClient()->resource( $this->resource_type );
+        $tag->setValue('name', $tag_name);
+        $saved_tag = $tag->save();
+
+        $this->assertFalse(
+            $saved_tag->hasError(),
+            'Error must not be set after creating tag.'
+        );
+
+        $tags = self::getClient()->resource( $this->resource_type )->all();
+        $found = false;
+        foreach ( $tags as $t ) {
+            if ( $t->getValue('name') === $tag_name ) {
+                $found = true;
+                break;
+            }
+        }
+
+        $this->assertTrue(
+            $found,
+            'Created tag must appear in all().'
+        );
+    }
+
+    public function testAdminUpdate()
+    {
+        $tag_name = self::getUniqueID();
+
+        $tag = self::getClient()->resource( $this->resource_type );
+        $tag->setValue('name', $tag_name);
+        $tag->save();
+
+        $this->assertFalse(
+            $tag->hasError(),
+            'Error must not be set after creating tag for update.'
+        );
+
+        $tags = self::getClient()->resource( $this->resource_type )->all();
+        $found_tag = null;
+        foreach ( $tags as $t ) {
+            if ( $t->getValue('name') === $tag_name ) {
+                $found_tag = $t;
+                break;
+            }
+        }
+
+        $this->assertNotNull(
+            $found_tag,
+            'Created tag must be found in all().'
+        );
+
+        $new_name = $tag_name . '_updated';
+        $found_tag->setValue('name', $new_name);
+        $found_tag->save();
+
+        $this->assertFalse(
+            $found_tag->hasError(),
+            'Error must not be set after updating tag.'
+        );
+
+        $tags = self::getClient()->resource( $this->resource_type )->all();
+        $found_updated = false;
+        $found_old = false;
+        foreach ( $tags as $t ) {
+            if ( $t->getValue('name') === $new_name ) {
+                $found_updated = true;
+            }
+            if ( $t->getValue('name') === $tag_name ) {
+                $found_old = true;
+            }
+        }
+
+        $this->assertTrue(
+            $found_updated,
+            'Updated tag name must appear in all().'
+        );
+        $this->assertFalse(
+            $found_old,
+            'Old tag name must not appear in all().'
+        );
+    }
+
+    public function testAdminDelete()
+    {
+        $tag_name = self::getUniqueID();
+
+        $tag = self::getClient()->resource( $this->resource_type );
+        $tag->setValue('name', $tag_name);
+        $tag->save();
+
+        $this->assertFalse(
+            $tag->hasError(),
+            'Error must not be set after creating tag for delete.'
+        );
+
+        $tags = self::getClient()->resource( $this->resource_type )->all();
+        $found_tag = null;
+        foreach ( $tags as $t ) {
+            if ( $t->getValue('name') === $tag_name ) {
+                $found_tag = $t;
+                break;
+            }
+        }
+
+        $this->assertNotNull(
+            $found_tag,
+            'Created tag must be found in all() before delete.'
+        );
+
+        $found_tag->delete();
+
+        $this->assertFalse(
+            $found_tag->hasError(),
+            'Error must not be set after deleting tag.'
+        );
+
+        $tags = self::getClient()->resource( $this->resource_type )->all();
+        $found = false;
+        foreach ( $tags as $t ) {
+            if ( $t->getValue('name') === $tag_name ) {
+                $found = true;
+                break;
+            }
+        }
+
+        $this->assertFalse(
+            $found,
+            'Deleted tag must not appear in all().'
+        );
+    }
+
     private static function createTicket()
     {
         self::$ticket = self::getClient()->resource( ResourceType::TICKET );

@@ -83,7 +83,8 @@ Additionally you can have a look at the REST interface documentation of Zammad:
    * [Ticket priorities](https://docs.zammad.org/en/latest/api/ticket-priority.html)
    * [Ticket states](https://docs.zammad.org/en/latest/api/ticket-state.html)
 * [Tags](https://docs.zammad.org/en/latest/api/tags.html)
-* [Linking Tickets](https://docs.zammad.org/en/latest/api/ticket/links.html)
+ * [Tag list](https://docs.zammad.org/en/latest/api/ticket/tags.html#administration-scope)
+ * [Linking Tickets](https://docs.zammad.org/en/latest/api/ticket/links.html)
 
 #### Fetching a ticket's articles
 If you already have a ticket object, you can easily fetch its articles:
@@ -325,7 +326,7 @@ $client->resource( ResourceType::TICKET );
 | ORGANIZATION|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|&ndash;|&#10004;|
 | GROUP|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|&ndash;|&ndash;|&ndash;|
 | USER|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|&ndash;|&#10004;|
-| TAG|&#10004;|&ndash;|&#10004;|&ndash;|&ndash;|&#10004;|&#10004;|&ndash;|
+| TAG|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|
 | LINK|&#10004;|&ndash;|&ndash;|&ndash;|&ndash;|&#10004;|&#10004;|&ndash;|
 
 ## Publishing

@@ -13,7 +13,11 @@ class Tag extends AbstractResource
         'get'    => 'tags',
         'search' => 'tag_search?term={query}',
         'add'    => 'tags/add',
-        'remove' => 'tags/remove'
+        'remove' => 'tags/remove',
+        'all'    => 'tag_list',
+        'create' => 'tag_list',
+        'update' => 'tag_list/{object_id}',
+        'delete' => 'tag_list/{object_id}',
     ];
 
     /**
