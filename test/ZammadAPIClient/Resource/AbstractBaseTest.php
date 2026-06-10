@@ -20,9 +20,12 @@ abstract class AbstractBaseTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
+        $client_timeout = getenv('ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_TIMEOUT');
+
         $client_config = self::getZammadConfig([
-            'timeout' => 30,
-            'debug'   => getenv('ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_DEBUG'),
+            'timeout'            => !empty($client_timeout) ? $client_timeout : 30,
+            'debug'              => getenv('ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_DEBUG'),
+            'connection_options' => ['headers' => ['Connection' => 'close']],
         ]);
 
         self::$client = new Client($client_config);

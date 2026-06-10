@@ -329,6 +329,7 @@ $client->resource( ResourceType::TICKET );
 | TAG|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|
 | LINK|&#10004;|&ndash;|&ndash;|&ndash;|&ndash;|&#10004;|&#10004;|&ndash;|
 
+
 ## Publishing
 
 1. Add release to [CHANGELOG.md](CHANGELOG.md)
@@ -338,3 +339,24 @@ $client->resource( ResourceType::TICKET );
 ## Contributing
 
 Bug reports and pull requests are welcome on [GitHub](https://github.com/zammad/zammad-api-client-php). This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+
+### Running tests
+
+Tests require a running Zammad instance with API access enabled. Set the following environment variables:
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL` | Yes | — | URL to Zammad (e.g. `http://localhost:3000/`) |
+| `ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_USERNAME` | Yes | — | Username for authentication |
+| `ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_PASSWORD` | Yes | — | Password for authentication |
+| `ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_TIMEOUT` | No | `30` | Request timeout in seconds |
+
+**Note:** Only username/password authentication is supported for tests.
+
+```bash
+ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL="http://localhost:3000/" \
+ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_USERNAME="admin@example.com" \
+ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_PASSWORD="test" \
+ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_TIMEOUT=120 \
+vendor/bin/phpunit
+```

@@ -134,14 +134,22 @@ class HTTPClient extends \GuzzleHttp\Client implements HTTPClientInterface
             $verifySsl = $options['verify'];
         }
 
+        // Optional: pass additional Guzzle options (e.g. headers, curl options)
+        $connection_options = [];
+        if (is_array($options['connection_options'] ?? null)) {
+            $connection_options = $options['connection_options'];
+        }
+
         // Execute constructor of base class
-        parent::__construct([
-            'base_uri'         => $this->base_url,
-            'timeout'          => $timeout,
-            'connect_timeout'  => $timeout,
-            'debug'            => $debug,
-            'verify'           => $verifySsl,
-        ]);
+        parent::__construct(
+            [
+                'base_uri'         => $this->base_url,
+                'timeout'          => $timeout,
+                'connect_timeout'  => $timeout,
+                'debug'            => $debug,
+                'verify'           => $verifySsl,
+            ] + $connection_options
+        );
     }
 
     /**
