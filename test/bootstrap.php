@@ -4,7 +4,6 @@ declare(strict_types=1);
 $composerAutoloadFiles = [
     __DIR__ . '/../vendor/autoload.php',
     __DIR__ . '/../../../autoload.php',
-    __DIR__ . '/../../../.composer/autoload.php',
 ];
 
 foreach ($composerAutoloadFiles as $autoloadFile) {
