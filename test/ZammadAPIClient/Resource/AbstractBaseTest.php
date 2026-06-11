@@ -1,14 +1,17 @@
 <?php
+declare(strict_types=1);
 
 namespace ZammadAPIClient\Resource;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 use ZammadAPIClient\Client;
 use ZammadAPIClient\EnvConfigTrait;
 use ZammadAPIClient\Exception\AlreadyFetchedObjectException;
 
-abstract class AbstractBaseTest extends TestCase
+abstract #[Group('integration')]
+class AbstractBaseTest extends TestCase
 {
     use EnvConfigTrait;
 

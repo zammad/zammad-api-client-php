@@ -1,10 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace ZammadAPIClient\Resource;
 
+use PHPUnit\Framework\Attributes\Group;
 use ZammadAPIClient\Exception\AlreadyFetchedObjectException;
 use ZammadAPIClient\ResourceType;
 
+#[Group('integration')]
 class TicketTest extends AbstractBaseTest
 {
     protected $resource_type = ResourceType::TICKET;

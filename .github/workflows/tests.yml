@@ -1,0 +1,62 @@
+name: Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  unit:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run PHPCS
+        run: vendor/bin/phpcs --standard=PSR12 src/
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse src/ --configuration phpstan.neon.dist
+
+      - name: Run PHPUnit unit suite
+        run: vendor/bin/phpunit --testsuite unit
+
+  testcontainers:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged
+        ports:
+          - 2375:2375
+    env:
+      DOCKER_HOST: tcp://127.0.0.1:2375
+      DOCKER_TLS_CERTDIR: ''
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Verify Docker daemon
+        run: docker info
+
+      - name: Run PHPUnit integration suite
+        run: vendor/bin/phpunit --no-configuration --bootstrap test/bootstrap.php test/ZammadAPIClient/Resource

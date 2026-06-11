@@ -1,15 +1,12 @@
 <?php
 
-/**
- * @package Zammad API Client
- * @author  Jens Pfeifer <jens.pfeifer@znuny.com>
- */
+declare(strict_types=1);
 
 namespace ZammadAPIClient\Resource;
 
 class Group extends AbstractResource
 {
-    const URLS = [
+    public const URLS = [
         'get'    => 'groups/{object_id}',
         'all'    => 'groups',
         'create' => 'groups',

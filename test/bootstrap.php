@@ -1,22 +1,58 @@
 <?php
+declare(strict_types=1);
 
-function IncludeIfExists($File)
-{
-    if ( file_exists($File) ) {
-        return include $File;
+$composerAutoloadFiles = [
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../../autoload.php',
+    __DIR__ . '/../../../.composer/autoload.php',
+];
+
+foreach ($composerAutoloadFiles as $autoloadFile) {
+    if (!is_file($autoloadFile)) {
+        continue;
+    }
+
+    $loader = require $autoloadFile;
+    $loader->add('ZammadAPIClient', __DIR__);
+
+    return $loader;
+}
+
+$systemAutoloadFiles = [
+    '/usr/share/php/GuzzleHttp/autoload.php',
+    '/usr/share/php/Mockery/autoload.php',
+    '/usr/share/php/Psr/Http/Client/autoload.php',
+    '/usr/share/php/Psr/Http/Message/autoload.php',
+    '/usr/share/php/Psr/Log/autoload.php',
+];
+
+foreach ($systemAutoloadFiles as $autoloadFile) {
+    if (is_file($autoloadFile)) {
+        require_once $autoloadFile;
     }
 }
 
-if (
-    ( !$Loader = IncludeIfExists( __DIR__.'/../vendor/autoload.php' ) )
-    && ( !$Loader = IncludeIfExists( __DIR__.'/../../../.composer/autoload.php' ) )
-) {
-    die(
-        'You must set up the project dependencies, run the following commands:' . PHP_EOL
-        . 'curl -s http://getcomposer.org/installer | php' . PHP_EOL
-        . 'php composer.phar install' . PHP_EOL
-    );
-}
+spl_autoload_register(static function (string $class): void {
+    if (!str_starts_with($class, 'ZammadAPIClient\\')) {
+        return;
+    }
 
-$Loader->add( 'ZammadAPIClient', __DIR__ );
-return $Loader;
+    $relativeClass = str_replace('\\', '/', substr($class, strlen('ZammadAPIClient\\')));
+    $relativePath = $relativeClass . '.php';
+    $candidateFiles = [
+        __DIR__ . '/../src/' . $relativePath,
+        __DIR__ . '/ZammadAPIClient/' . $relativePath,
+    ];
+
+    foreach ($candidateFiles as $candidateFile) {
+        if (!is_file($candidateFile)) {
+            continue;
+        }
+
+        require_once $candidateFile;
+
+        return;
+    }
+});
+
+return true;

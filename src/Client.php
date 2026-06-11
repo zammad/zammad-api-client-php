@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @package Zammad API Client
- * @author  Jens Pfeifer <jens.pfeifer@znuny.com>
- */
+declare(strict_types=1);
 
 namespace ZammadAPIClient;
 
@@ -11,7 +8,7 @@ use ZammadAPIClient\Client\Response;
 
 class Client
 {
-    const API_VERSION = 'v1';
+    public const API_VERSION = 'v1';
 
     private $http_client;
     private $last_response;
@@ -46,10 +43,24 @@ class Client
      *
      * @return Object                           Client object
      */
-    public function __construct( array $options = [], ?HTTPClientInterface $client = null)
+    public function __construct(array $options = [], ?HTTPClientInterface $client = null)
     {
-        $this->options     = $options;
-        $this->http_client = $client ?? new HTTPClient($options);
+        $this->options = $options;
+
+        if ($client !== null) {
+            $this->http_client = $client;
+
+            return;
+        }
+
+        if (!class_exists(\GuzzleHttp\Client::class)) {
+            throw new \RuntimeException(
+                'No default HTTP client is available. '
+                . 'Install guzzlehttp/guzzle or pass a custom HTTPClientInterface implementation.'
+            );
+        }
+
+        $this->http_client = new HTTPClient($options);
     }
 
     /**
@@ -61,12 +72,12 @@ class Client
      *
      * @return Response object
      */
-    private function request ( $method, $url, array $url_parameters = [], array $options = [] )
+    private function request($method, $url, array $url_parameters = [], array $options = [])
     {
         $method = mb_strtoupper($method);
 
         if (!empty($url_parameters)) {
-          $options['query'] = $url_parameters;
+            $options['query'] = $url_parameters;
         }
 
         // Set JSON headers
@@ -74,12 +85,12 @@ class Client
         $options['headers']['Content-Type'] = 'application/json; charset=utf-8';
 
         // Set "on behalf of user" header (X-On-Behalf-Of was deprecated in Zammad 6.5 in favor of From)
-        if ( !empty($this->on_behalf_of_user) ) {
+        if (!empty($this->on_behalf_of_user)) {
             $options['headers']['From'] = $this->on_behalf_of_user;
         }
 
-        $http_client_response = $this->http_client->request( $method, $url, $options );
-        if ( !is_object($http_client_response) ) {
+        $http_client_response = $this->http_client->request($method, $url, $options);
+        if (!is_object($http_client_response)) {
             throw new \RuntimeException('Unable to create HTTP client request.');
         }
 
@@ -104,7 +115,7 @@ class Client
      *
      * @return Response object
      */
-    public function get( $url, array $url_parameters = [] )
+    public function get($url, array $url_parameters = [])
     {
         $response = $this->request(
             'GET',
@@ -124,7 +135,7 @@ class Client
      *
      * @return Response object
      */
-    public function post( $url, array $data = [], array $url_parameters = [] )
+    public function post($url, array $data = [], array $url_parameters = [])
     {
         $response = $this->request(
             'POST',
@@ -145,7 +156,7 @@ class Client
      *
      * @return Response object
      */
-    public function put( $url, array $data = [], array $url_parameters = [] )
+    public function put($url, array $data = [], array $url_parameters = [])
     {
         $response = $this->request(
             'PUT',
@@ -165,10 +176,10 @@ class Client
      *
      * @return Response object
      */
-    public function delete( $url, array $url_parameters = [], array $data = [] )
+    public function delete($url, array $url_parameters = [], array $data = [])
     {
         $options = [];
-        if ( !empty($data) ) {
+        if (!empty($data)) {
             $options['json'] = $data;
         }
 
@@ -220,7 +231,7 @@ class Client
      *
      * @param Object $response              Response object to store.
      */
-    private function setLastResponse( Response $response )
+    private function setLastResponse(Response $response)
     {
         $this->last_response = $response;
     }

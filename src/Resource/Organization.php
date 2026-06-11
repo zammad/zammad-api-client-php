@@ -1,15 +1,12 @@
 <?php
 
-/**
- * @package Zammad API Client
- * @author  Jens Pfeifer <jens.pfeifer@znuny.com>
- */
+declare(strict_types=1);
 
 namespace ZammadAPIClient\Resource;
 
 class Organization extends AbstractResource
 {
-    const URLS = [
+    public const URLS = [
         'get'    => 'organizations/{object_id}',
         'all'    => 'organizations',
         'create' => 'organizations',
@@ -37,12 +34,11 @@ class Organization extends AbstractResource
             ]
         );
 
-        if ( $response->hasError() ) {
-            $this->setError( $response->getError() );
-        }
-        else {
+        if ($response->hasError()) {
+            $this->setError($response->getError());
+        } else {
             $this->clearError();
-            $this->setRemoteData( $response->getData() );
+            $this->setRemoteData($response->getData());
         }
 
         return $this;

@@ -1,9 +1,12 @@
 <?php
+declare(strict_types=1);
 
 namespace ZammadAPIClient\Resource;
 
+use PHPUnit\Framework\Attributes\Group;
 use ZammadAPIClient\ResourceType;
 
+#[Group('integration')]
 class TextModuleTest extends AbstractBaseTest
 {
     protected $resource_type = ResourceType::TEXT_MODULE;

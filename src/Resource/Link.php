@@ -1,21 +1,18 @@
 <?php
 
-/**
- * @package Zammad API Client
- * @author  Fran Rey <franreycastedo@gmail.com>
- */
+declare(strict_types=1);
 
 namespace ZammadAPIClient\Resource;
 
 class Link extends AbstractResource
 {
-    const URLS = [
+    public const URLS = [
         'get'    => 'links',
         'add'    => 'links/add',
         'remove' => 'links/remove'
     ];
 
-    const LINKTYPES = [
+    public const LINKTYPES = [
         'normal',
         'parent',
         'child'
@@ -34,7 +31,7 @@ class Link extends AbstractResource
         $this->clearError();
 
         $object_id = intval($object_id);
-        if ( empty($object_id) ) {
+        if (empty($object_id)) {
             throw new \RuntimeException('Missing object ID');
         }
 
@@ -46,12 +43,11 @@ class Link extends AbstractResource
             ]
         );
 
-        if ( $response->hasError() ) {
-            $this->setError( $response->getError() );
-        }
-        else {
+        if ($response->hasError()) {
+            $this->setError($response->getError());
+        } else {
             $this->clearError();
-            $this->setRemoteData( $response->getData() );
+            $this->setRemoteData($response->getData());
         }
 
         return $this;
@@ -70,11 +66,11 @@ class Link extends AbstractResource
     {
         $this->clearError();
 
-        if ( empty($source->getID()) || empty($target->getID()) ) {
+        if (empty($source->getID()) || empty($target->getID())) {
             $this->setError('Tickets not valid.');
             return $this;
         }
-        if ( !in_array($type, self::LINKTYPES, true) ) {
+        if (!in_array($type, self::LINKTYPES, true)) {
             $this->setError('Linktype is not supported.');
             return $this;
         }
@@ -90,8 +86,8 @@ class Link extends AbstractResource
             ]
         );
 
-        if ( $response->hasError() ) {
-            $this->setError( $response->getError() );
+        if ($response->hasError()) {
+            $this->setError($response->getError());
         }
 
         return $this;
@@ -110,11 +106,11 @@ class Link extends AbstractResource
     {
         $this->clearError();
 
-        if ( empty($source->getID()) || empty($target->getID()) ) {
+        if (empty($source->getID()) || empty($target->getID())) {
             $this->setError('Tickets not valid.');
             return $this;
         }
-        if ( !in_array($type, self::LINKTYPES, true) ) {
+        if (!in_array($type, self::LINKTYPES, true)) {
             $this->setError('Linktype is not supported.');
             return $this;
         }
@@ -131,8 +127,8 @@ class Link extends AbstractResource
             ]
         );
 
-        if ( $response->hasError() ) {
-            $this->setError( $response->getError() );
+        if ($response->hasError()) {
+            $this->setError($response->getError());
             return $this;
         }
 

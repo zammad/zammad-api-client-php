@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * Example for Tag administration scope.

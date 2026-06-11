@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @package Zammad API Client
- * @author  Jens Pfeifer <jens.pfeifer@znuny.com>
- */
+declare(strict_types=1);
 
 namespace ZammadAPIClient;
 
@@ -44,32 +41,31 @@ class HTTPClient extends \GuzzleHttp\Client implements HTTPClientInterface
      *
      * @return Object                           HTTPClient object
      */
-    public function __construct( array $options = [] )
+    public function __construct(array $options = [])
     {
         //
         // Check options
         //
 
         // URL
-        if ( empty( $options['url'] ) ) {
+        if (empty($options['url'])) {
             throw new \RuntimeException('Missing option "url"');
         }
-        $url_components = parse_url( $options['url'] );
+        $url_components = parse_url($options['url']);
         if (
             $url_components === false
-            || empty( $url_components['scheme'] )
-            || empty( $url_components['host'] )
+            || empty($url_components['scheme'])
+            || empty($url_components['host'])
         ) {
             throw new \RuntimeException('Invalid URL');
         }
 
         // Authentication
         $number_of_authentication_types_given = 0;
-        if ( !empty( $options['username'] ) || !empty( $options['password'] ) ) {
-            if ( empty( $options['username'] ) ) {
+        if (!empty($options['username']) || !empty($options['password'])) {
+            if (empty($options['username'])) {
                 throw new \RuntimeException('Missing option "username"');
-            }
-            else if ( empty( $options['password'] ) ) {
+            } elseif (empty($options['password'])) {
                 throw new \RuntimeException('Missing option "password"');
             }
 
@@ -81,7 +77,7 @@ class HTTPClient extends \GuzzleHttp\Client implements HTTPClientInterface
             ];
         }
 
-        if ( !empty( $options['http_token'] ) ) {
+        if (!empty($options['http_token'])) {
             $number_of_authentication_types_given++;
 
             $this->authentication_options = [
@@ -89,7 +85,7 @@ class HTTPClient extends \GuzzleHttp\Client implements HTTPClientInterface
             ];
         }
 
-        if ( !empty( $options['oauth2_token'] ) ) {
+        if (!empty($options['oauth2_token'])) {
             $number_of_authentication_types_given++;
 
             $this->authentication_options = [
@@ -97,8 +93,11 @@ class HTTPClient extends \GuzzleHttp\Client implements HTTPClientInterface
             ];
         }
 
-        if ( $number_of_authentication_types_given != 1 ) {
-            throw new \RuntimeException('Missing authentication options: Either give username/password, http_token or oauth2_token');
+        if ($number_of_authentication_types_given != 1) {
+            throw new \RuntimeException(
+                'Missing authentication options: Either give username/password, ' .
+                'http_token or oauth2_token'
+            );
         }
 
         // Assemble base URL
@@ -106,7 +105,7 @@ class HTTPClient extends \GuzzleHttp\Client implements HTTPClientInterface
 
         // Optional: override timeout
         $timeout = 5;
-        if ( array_key_exists( 'timeout', $options ) ) {
+        if (array_key_exists('timeout', $options)) {
             $timeout = intval($options['timeout']);
             if ($timeout < 0) {
                 $timeout = 0;
@@ -115,7 +114,7 @@ class HTTPClient extends \GuzzleHttp\Client implements HTTPClientInterface
 
         // Debug flag
         $debug = false;
-        if ( array_key_exists( 'debug', $options ) ) {
+        if (array_key_exists('debug', $options)) {
             $debug = $options['debug'] ? true : false;
         }
 
@@ -155,40 +154,33 @@ class HTTPClient extends \GuzzleHttp\Client implements HTTPClientInterface
     /**
      * Overrides base class request method to automatically add authentication options to request.
      */
-    public function request(string $method, $uri = '', array $options = [] ): ResponseInterface
+    public function request(string $method, $uri = '', array $options = []): ResponseInterface
     {
         //
         // Add authentication options
         //
 
-        // Username and password
         if (
-            !empty( $this->authentication_options['username'] )
-            && !empty( $this->authentication_options['password'] )
+            !empty($this->authentication_options['username'])
+            && !empty($this->authentication_options['password'])
         ) {
             $options['auth'] = [
                 $this->authentication_options['username'],
                 $this->authentication_options['password'],
             ];
-        }
-        // HTTP token
-        else if ( !empty( $this->authentication_options['http_token'] ) ) {
+        } elseif (!empty($this->authentication_options['http_token'])) {
             $options['headers']['Authorization']
                 = 'Token token=' . $this->authentication_options['http_token'];
-        }
-        // OAuth2 token
-        else if ( !empty( $this->authentication_options['oauth2_token'] ) ) {
+        } elseif (!empty($this->authentication_options['oauth2_token'])) {
             $options['headers']['Authorization']
                 = 'Bearer ' . $this->authentication_options['oauth2_token'];
-        }
-        else {
+        } else {
             throw new \RuntimeException('No authentication options available');
         }
 
         try {
-            $response = parent::request( $method, $uri, $options );
-        }
-        catch ( \GuzzleHttp\Exception\TransferException $e ) {
+            $response = parent::request($method, $uri, $options);
+        } catch (\GuzzleHttp\Exception\TransferException $e) {
             if (method_exists($e, 'hasResponse') && $e->hasResponse()) {
                 return $e->getResponse();
             }

@@ -3,8 +3,14 @@
     "type": "library",
     "description": "Zammad API client for PHP",
     "homepage": "https://github.com/zammad/zammad-api-client-php",
-    "keywords": ["zammad", "api"],
-    "license": ["AGPL-3.0", "MIT"],
+    "keywords": [
+        "zammad",
+        "api"
+    ],
+    "license": [
+        "AGPL-3.0",
+        "MIT"
+    ],
     "authors": [
         {
             "name": "Zammad GmbH",
@@ -12,13 +18,38 @@
         }
     ],
     "require": {
-        "php":               ">=7.2",
-        "guzzlehttp/guzzle": "^7"
+        "php": ">=8.3",
+        "psr/http-client": "^1.0",
+        "psr/http-factory": "^1.1",
+        "psr/log": "^3.0"
     },
     "require-dev": {
-        "phpunit/phpunit": ">=5.7 <9"
+        "guzzlehttp/guzzle": "^7.11",
+        "league/openapi-psr7-validator": "^0.22",
+        "mockery/mockery": "^1.6",
+        "phpstan/phpstan": "^2.2",
+        "phpunit/phpunit": "^10.5.62",
+        "squizlabs/php_codesniffer": "^3.11"
+    },
+    "suggest": {
+        "guzzlehttp/guzzle": "Provides the default HTTP client implementation used by ZammadAPIClient\\HTTPClient."
     },
     "autoload": {
-        "psr-4": {"ZammadAPIClient\\": "src/"}
+        "psr-4": {
+            "ZammadAPIClient\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "classmap": [
+            "test/"
+        ]
+    },
+    "scripts": {
+        "phpcs": "phpcs --standard=PSR12 src/",
+        "phpstan": "phpstan analyse src/ --configuration phpstan.neon.dist",
+        "test": "phpunit --testsuite=unit"
+    },
+    "config": {
+        "sort-packages": true
     }
 }

@@ -1,15 +1,12 @@
 <?php
 
-/**
- * @package Zammad API Client
- * @author  Jens Pfeifer <jens.pfeifer@znuny.com>
- */
+declare(strict_types=1);
 
 namespace ZammadAPIClient\Resource;
 
 class TextModule extends AbstractResource
 {
-    const URLS = [
+    public const URLS = [
         'get'    => 'text_modules/{object_id}',
         'all'    => 'text_modules',
         'create' => 'text_modules',
@@ -36,12 +33,11 @@ class TextModule extends AbstractResource
             ]
         );
 
-        if ( $response->hasError() ) {
-            $this->setError( $response->getError() );
-        }
-        else {
+        if ($response->hasError()) {
+            $this->setError($response->getError());
+        } else {
             $this->clearError();
-            $this->setRemoteData( $response->getData() );
+            $this->setRemoteData($response->getData());
         }
 
         return $this;

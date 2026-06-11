@@ -1,15 +1,12 @@
 <?php
 
-/**
- * @package Zammad API Client
- * @author  Jens Pfeifer <jens.pfeifer@znuny.com>
- */
+declare(strict_types=1);
 
 namespace ZammadAPIClient\Resource;
 
 class TicketArticle extends AbstractResource
 {
-    const URLS = [
+    public const URLS = [
         'get'                    => 'ticket_articles/{object_id}',
         'get_for_ticket'         => 'ticket_articles/by_ticket/{ticket_id}',
         'get_attachment_content' => 'ticket_attachment/{ticket_id}/{ticket_article_id}/{object_id}',
@@ -27,14 +24,17 @@ class TicketArticle extends AbstractResource
      */
     public function getForTicket($ticket_id)
     {
-        if ( !empty( $this->getValues() ) ) {
-            throw new \RuntimeException('Object already contains values, getForTicket() not possible, use a new object');
+        if (!empty($this->getValues())) {
+            throw new \RuntimeException(
+                'Object already contains values, getForTicket() not possible, ' .
+                'use a new object'
+            );
         }
 
         $this->clearError();
 
         $ticket_id = intval($ticket_id);
-        if ( empty($ticket_id) ) {
+        if (empty($ticket_id)) {
             throw new \RuntimeException('Missing ticket ID');
         }
 
@@ -51,15 +51,15 @@ class TicketArticle extends AbstractResource
             ]
         );
 
-        if ( $response->hasError() ) {
-            $this->setError( $response->getError() );
+        if ($response->hasError()) {
+            $this->setError($response->getError());
             return $this;
         }
 
         // Return array of TicketArticle objects.
         $ticket_articles = [];
-        foreach ( $response->getData() as $ticket_article_data ) {
-            $ticket_article = $this->getClient()->resource( get_class($this) );
+        foreach ($response->getData() as $ticket_article_data) {
+            $ticket_article = $this->getClient()->resource(get_class($this));
             $ticket_article->setRemoteData($ticket_article_data);
             $ticket_articles[] = $ticket_article;
         }
@@ -82,20 +82,20 @@ class TicketArticle extends AbstractResource
             throw new \Exception('Attachment ID is invalid');
         }
 
-        if ( empty( $this->getID() ) ) {
+        if (empty($this->getID())) {
             throw new \Exception('Object data does not contain an ID, getAttachmentContent() not possible');
         }
 
         $this->clearError();
 
         $attachments = $this->getValue('attachments');
-        if ( !is_array($attachments) || !count($attachments) ) {
+        if (!is_array($attachments) || !count($attachments)) {
             return false;
         }
 
         // Check if given attachment ID exists for article.
-        $attachment_key = array_search( $attachment_id, array_column( $attachments, 'id' ) );
-        if ( $attachment_key === false ) {
+        $attachment_key = array_search($attachment_id, array_column($attachments, 'id'));
+        if ($attachment_key === false) {
             return false;
         }
         $attachment = $attachments[$attachment_key];
@@ -111,13 +111,13 @@ class TicketArticle extends AbstractResource
         );
 
         $response = $this->getClient()->get($url);
-        if ( $response->hasError() ) {
-            $this->setError( $response->getError() );
+        if ($response->hasError()) {
+            $this->setError($response->getError());
             return false;
         }
 
         $content = $response->getBody();
-        if ( $content instanceof \Psr\Http\Message\StreamInterface ) {
+        if ($content instanceof \Psr\Http\Message\StreamInterface) {
             $content = $content->getContents();
         }
         return $content;

@@ -1,0 +1,1021 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Call to an undefined method object\:\:getBody\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getHeaders\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getReasonPhrase\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getStatusCode\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Cannot access offset ''Accept'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Cannot access offset ''Content\-Type'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Cannot access offset ''From'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Cannot call method request\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\:\:__construct\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\:\:delete\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\:\:delete\(\) has parameter \$url_parameters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\:\:get\(\) has parameter \$url_parameters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\:\:getLastResponse\(\) has invalid return type ZammadAPIClient\\objects\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\:\:getLastResponse\(\) should return ZammadAPIClient\\objects but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\:\:post\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\:\:post\(\) has parameter \$url_parameters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\:\:put\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\:\:put\(\) has parameter \$url_parameters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\:\:request\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\:\:request\(\) has parameter \$url_parameters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\:\:setLastResponse\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\:\:setOnBehalfOfUser\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\:\:unsetOnBehalfOfUser\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^PHPDoc tag @param for parameter \$response with type object is not subtype of native type ZammadAPIClient\\Client\\Response\.$#'
+			identifier: parameter.phpDocType
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Parameter \#4 \$headers of class ZammadAPIClient\\Client\\Response constructor expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Property ZammadAPIClient\\Client\:\:\$http_client has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Property ZammadAPIClient\\Client\:\:\$last_response has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Property ZammadAPIClient\\Client\:\:\$on_behalf_of_user has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Property ZammadAPIClient\\Client\:\:\$options has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Property ZammadAPIClient\\Client\:\:\$options is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Client.php
+
+		-
+			message: '#^Binary operation "\." between mixed and '' \- '' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Binary operation "\." between non\-falsy\-string and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Cannot access offset ''error'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Cannot access offset 0 on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\\Response\:\:__construct\(\) has parameter \$body with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\\Response\:\:__construct\(\) has parameter \$headers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\\Response\:\:__construct\(\) has parameter \$reason_phrase with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\\Response\:\:__construct\(\) has parameter \$status_code with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\\Response\:\:getBody\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\\Response\:\:getData\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\\Response\:\:getError\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\\Response\:\:getHeaders\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\\Response\:\:getReasonPhrase\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\\Response\:\:getStatusCode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\\Response\:\:getStatusMessage\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Client\\Response\:\:hasError\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Parameter \#1 \$haystack of function mb_strpos expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Parameter \#1 \$json of function json_decode expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Parameter \#1 \$value of function intval expects array\|bool\|float\|GMP\|int\|resource\|SimpleXMLElement\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Property ZammadAPIClient\\Client\\Response\:\:\$body has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Property ZammadAPIClient\\Client\\Response\:\:\$data has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Property ZammadAPIClient\\Client\\Response\:\:\$error has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Property ZammadAPIClient\\Client\\Response\:\:\$headers has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Property ZammadAPIClient\\Client\\Response\:\:\$reason_phrase has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Property ZammadAPIClient\\Client\\Response\:\:\$status_code has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Client/Response.php
+
+		-
+			message: '#^Binary operation "\." between ''Bearer '' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/HTTPClient.php
+
+		-
+			message: '#^Binary operation "\." between ''Token token\='' and mixed results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/HTTPClient.php
+
+		-
+			message: '#^Binary operation "\." between mixed and ''/api/'' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: src/HTTPClient.php
+
+		-
+			message: '#^Call to an undefined method GuzzleHttp\\Exception\\TransferException\:\:getResponse\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/HTTPClient.php
+
+		-
+			message: '#^Cannot access offset ''Authorization'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: src/HTTPClient.php
+
+		-
+			message: '#^Cannot access offset ''http_token'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/HTTPClient.php
+
+		-
+			message: '#^Cannot access offset ''oauth2_token'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/HTTPClient.php
+
+		-
+			message: '#^Cannot access offset ''password'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/HTTPClient.php
+
+		-
+			message: '#^Cannot access offset ''username'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/HTTPClient.php
+
+		-
+			message: '#^Class ZammadAPIClient\\HTTPClient extends @final class GuzzleHttp\\Client\.$#'
+			identifier: class.extendsFinalByPhpDoc
+			count: 1
+			path: src/HTTPClient.php
+
+		-
+			message: '#^Method ZammadAPIClient\\HTTPClient\:\:__construct\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/HTTPClient.php
+
+		-
+			message: '#^Method ZammadAPIClient\\HTTPClient\:\:request\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/HTTPClient.php
+
+		-
+			message: '#^Method ZammadAPIClient\\HTTPClient\:\:request\(\) should return Psr\\Http\\Message\\ResponseInterface but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/HTTPClient.php
+
+		-
+			message: '#^Parameter \#1 \$url of function parse_url expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/HTTPClient.php
+
+		-
+			message: '#^Parameter \#1 \$value of function intval expects array\|bool\|float\|GMP\|int\|resource\|SimpleXMLElement\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/HTTPClient.php
+
+		-
+			message: '#^Property ZammadAPIClient\\HTTPClient\:\:\$authentication_options has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/HTTPClient.php
+
+		-
+			message: '#^Property ZammadAPIClient\\HTTPClient\:\:\$base_url has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/HTTPClient.php
+
+		-
+			message: '#^Method ZammadAPIClient\\HTTPClientInterface\:\:request\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/HTTPClientInterface.php
+
+		-
+			message: '#^Method ZammadAPIClient\\HTTPClientInterface\:\:request\(\) has parameter \$uri with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/HTTPClientInterface.php
+
+		-
+			message: '#^Access to undefined constant ZammadAPIClient\\Resource\\AbstractResource\:\:URLS\.$#'
+			identifier: classConstant.notFound
+			count: 2
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 2
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Call to an undefined method object\:\:delete\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Call to an undefined method object\:\:get\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Call to an undefined method object\:\:post\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Call to an undefined method object\:\:put\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Call to an undefined method object\:\:resource\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Cannot access offset string on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Cannot call method getData\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 5
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Cannot call method getError\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 6
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Cannot call method hasError\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 6
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Cannot call method setRemoteData\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Resource\\AbstractResource\:\:can\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Resource\\AbstractResource\:\:can\(\) has parameter \$method_name with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Resource\\AbstractResource\:\:getClient\(\) should return object but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Resource\\AbstractResource\:\:getError\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Resource\\AbstractResource\:\:getRemoteData\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Resource\\AbstractResource\:\:getRemoteData\(\) should return array but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Resource\\AbstractResource\:\:getURL\(\) has parameter \$placeholder_values with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Resource\\AbstractResource\:\:getURL\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Resource\\AbstractResource\:\:setRemoteData\(\) has parameter \$remote_data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Resource\\AbstractResource\:\:setValues\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Negated boolean expression is always false\.$#'
+			identifier: booleanNot.alwaysFalse
+			count: 2
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^PHPDoc tag @param for parameter \$client with type object is not subtype of native type ZammadAPIClient\\Client\.$#'
+			identifier: parameter.phpDocType
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Parameter \#1 \$error of method ZammadAPIClient\\Resource\\AbstractResource\:\:setError\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 6
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Parameter \#1 \$key of function array_key_exists expects int\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Parameter \#1 \$remote_data of method ZammadAPIClient\\Resource\\AbstractResource\:\:setRemoteData\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Parameter \#1 \.\.\.\$arrays of function array_merge expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Parameter \#2 \$array of function array_key_exists expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Parameter \#2 \.\.\.\$arrays of function array_merge expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Parameter \#3 \$subject of function preg_replace expects array\<float\|int\|string\>\|string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Part \$value \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Property ZammadAPIClient\\Resource\\AbstractResource\:\:\$client has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Property ZammadAPIClient\\Resource\\AbstractResource\:\:\$error has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Property ZammadAPIClient\\Resource\\AbstractResource\:\:\$remote_data has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Property ZammadAPIClient\\Resource\\AbstractResource\:\:\$values has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Result of && is always true\.$#'
+			identifier: booleanAnd.alwaysTrue
+			count: 2
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Variable \$objects_per_page in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.variable
+			count: 4
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Variable \$page in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.variable
+			count: 2
+			path: src/Resource/AbstractResource.php
+
+		-
+			message: '#^Call to an undefined method object\:\:delete\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Resource/Link.php
+
+		-
+			message: '#^Call to an undefined method object\:\:get\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Resource/Link.php
+
+		-
+			message: '#^Call to an undefined method object\:\:post\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Resource/Link.php
+
+		-
+			message: '#^Cannot call method getData\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Resource/Link.php
+
+		-
+			message: '#^Cannot call method getError\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 3
+			path: src/Resource/Link.php
+
+		-
+			message: '#^Cannot call method hasError\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 3
+			path: src/Resource/Link.php
+
+		-
+			message: '#^Parameter \#1 \$error of method ZammadAPIClient\\Resource\\AbstractResource\:\:setError\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/Resource/Link.php
+
+		-
+			message: '#^Parameter \#1 \$remote_data of method ZammadAPIClient\\Resource\\AbstractResource\:\:setRemoteData\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Resource/Link.php
+
+		-
+			message: '#^Call to an undefined method object\:\:post\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Resource/Organization.php
+
+		-
+			message: '#^Cannot call method getData\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Resource/Organization.php
+
+		-
+			message: '#^Cannot call method getError\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Resource/Organization.php
+
+		-
+			message: '#^Cannot call method hasError\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Resource/Organization.php
+
+		-
+			message: '#^Parameter \#1 \$error of method ZammadAPIClient\\Resource\\AbstractResource\:\:setError\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Resource/Organization.php
+
+		-
+			message: '#^Parameter \#1 \$remote_data of method ZammadAPIClient\\Resource\\AbstractResource\:\:setRemoteData\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Resource/Organization.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: src/Resource/Tag.php
+
+		-
+			message: '#^Call to an undefined method object\:\:delete\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Resource/Tag.php
+
+		-
+			message: '#^Call to an undefined method object\:\:get\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Resource/Tag.php
+
+		-
+			message: '#^Call to an undefined method object\:\:post\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Resource/Tag.php
+
+		-
+			message: '#^Call to an undefined method object\:\:resource\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Resource/Tag.php
+
+		-
+			message: '#^Cannot call method getData\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: src/Resource/Tag.php
+
+		-
+			message: '#^Cannot call method getError\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 4
+			path: src/Resource/Tag.php
+
+		-
+			message: '#^Cannot call method hasError\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 4
+			path: src/Resource/Tag.php
+
+		-
+			message: '#^Cannot call method setRemoteData\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Resource/Tag.php
+
+		-
+			message: '#^Parameter \#1 \$error of method ZammadAPIClient\\Resource\\AbstractResource\:\:setError\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 4
+			path: src/Resource/Tag.php
+
+		-
+			message: '#^Parameter \#1 \$remote_data of method ZammadAPIClient\\Resource\\AbstractResource\:\:setRemoteData\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Resource/Tag.php
+
+		-
+			message: '#^Call to an undefined method object\:\:post\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Resource/TextModule.php
+
+		-
+			message: '#^Cannot call method getData\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Resource/TextModule.php
+
+		-
+			message: '#^Cannot call method getError\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Resource/TextModule.php
+
+		-
+			message: '#^Cannot call method hasError\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Resource/TextModule.php
+
+		-
+			message: '#^Parameter \#1 \$error of method ZammadAPIClient\\Resource\\AbstractResource\:\:setError\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Resource/TextModule.php
+
+		-
+			message: '#^Parameter \#1 \$remote_data of method ZammadAPIClient\\Resource\\AbstractResource\:\:setRemoteData\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Resource/TextModule.php
+
+		-
+			message: '#^Call to an undefined method object\:\:resource\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Resource/Ticket.php
+
+		-
+			message: '#^Cannot call method getError\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Resource/Ticket.php
+
+		-
+			message: '#^Cannot call method getForTicket\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Resource/Ticket.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Resource\\Ticket\:\:getTicketArticles\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Resource/Ticket.php
+
+		-
+			message: '#^Parameter \#1 \$error of method ZammadAPIClient\\Resource\\AbstractResource\:\:setError\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Resource/Ticket.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: src/Resource/TicketArticle.php
+
+		-
+			message: '#^Call to an undefined method object\:\:get\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Resource/TicketArticle.php
+
+		-
+			message: '#^Call to an undefined method object\:\:resource\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Resource/TicketArticle.php
+
+		-
+			message: '#^Cannot access offset ''id'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Resource/TicketArticle.php
+
+		-
+			message: '#^Cannot call method getBody\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Resource/TicketArticle.php
+
+		-
+			message: '#^Cannot call method getData\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Resource/TicketArticle.php
+
+		-
+			message: '#^Cannot call method getError\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: src/Resource/TicketArticle.php
+
+		-
+			message: '#^Cannot call method hasError\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: src/Resource/TicketArticle.php
+
+		-
+			message: '#^Cannot call method setRemoteData\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Resource/TicketArticle.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Resource\\TicketArticle\:\:getAttachmentContent\(\) should return string but returns false\.$#'
+			identifier: return.type
+			count: 3
+			path: src/Resource/TicketArticle.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Resource\\TicketArticle\:\:getAttachmentContent\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Resource/TicketArticle.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Resource\\TicketArticle\:\:getForTicket\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Resource/TicketArticle.php
+
+		-
+			message: '#^Method ZammadAPIClient\\Resource\\TicketArticle\:\:getForTicket\(\) should return array but returns \$this\(ZammadAPIClient\\Resource\\TicketArticle\)\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Resource/TicketArticle.php
+
+		-
+			message: '#^Parameter \#1 \$error of method ZammadAPIClient\\Resource\\AbstractResource\:\:setError\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Resource/TicketArticle.php
+
+		-
+			message: '#^Call to an undefined method object\:\:post\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Resource/User.php
+
+		-
+			message: '#^Cannot call method getData\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Resource/User.php
+
+		-
+			message: '#^Cannot call method getError\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Resource/User.php
+
+		-
+			message: '#^Cannot call method hasError\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Resource/User.php
+
+		-
+			message: '#^Parameter \#1 \$error of method ZammadAPIClient\\Resource\\AbstractResource\:\:setError\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Resource/User.php
+
+		-
+			message: '#^Parameter \#1 \$remote_data of method ZammadAPIClient\\Resource\\AbstractResource\:\:setRemoteData\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Resource/User.php

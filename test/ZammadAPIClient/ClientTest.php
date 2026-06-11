@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace ZammadAPIClient;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 use ZammadAPIClient\Client;
@@ -55,6 +57,7 @@ class ClientTest extends TestCase
         $this->assertArrayNotHasKey('From', $this->capturedOptions['headers']);
     }
 
+    #[Group('integration')]
     public function testFromHeaderAgainstZammad()
     {
         $client = self::createZammadClient();
@@ -87,6 +90,10 @@ class ClientTest extends TestCase
         $this->capturedOptions = [];
 
         $mockResponse = $this->createMock(ResponseInterface::class);
+        $mockResponse->method('getStatusCode')->willReturn(200);
+        $mockResponse->method('getReasonPhrase')->willReturn('OK');
+        $mockResponse->method('getBody')->willReturn('{}');
+        $mockResponse->method('getHeaders')->willReturn([]);
 
         $mockHttpClient = $this->createMock(HTTPClientInterface::class);
         $mockHttpClient

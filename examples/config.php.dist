@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 // Copy this file to config.php and insert your credentials.
 // Note that you have to activate API access within your Zammad (Settings => System => API)

@@ -1,11 +1,14 @@
 <?php
+declare(strict_types=1);
 
 namespace ZammadAPIClient\Resource;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ZammadAPIClient\Client;
 use ZammadAPIClient\ResourceType;
 
+#[Group('integration')]
 class LinkTest extends TestCase
 {
     private static $client;

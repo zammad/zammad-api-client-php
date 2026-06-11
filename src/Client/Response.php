@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @package Zammad API Client
- * @author  Jens Pfeifer <jens.pfeifer@znuny.com>
- */
+declare(strict_types=1);
 
 namespace ZammadAPIClient\Client;
 
@@ -20,9 +17,8 @@ class Response
         $status_code,
         $reason_phrase,
         $body,
-        array  $headers = []
-    )
-    {
+        array $headers = []
+    ) {
         $this->status_code   = intval($status_code);
         $this->reason_phrase = $reason_phrase;
         $this->body          = $body;
@@ -33,12 +29,12 @@ class Response
 
         // Store decoded JSON data, if present
         if (
-            !empty( $lowercase_headers['content-type'] )
-            && mb_strpos( $lowercase_headers['content-type'][0], 'application/json;' ) !== false
+            !empty($lowercase_headers['content-type'])
+            && mb_strpos($lowercase_headers['content-type'][0], 'application/json;') !== false
         ) {
-            $this->data = json_decode( $this->body, true );
+            $this->data = json_decode($this->body, true);
 
-            if ( !empty( $this->data['error'] ) ) {
+            if (!empty($this->data['error'])) {
                 $this->error = $this->data['error'];
             }
         }
@@ -81,6 +77,6 @@ class Response
 
     public function hasError()
     {
-        return !empty( $this->getError() );
+        return !empty($this->getError());
     }
 }

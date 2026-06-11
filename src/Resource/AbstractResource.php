@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @package Zammad API Client
- * @author  Jens Pfeifer <jens.pfeifer@znuny.com>
- */
+declare(strict_types=1);
 
 namespace ZammadAPIClient\Resource;
 
@@ -26,7 +23,7 @@ abstract class AbstractResource
     /**
      * @param object $client        ZammadAPIClient object
      */
-    public function __construct( \ZammadAPIClient\Client $client )
+    public function __construct(\ZammadAPIClient\Client $client)
     {
         $this->client = $client;
     }
@@ -48,7 +45,7 @@ abstract class AbstractResource
      *
      * @return object
      */
-    protected function setRemoteData( array $remote_data = [] )
+    protected function setRemoteData(array $remote_data = [])
     {
         $this->remote_data = $remote_data;
         return $this;
@@ -86,9 +83,9 @@ abstract class AbstractResource
      *
      * @return object   This object
      */
-    public function setValues( array $values )
+    public function setValues(array $values)
     {
-        $this->values = array_merge( $this->values, $values );
+        $this->values = array_merge($this->values, $values);
         return $this;
     }
 
@@ -100,7 +97,7 @@ abstract class AbstractResource
      *
      * @return object   This object
      */
-    public function setValue( $key, $value )
+    public function setValue($key, $value)
     {
         $this->values[$key] = $value;
         return $this;
@@ -121,12 +118,12 @@ abstract class AbstractResource
      */
     public function getValue($key)
     {
-        if ( array_key_exists( $key, $this->values ) ) {
+        if (array_key_exists($key, $this->values)) {
             return $this->values[$key];
         }
 
         $remote_data = $this->getRemoteData();
-        if ( array_key_exists( $key, $remote_data ) ) {
+        if (array_key_exists($key, $remote_data)) {
             return $remote_data[$key];
         }
 
@@ -143,7 +140,7 @@ abstract class AbstractResource
      */
     public function getValues()
     {
-        $values = array_merge( $this->getRemoteData(), $this->values );
+        $values = array_merge($this->getRemoteData(), $this->values);
         return $values;
     }
 
@@ -188,7 +185,7 @@ abstract class AbstractResource
      */
     public function isDirty()
     {
-        return !empty( $this->getUnsavedValues() );
+        return !empty($this->getUnsavedValues());
     }
 
     /**
@@ -198,7 +195,7 @@ abstract class AbstractResource
      *
      * @return object   This object
      */
-    protected function setError( $error )
+    protected function setError($error)
     {
         $this->error = $error;
         return $this;
@@ -221,7 +218,7 @@ abstract class AbstractResource
      */
     public function hasError()
     {
-        return !empty( $this->getError() );
+        return !empty($this->getError());
     }
 
     /**
@@ -244,11 +241,13 @@ abstract class AbstractResource
      */
     public function get($object_id)
     {
-        if ( !empty( $this->getValues() ) ) {
-            throw new AlreadyFetchedObjectException('Object already contains values, get() not possible, use a new object');
+        if (!empty($this->getValues())) {
+            throw new AlreadyFetchedObjectException(
+                'Object already contains values, get() not possible, use a new object'
+            );
         }
 
-        if ( empty($object_id) ) {
+        if (empty($object_id)) {
             throw new \RuntimeException('Missing object ID');
         }
 
@@ -266,12 +265,11 @@ abstract class AbstractResource
             ]
         );
 
-        if ( $response->hasError() ) {
-            $this->setError( $response->getError() );
-        }
-        else {
+        if ($response->hasError()) {
+            $this->setError($response->getError());
+        } else {
             $this->clearError();
-            $this->setRemoteData( $response->getData() );
+            $this->setRemoteData($response->getData());
         }
 
         return $this;
@@ -287,16 +285,18 @@ abstract class AbstractResource
      * @return mixed                        Returns array of ZammadAPIClient\Resource\... objects
      *                                          or this object on failure.
      */
-    public function all( $page = null, $objects_per_page = null )
+    public function all($page = null, $objects_per_page = null)
     {
-        if ( !empty( $this->getValues() ) ) {
-            throw new AlreadyFetchedObjectException('Object already contains values, all() not possible, use a new object');
+        if (!empty($this->getValues())) {
+            throw new AlreadyFetchedObjectException(
+                'Object already contains values, all() not possible, use a new object'
+            );
         }
 
-        if ( isset($page) && $page <= 0 ) {
+        if (isset($page) && $page <= 0) {
             throw new \RuntimeException('Parameter page must be > 0');
         }
-        if ( isset($objects_per_page) && $objects_per_page <= 0 ) {
+        if (isset($objects_per_page) && $objects_per_page <= 0) {
             throw new \RuntimeException('Parameter objects_per_page must be > 0');
         }
         if (
@@ -306,7 +306,7 @@ abstract class AbstractResource
             throw new \RuntimeException('Parameters page and objects_per_page must both be given');
         }
 
-        if ( !isset($page) || !isset($objects_per_page) ) {
+        if (!isset($page) || !isset($objects_per_page)) {
             return $this->allWithoutPagination();
         }
 
@@ -314,7 +314,7 @@ abstract class AbstractResource
             'expand' => true,
         ];
 
-        if ( isset($page) && isset($objects_per_page) ) {
+        if (isset($page) && isset($objects_per_page)) {
             $url_parameters['page']     = $page;
             $url_parameters['per_page'] = $objects_per_page;
         }
@@ -325,8 +325,8 @@ abstract class AbstractResource
             $url_parameters
         );
 
-        if ( $response->hasError() ) {
-            $this->setError( $response->getError() );
+        if ($response->hasError()) {
+            $this->setError($response->getError());
             return $this;
         }
 
@@ -335,8 +335,8 @@ abstract class AbstractResource
         // Return array of resource objects if no $object_id was given.
         // Note: the resource object (this object) used to execute get() will be left empty in this case.
         $objects       = [];
-        foreach ( $response->getData() as $object_data ) {
-            $object = $this->getClient()->resource( get_class($this) );
+        foreach ($response->getData() as $object_data) {
+            $object = $this->getClient()->resource(get_class($this));
             $object->setRemoteData($object_data);
             $objects[] = $object;
         }
@@ -360,18 +360,18 @@ abstract class AbstractResource
         $objects_of_page  = [];
 
         do {
-            $objects_of_page = $this->all( $page, $objects_per_page );
-            if ( !is_array($objects_of_page) ) {
+            $objects_of_page = $this->all($page, $objects_per_page);
+            if (!is_array($objects_of_page)) {
                 return $this;
             }
 
-            $objects = array_merge( $objects, $objects_of_page );
+            $objects = array_merge($objects, $objects_of_page);
 
             $is_last_page = count($objects_of_page) < $objects_per_page
                 || !count($objects_of_page);
 
             $page++;
-        } while ( !$is_last_page );
+        } while (!$is_last_page);
 
         return $objects;
     }
@@ -389,16 +389,18 @@ abstract class AbstractResource
      * @return mixed                        Returns array of ZammadAPIClient\Resource\... objects
      *                                          or this object on failure.
      */
-    public function search( $search_term, $page = null, $objects_per_page = null, $sort_by = null, $order_by = null )
+    public function search($search_term, $page = null, $objects_per_page = null, $sort_by = null, $order_by = null)
     {
-        if ( !empty( $this->getValues() ) ) {
-            throw new AlreadyFetchedObjectException('Object already contains values, search() not possible, use a new object');
+        if (!empty($this->getValues())) {
+            throw new AlreadyFetchedObjectException(
+                'Object already contains values, search() not possible, use a new object'
+            );
         }
 
-        if ( isset($page) && $page <= 0 ) {
+        if (isset($page) && $page <= 0) {
             throw new \RuntimeException('Parameter page must be a > 0');
         }
-        if ( isset($objects_per_page) && $objects_per_page <= 0 ) {
+        if (isset($objects_per_page) && $objects_per_page <= 0) {
             throw new \RuntimeException('Parameter objects_per_page must be a > 0');
         }
         if (
@@ -408,11 +410,11 @@ abstract class AbstractResource
             throw new \RuntimeException('Parameters page and objects_per_page must both be given');
         }
 
-        if ( isset($order_by) && !in_array( mb_strtolower($order_by), [ 'asc', 'desc' ] ) ) {
+        if (isset($order_by) && !in_array(mb_strtolower($order_by), [ 'asc', 'desc' ])) {
             throw new \RuntimeException('Parameter order_by must be "asc" or "desc"');
         }
 
-        if ( !isset($page) || !isset($objects_per_page) ) {
+        if (!isset($page) || !isset($objects_per_page)) {
             return $this->searchWithoutPagination($search_term, $sort_by, $order_by);
         }
 
@@ -421,15 +423,15 @@ abstract class AbstractResource
             'query'  => $search_term,
         ];
 
-        if ( isset($page) && isset($objects_per_page) ) {
+        if (isset($page) && isset($objects_per_page)) {
             $url_parameters['page']     = $page;
             $url_parameters['per_page'] = $objects_per_page;
         }
 
-        if ( isset($sort_by) ) {
+        if (isset($sort_by)) {
             $url_parameters['sort_by'] = $sort_by;
         }
-        if ( isset($order_by) ) {
+        if (isset($order_by)) {
             $url_parameters['order_by'] = $order_by;
         }
 
@@ -439,8 +441,8 @@ abstract class AbstractResource
             $url_parameters
         );
 
-        if ( $response->hasError() ) {
-            $this->setError( $response->getError() );
+        if ($response->hasError()) {
+            $this->setError($response->getError());
             return $this;
         }
 
@@ -449,8 +451,8 @@ abstract class AbstractResource
         // Return array of resource objects if no $object_id was given.
         // Note: the resource object (this object) used to execute get() will be left empty in this case.
         $objects = [];
-        foreach ( $response->getData() as $object_data ) {
-            $object = $this->getClient()->resource( get_class($this) );
+        foreach ($response->getData() as $object_data) {
+            $object = $this->getClient()->resource(get_class($this));
             $object->setRemoteData($object_data);
             $objects[] = $object;
         }
@@ -478,18 +480,18 @@ abstract class AbstractResource
         $objects_of_page  = [];
 
         do {
-            $objects_of_page = $this->search( $search_term, $page, $objects_per_page, $sort_by, $order_by );
-            if ( !is_array($objects_of_page) ) {
+            $objects_of_page = $this->search($search_term, $page, $objects_per_page, $sort_by, $order_by);
+            if (!is_array($objects_of_page)) {
                 return $this;
             }
 
-            $objects = array_merge( $objects, $objects_of_page );
+            $objects = array_merge($objects, $objects_of_page);
 
             $is_last_page = count($objects_of_page) < $objects_per_page
                 || !count($objects_of_page);
 
             $page++;
-        } while ( !$is_last_page );
+        } while (!$is_last_page);
 
         return $objects;
     }
@@ -501,7 +503,7 @@ abstract class AbstractResource
      */
     public function save()
     {
-        if ( empty( $this->getID() ) ) {
+        if (empty($this->getID())) {
             return $this->create();
         }
 
@@ -515,11 +517,11 @@ abstract class AbstractResource
      */
     protected function create()
     {
-        if ( !empty( $this->getID() ) ) {
+        if (!empty($this->getID())) {
             throw new \Exception('Object already has an ID, create() not possible');
         }
 
-        if ( !$this->isDirty() ) {
+        if (!$this->isDirty()) {
             return $this;
         }
 
@@ -530,14 +532,14 @@ abstract class AbstractResource
             [
                 'expand' => true,
             ]
-         );
-        if ( $response->hasError() ) {
-            $this->setError( $response->getError() );
+        );
+        if ($response->hasError()) {
+            $this->setError($response->getError());
             return $this;
         }
 
         $this->clearError();
-        $this->setRemoteData( $response->getData() );
+        $this->setRemoteData($response->getData());
         $this->clearUnsavedValues();
 
         return $this;
@@ -551,11 +553,11 @@ abstract class AbstractResource
     protected function update()
     {
         $object_id = $this->getID();
-        if ( empty($object_id) ) {
+        if (empty($object_id)) {
             throw new \Exception('Object has no ID, update() not possible');
         }
 
-        if ( !$this->isDirty() ) {
+        if (!$this->isDirty()) {
             return $this;
         }
 
@@ -573,13 +575,13 @@ abstract class AbstractResource
                 'expand' => true,
             ]
         );
-        if ( $response->hasError() ) {
-            $this->setError( $response->getError() );
+        if ($response->hasError()) {
+            $this->setError($response->getError());
             return $this;
         }
 
         $this->clearError();
-        $this->setRemoteData( $response->getData() );
+        $this->setRemoteData($response->getData());
         $this->clearUnsavedValues();
 
         return $this;
@@ -595,7 +597,7 @@ abstract class AbstractResource
     {
         // Delete object in Zammad.
         $object_id = $this->getID();
-        if ( !empty($object_id) ) {
+        if (!empty($object_id)) {
             $url = $this->getURL(
                 'delete',
                 [
@@ -609,8 +611,8 @@ abstract class AbstractResource
                     'expand' => true,
                 ]
             );
-            if ( $response->hasError() ) {
-                $this->setError( $response->getError() );
+            if ($response->hasError()) {
+                $this->setError($response->getError());
                 return $this;
             }
         }
@@ -633,9 +635,9 @@ abstract class AbstractResource
      *
      * @return string                           URL, e. g. 'tickets/10'.
      */
-    protected function getURL( $method_name, array $placeholder_values = [] )
+    protected function getURL($method_name, array $placeholder_values = [])
     {
-        if ( !array_key_exists( $method_name, $this::URLS ) ) {
+        if (!array_key_exists($method_name, $this::URLS)) {
             throw new \RuntimeException(
                 "Method '$method_name' is not supported for "
                 . get_class($this)
@@ -644,15 +646,15 @@ abstract class AbstractResource
         }
 
         $url = $this::URLS[$method_name];
-        foreach ( $placeholder_values as $placeholder => $value ) {
-            $url = preg_replace( "/\{$placeholder\}/", "$value", $url );
+        foreach ($placeholder_values as $placeholder => $value) {
+            $url = preg_replace("/\{$placeholder\}/", "$value", $url);
         }
 
         return $url;
     }
 
-    public function can( $method_name )
+    public function can($method_name)
     {
-        return array_key_exists( $method_name, $this::URLS );
+        return array_key_exists($method_name, $this::URLS);
     }
 }

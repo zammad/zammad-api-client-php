@@ -1,13 +1,9 @@
 <?php
 
-/**
- * @package Zammad API Client
- * @author  Jens Pfeifer <jens.pfeifer@znuny.com>
- */
+declare(strict_types=1);
 
 namespace ZammadAPIClient\Exception;
 
 class AlreadyFetchedObjectException extends AbstractException
 {
-
 }
