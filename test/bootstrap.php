@@ -15,7 +15,7 @@ foreach ($composerAutoloadFiles as $autoloadFile) {
     $loader = require $autoloadFile;
     $loader->add('ZammadAPIClient', __DIR__);
 
-    return $loader;
+    return;
 }
 
 $systemAutoloadFiles = [
@@ -55,4 +55,4 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
-return true;
+return;
