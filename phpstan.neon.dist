@@ -1,0 +1,15 @@
+parameters:
+    level: max
+    paths:
+        - src/
+    scanDirectories:
+        - test/
+    excludePaths:
+        # Optional Laravel integration; requires illuminate/support only at runtime.
+        - src/Bridge/
+        # Frozen v5 compatibility layer (legacy PHP style).
+        - src/V5/
+    ignoreErrors:
+        -
+            message: '#return type with generic class.*does not specify its types#'
+            path: src/ZammadClient.php
