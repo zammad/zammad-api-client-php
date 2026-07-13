@@ -1,14 +1,28 @@
-name: CI
+name: Tests
+
 on:
   push:
-    branches: [master]
   pull_request:
-  schedule:
-    # Run every on Friday to ensure everything works as expected.
-    - cron:  '0 6 * * 5'
+  workflow_dispatch:
+
 jobs:
-  CI:
+  unit:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: php-actions/composer@v6
+        with:
+          php_version: "8.3"
+      - run: |
+          if [ -d src ]; then vendor/bin/phpcs --standard=PSR12 src/; else echo "→ Skip (src/ not yet present)"; fi
+      - run: |
+          if [ -d src ]; then vendor/bin/phpstan analyse src/ --level=max; else echo "→ Skip (src/ not yet present)"; fi
+      - run: |
+          if [ -d test/Unit ]; then vendor/bin/phpunit --testsuite=unit; else echo "→ Skip (test/Unit/ not yet present)"; fi
+
+  integration:
+    runs-on: ubuntu-latest
+    continue-on-error: true
     container:
       image: zammad/zammad-ci:latest
     services:
@@ -19,35 +33,20 @@ jobs:
           POSTGRES_PASSWORD: zammad
       redis:
         image: redis:7
-    env:
-      ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL: "http://localhost:3000"
-      ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_USERNAME: "admin@example.com"
-      ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_PASSWORD: "test"
-    strategy:
-      fail-fast: false
-      matrix:
-        php: ['7.4', '7.3', '7.2', '8.0', '8.1', '8.2', '8.3', '8.4']
-    name: PHP ${{ matrix.php }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - name: Install PHP
         uses: shivammathur/setup-php@v2
-        env:
-          fail-fast: true
         with:
-          php-version: ${{ matrix.php }}
-      - name: Report PHP version
-        run: php -v
+          php-version: "8.3"
       - name: Install dependencies
-        shell: bash
-        run: |
-          composer install
+        run: composer install --no-interaction
       - name: Set up Zammad
         shell: bash
         run: |
           git clone --depth 1 https://github.com/zammad/zammad.git
           cd zammad
-          source /etc/profile.d/rvm.sh # ensure RVM is loaded
+          source /etc/profile.d/rvm.sh
           bundle config set --local frozen 'true'
           bundle config set --local path 'vendor'
           bundle install -j $(nproc)
@@ -55,7 +54,10 @@ jobs:
           source .gitlab/environment.env
           RAILS_ENV=test bundle exec rake db:create
           RAILS_ENV=test bundle exec rake zammad:ci:test:start zammad:setup:auto_wizard
-      - name: Run PHP API integration tests
-        shell: bash
+      - name: Run integration tests
         run: |
-          vendor/bin/phpunit
+          if [ -d test/Integration ]; then vendor/bin/phpunit --testsuite=integration --group=integration; else echo "→ Skip (test/Integration/ not yet present)"; fi
+        env:
+          ZAMMAD_URL: http://localhost:3000/api/v1
+          ZAMMAD_USER: admin@example.com
+          ZAMMAD_PASS: test

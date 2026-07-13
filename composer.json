@@ -1,24 +1,48 @@
 {
     "name": "zammad/zammad-api-client-php",
+    "version": "6.0.0-dev",
     "type": "library",
-    "description": "Zammad API client for PHP",
+    "description": "PSR-compliant Zammad API client for PHP 8.3+",
     "homepage": "https://github.com/zammad/zammad-api-client-php",
-    "keywords": ["zammad", "api"],
+    "keywords": ["zammad", "api", "psr-18", "psr-17", "ticketing"],
     "license": ["AGPL-3.0", "MIT"],
     "authors": [
-        {
-            "name": "Zammad GmbH",
-            "homepage": "https://zammad.com"
-        }
+        { "name": "Zammad GmbH", "homepage": "https://zammad.com" }
     ],
     "require": {
-        "php":               ">=7.2",
-        "guzzlehttp/guzzle": "^7"
+        "php": ">=8.3",
+        "psr/http-client": "^1.0",
+        "psr/http-factory": "^1.0",
+        "psr/log": "^3.0"
     },
     "require-dev": {
-        "phpunit/phpunit": ">=5.7 <9"
+        "phpunit/phpunit": "^11.0",
+        "mockery/mockery": "^1.6",
+        "phpstan/phpstan": "^1.12",
+        "league/openapi-psr7-validator": "^0.22",
+        "guzzlehttp/guzzle": "^7.10",
+        "guzzlehttp/psr7": "^2.7",
+        "squizlabs/php_codesniffer": "^4.0"
+    },
+    "suggest": {
+        "guzzlehttp/guzzle": "PSR-18 HTTP transport",
+        "symfony/http-client": "Alternative PSR-18 transport",
+        "symfony/serializer": "Alternative DTO hydration (replaces manual fromArray)",
+        "symfony/cache": "PSR-6/16 cache for response caching"
     },
     "autoload": {
-        "psr-4": {"ZammadAPIClient\\": "src/"}
-    }
+        "psr-4": { "ZammadAPIClient\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "ZammadAPIClient\\Tests\\": "test/" }
+    },
+    "scripts": {
+        "cs": "phpcs",
+        "cs:fix": "phpcbf",
+        "stan": "phpstan analyse src/ --level=max",
+        "test": "phpunit --testsuite=unit",
+        "test:integration": "phpunit --testsuite=integration --group=integration"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
