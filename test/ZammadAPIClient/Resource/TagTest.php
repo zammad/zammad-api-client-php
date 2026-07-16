@@ -4,10 +4,13 @@ namespace ZammadAPIClient\Resource;
 
 use PHPUnit\Framework\TestCase;
 use ZammadAPIClient\Client;
+use ZammadAPIClient\EnvConfigTrait;
 use ZammadAPIClient\ResourceType;
 
 class TagTest extends TestCase
 {
+    use EnvConfigTrait;
+
     private static $client;
     private static $ticket;
 
@@ -15,21 +18,15 @@ class TagTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        $client_config = [];
+        // This suite creates and deletes a real ticket for every single test, which
+        // can occasionally take longer than the client's 5 second default timeout
+        // under load. Match AbstractBaseTest's more generous timeout to avoid
+        // spurious ConnectExceptions in tearDown().
+        $client_timeout = getenv('ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_TIMEOUT');
 
-        $env_keys = [
-            'url'      => 'ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL',
-            'username' => 'ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_USERNAME',
-            'password' => 'ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_PASSWORD',
-        ];
-        foreach ( $env_keys as $config_key => $env_key ) {
-            $value = getenv($env_key);
-            if ( empty($value) ) {
-                throw new \RuntimeException("Missing environment variable $env_key");
-            }
-
-            $client_config[$config_key] = $value;
-        }
+        $client_config = self::getZammadConfig([
+            'timeout' => !empty($client_timeout) ? $client_timeout : 30,
+        ]);
 
         self::$client = new Client($client_config);
     }
