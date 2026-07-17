@@ -1,0 +1,69 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: xdebug
+      - run: composer install --no-interaction
+      - run: composer dump-autoload
+      - run: |
+          if [ -d src ]; then vendor/bin/phpcs --standard=PSR12 src/; else echo "→ Skip (src/ not yet present)"; fi
+      - run: |
+          if [ -d src ]; then vendor/bin/phpstan analyse src/ --level=max; else echo "→ Skip (src/ not yet present)"; fi
+      - run: |
+          if [ -d test/Unit ]; then vendor/bin/phpunit --testsuite=unit --display-skipped; else echo "→ Skip (test/Unit/ not yet present)"; fi
+
+  integration:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    container:
+      image: zammad/zammad-ci:latest
+    services:
+      postgresql:
+        image: postgres:17
+        env:
+          POSTGRES_USER: zammad
+          POSTGRES_PASSWORD: zammad
+      redis:
+        image: redis:7
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+      - name: Install dependencies
+        run: composer install --no-interaction
+      - name: Dump autoload
+        run: composer dump-autoload
+      - name: Set up Zammad
+        shell: bash
+        run: |
+          git clone --depth 1 https://github.com/zammad/zammad.git
+          cd zammad
+          source /etc/profile.d/rvm.sh
+          bundle config set --local frozen 'true'
+          bundle config set --local path 'vendor'
+          bundle install -j $(nproc)
+          bundle exec ruby .gitlab/configure_environment.rb
+          source .gitlab/environment.env
+          RAILS_ENV=test bundle exec rake db:create
+          RAILS_ENV=test bundle exec rake zammad:ci:test:start zammad:setup:auto_wizard
+      - name: Run integration tests
+        run: |
+          set -x
+          if [ -d test/Integration ]; then vendor/bin/phpunit --testsuite=integration --group=integration --display-skipped; else echo "→ Skip (test/Integration/ not yet present)"; fi
+        env:
+          ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL: http://localhost:3000/api/v1
+          ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_USERNAME: admin@example.com
+          ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_PASSWORD: test

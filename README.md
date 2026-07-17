@@ -1,362 +1,647 @@
-# Zammad API Client for PHP
+# Zammad API Client for PHP (v3)
 
-This client can be used to access the API of the open source helpdesk [Zammad](http://www.zammad.org) via PHP.
+PSR-compliant PHP client for the [Zammad](https://zammad.com) REST API. PHP 8.1+.
 
-## Zammad version support
-This client supports Zammad 3.4.1 and newer.
+## Quick Start
 
-## Installation
-
-### Requirements
-The API client needs [composer](https://getcomposer.org/). For installation have a look at its [documentation](https://getcomposer.org/download/).
-Additionally, the API client needs PHP 7.2 or newer.
-
-### Integration into your project
-Add the following to the "require" section of your project's composer.json file:
-```json
-"zammad/zammad-api-client-php": "^2.3"
-```
-
-### Installing the API client's dependencies
-Fetch the API client's code and its dependencies by updating your project's dependencies with composer:
-```
-$ composer update
-```
-
-Once installed, you have to include the generated autoload.php into your project's code:
-```php
-require_once dirname(__DIR__).'/vendor/autoload.php';
-```
-
-## How to use the API client
-
-### Example code
-You can find example code within the directory `examples`.
-
-### The Client object
-Your starting point is the `Client` object:
-```php
-use ZammadAPIClient\Client;
-$client = new Client([
-    'url'           => 'https://myzammad.com', // URL to your Zammad installation
-    'username'      => 'myuser@myzammad.com',  // Username to use for authentication
-    'password'      => 'mypassword',           // Password to use for authentication
-    // 'timeout'       => 15,                  // Sets timeout for requests, defaults to 5 seconds, 0: no timeout
-    // 'debug'         => true,                // Enables debug output
-    // 'verify'        => true,                // Enabled SSL verification. You can also give a path to a CA bundle file. Default is true.
-]);
-```
-Besides using a combination of `username` and `password`, you can alternatively give an `http_token` or an `oauth2_token`.
-**Important:** You have to activate API access in Zammad. Should be active by default.
-
-### Fetching a single Resource object
-To fetch a `Resource` object by ID, e. g. a ticket with ID 34, use the `Client` object:
-```php
-use ZammadAPIClient\ResourceType;
-$ticket = $client->resource( ResourceType::TICKET )->get(34);
-```
-
-`$ticket` now is a `Resource` object which holds the data of the ticket and provides all of the methods for setting/getting specific values (like the title of the ticket) and sending changed values to Zammad to update the ticket.
-
-Note: Once you successfully called `get` on a `Resource` object, you cannot call it again, instead you have to create a new one with `resource`.
-
-### Accessing values of Resource objects
-You can access the values of a `Resource` object via its 'value' methods.
-```php
-$ticket->setValue( 'title', 'My ticket title' );
-$title = $ticket->getValue('title');
-$all_values = $ticket->getValues();
-```
-
-Please note that the API client does not provide checks for nor does it know about the available fields of the `Resource` objects. If you set or get a value of a non-existing field or set an invalid value, Zammad will ignore it or return an error.
-
-So, how can you know which fields are available? Just fetch an existing `Resource` object and have a look at the returned fields. A fresh Zammad system always contains an object with ID 1 for every resource type.
-
-Additionally you can have a look at the REST interface documentation of Zammad:
-
-[Introduction to the REST interface](https://docs.zammad.org/en/latest/api/intro.html)
-* [Users](https://docs.zammad.org/en/latest/api/user.html)
-* [Groups](https://docs.zammad.org/en/latest/api/group.html)
-* [Organizations](https://docs.zammad.org/en/latest/api/organization.html)
-* [Tickets](https://docs.zammad.org/en/latest/api/ticket.html)
-   * [Ticket articles](https://docs.zammad.org/en/latest/api/ticket/articles.html)
-   * [Ticket priorities](https://docs.zammad.org/en/latest/api/ticket-priority.html)
-   * [Ticket states](https://docs.zammad.org/en/latest/api/ticket-state.html)
-* [Tags](https://docs.zammad.org/en/latest/api/tags.html)
- * [Tag list](https://docs.zammad.org/en/latest/api/ticket/tags.html#administration-scope)
- * [Linking Tickets](https://docs.zammad.org/en/latest/api/ticket/links.html)
-
-#### Fetching a ticket's articles
-If you already have a ticket object, you can easily fetch its articles:
-```php
-$ticket_articles = $ticket->getTicketArticles();
-```
-
-#### Fetching content of ticket article attachments
-The content of ticket article attachments can be fetched with a call of `getAttachmentContent()` of the ticket article resource object:
-```php
-$attachment_content = $ticket_article->getAttachmentContent(23);
-```
-
-In the above example 23 is the ID of the attachment. This ID can be found within the `attachments` array of the ticket article data. Usually you want to loop over this array to fetch the content of all attachments.
-
-`getAttachmentContent()` returns the attachment content as a string, ready to use.
-
-### Updating Resource objects
-If you fetched a `Resource` object and changed some values, you have to send your changes to Zammad. You do this with a simple call:
-```php
-$ticket->save();
-```
-
-`save()` will check it itself but if you somehow need to know if a `Resource` object has unsaved changes, you can check it with:
-```php
-if ( $ticket->isDirty() ) {...}
-```
-
-Note: Some resource types don't support updating the values of certain fields. Please refer to the API documentation (see links above).
-
-### Creating Resource objects
-To create a new `Resource` object, use the following code (example):
-```php
-use ZammadAPIClient\ResourceType;
-
-$ticket = $client->resource( ResourceType::TICKET );
-$ticket->setValue( 'title', 'My new ticket' );
-// ...
-// Set additional values
-// ...
-$ticket->save(); // Will create a new ticket object in Zammad
-```
-
-### Searching Resource objects
-Some types of resources can be searched, pagination is available.
-```php
-use ZammadAPIClient\ResourceType;
-
-// Fulltext search
-$tickets = $client->resource( ResourceType::TICKET )->search('some text');
-
-// Field specific search
-$tickets = $client->resource( ResourceType::TICKET )->search('title:My Title');
-
-// Field specific search with more than one field
-$tickets = $client->resource( ResourceType::TICKET )->search('title:My Title AND priority_id:1');
-
-// Pagination: Page 1, 25 entries per page
-$tickets = $client->resource( ResourceType::TICKET )->search( 'some text', 1, 25 );
-```
-
-Note that there is a configurable server-side limit for the number of returned objects (e. g. 500). This limit also applies to the number of entries per page. If you call search() with 1000 entries per page and the server-side limit is set to 500, the server-side limit will be applied.
-
-A successful search (which might have zero results) returns an array of objects (or an empty array). If the result is the original caller object, there was an error (see error handling below).
-Therefore, the code for searching should look like the following:
+> **Note:** v3 is under active development and not yet released as a stable Packagist version. Add the repository to your `composer.json`:
+> ```json
+> {
+>     "minimum-stability": "dev",
+>     "repositories": [{ "type": "vcs", "url": "https://github.com/zammad/zammad-api-client-php" }],
+>     "require": { "zammad/zammad-api-client-php": "dev-epic-79/pre-merge-develop" }
+> }
+> ```
 
 ```php
-use ZammadAPIClient\ResourceType;
+use ZammadAPIClient\Endpoints\Tickets\TicketDTO;
+use ZammadAPIClient\Endpoints\Tickets\TicketRepository;
+use ZammadAPIClient\ZammadClient;
 
-$tickets = $client->resource( ResourceType::TICKET )->search('some text');
-if ( !is_array($tickets) ) {
-    // Error handling
-    print $tickets->getError();
-}
-else {
-    // Do something with $tickets array
+$client = ZammadClient::withToken('https://zammad.example', 'your-token');
+
+// Fetch
+$ticket = $client->repo(TicketRepository::class)->find(1);
+echo $ticket->title; // typed property, IDE autocomplete
+
+// Create (customer_id is required on creation; article is optional)
+// For production code, resolve priority_id/state_id by name via
+// TicketPriorityRepository / TicketStateRepository. See examples/cookbook.php.
+$created = $client->repo(TicketRepository::class)->create(new TicketDTO(
+    title: 'Hello from v3',
+    customer_id: 1,
+    group_id: 1,
+    priority_id: 2,
+    state_id: 1,
+    article: [
+        'subject' => 'Hello',
+        'body'    => 'Message body',
+        'type'    => 'note',
+    ],
+));
+
+// Partial update
+$client->repo(TicketRepository::class)->patch($created->id, ['title' => 'Updated']);
+
+// Search
+foreach ($client->repo(TicketRepository::class)->search('error') as $ticket) {
+    echo $ticket->title;
 }
 ```
 
-Note: You cannot use a `Resource` object that contains data (either via `get`, `search`, `all` or by setting values on a new object) to execute a search. Use a new `Resource` object instead.
+## Getting started
 
+### Standalone PHP app
 
-### Fetching 'all' Resource objects
-For some types of resources, all available objects can be fetched, pagination is available.
+> **Note:** Until a stable release, use the same VCS repository setup as in Quick Start above.
 
 ```php
-use ZammadAPIClient\ResourceType;
+<?php
+require_once __DIR__ . '/vendor/autoload.php';
 
-// Fetch all tickets (keep in mind the server-side limit, see 'Searching Resource objects')
-$tickets = $client->resource( ResourceType::TICKET )->all();
+use ZammadAPIClient\ZammadClient;
 
-// Fetch all tickets with pagination (keep in mind the server-side limit, see 'Searching Resource objects'), page 4, 50 entries per page
-$tickets = $client->resource( ResourceType::TICKET )->all( 4, 50 );
+$client = ZammadClient::withToken('https://zammad.example', getenv('ZAMMAD_TOKEN'));
 ```
-A successful call of `all` (which might have zero results) returns an array of objects (or an empty array). If the result is the original caller object, there was an error (see error handling below).
-Therefore, the code to use `all` should look like the following:
+
+### Laravel
+
+```bash
+# 1. Register the provider in config/app.php (skip if using auto-discovery, Laravel 5.5+)
+```
+Add `ZammadAPIClient\Bridge\LaravelServiceProvider::class` to `config/app.php`.
+
+```bash
+# 2. Publish the default config to config/zammad.php
+php artisan vendor:publish --tag=zammad-config
+```
+Then inject `ZammadClient` via the container.
+
+### Symfony
+
+Register `ZammadAPIClient\Bridge\SymfonyBundle` in `config/bundles.php`.
+
+## Authentication
 
 ```php
-use ZammadAPIClient\ResourceType;
+// Token — sends Authorization: Token token=your-token (Zammad personal access token)
+ZammadClient::withToken($url, 'your-token');
 
-$tickets = $client->resource( ResourceType::TICKET )->all( 4, 50 ); // pagination
-if ( !is_array($tickets) ) {
-    // Error handling
-    print $tickets->getError();
+// OAuth2 — sends Authorization: Bearer your-oauth-token (OAuth2 access token)
+ZammadClient::withOAuth2($url, 'your-oauth-token');
+
+// Basic Auth — sends Authorization: Basic base64(user:pass)
+ZammadClient::withBasicAuth($url, 'admin@example.com', 'test');
+
+// Options
+ZammadClient::withToken($url, 'your-token',
+    new ConnectionConfig(verifySsl: false, maxRetries: 5),
+);
+
+// Pass a PSR-3 Logger to log HTTP requests and retries
+ZammadClient::withToken($url, 'your-token',
+    new ConnectionConfig(logger: $myLogger),
+);
+```
+
+| ConnectionConfig property | Type | Default | Description |
+|---------------------------|------|---------|-------------|
+| `maxRetries` | `int` | `3` | Number of retries on HTTP 429 before throwing `RateLimitException` |
+| `verifySsl` | `bool` | `true` | Verify SSL certificate of the Zammad server |
+| `timeout` | `int` | `30` | Total request timeout in seconds |
+| `connectTimeout` | `int` | `10` | Connection timeout in seconds |
+| `logger` | `?LoggerInterface` | `null` | PSR-3 Logger for HTTP request/retry logging |
+
+## Examples
+
+The primary example is [`examples/cookbook.php`](examples/cookbook.php) — nine runnable recipes covering tickets, stateful resources, pagination, error handling, impersonation, and search. Run it against any Zammad instance:
+
+```bash
+ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL=http://your-zammad:3000 \
+ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_TOKEN=your-token \
+php examples/cookbook.php
+```
+
+> The env vars are named `...UNIT_TESTS...` for historical reasons. They are used by integration tests and the cookbook example. Unit tests (`make test`) need no env vars.
+
+For user and organization CRUD examples, refer to the integration tests in [`test/Integration/`](test/Integration/) (`UserIntegrationTest.php`, `OrganizationIntegrationTest.php`). Side-by-side v2→v3 migration examples are in [`docs/migration-v3-examples.md`](docs/migration-v3-examples.md).
+
+## How to use
+
+This library offers three interaction styles. Choose based on your use case:
+
+| Style | API | Best for |
+|-------|-----|----------|
+| **Repository + DTOs** (recommended) | `$repo->find()`, `create()`, `patch()`, `delete()` | Type-safe CRUD, IDE autocomplete, explicit intent. Use this by default. |
+| **Stateful Resource** | `$repo->resource($id)->save()` / `destroy()` | Interactive editing — mutate properties step by step, only changes are sent. |
+| **Raw HTTP** | `$client->getHandler()->get()`, `delete()`, etc. | Calling endpoints that have no dedicated repository. Escape hatch. |
+| **Magic accessor** (deprecated) | `$client->ticket()->find(1)` | Triggers `E_USER_DEPRECATED`. Removed in v4. Migrate to `repo()`. |
+
+### Connecting
+
+```php
+use ZammadAPIClient\ZammadClient;
+
+// ZammadClient normalizes the URL — /api/v1 is appended automatically
+$client = ZammadClient::withToken('https://zammad.example', 'your-token');
+```
+
+### Fetching
+
+```php
+// Access via typed repository — autocomplete, type-safe
+$ticket = $client->repo(TicketRepository::class)->find(1);
+$user   = $client->repo(UserRepository::class)->find(1);
+$group  = $client->repo(GroupRepository::class)->find(1);
+```
+
+### Accessing values
+
+```php
+$ticket = $client->repo(TicketRepository::class)->find(1);
+
+echo $ticket->title;          // Typed property, IDE autocomplete
+echo $ticket->state_id;       // ?int
+echo $ticket->created_at;     // ?DateTimeImmutable
+
+$data = $ticket->toArray();   // All values as array
+$id   = $ticket->id;          // Server-assigned ID (null before create)
+```
+
+### Creating
+
+```php
+$ticket = $client->repo(TicketRepository::class)->create(new TicketDTO(
+    title: 'My ticket',
+    customer_id: 1,
+    group_id: 1,
+    priority_id: 2,
+    state_id: 1,
+    article: [
+        'subject' => 'My ticket',
+        'body'    => 'First message',
+        'type'    => 'note',
+    ],
+));
+
+echo $ticket->id; // Server-assigned after creation
+```
+
+### Updating
+
+```php
+$repo = $client->repo(TicketRepository::class);
+
+// Send a DTO — only non-null fields are transmitted
+$repo->patch(1, new TicketDTO(title: 'New title', group_id: 1));
+
+// Partial update via array — only supplied fields change
+$repo->patch(1, ['title' => 'New title', 'state_id' => 3]);
+
+// Partial update via TicketUpdateDTO — only non-null fields sent
+$repo->patch(1, new TicketUpdateDTO(title: 'New title'));
+```
+
+### Stateful resource
+
+`$repo->resource($id)` returns a `Resource` wrapper — **not a DTO**. Properties are accessed and mutated via `__get`/`__set` magic (not typed properties), and changes are automatically tracked. `save()` sends only modified fields; `destroy()` sends DELETE.
+
+```php
+$repo = $client->repo(TicketRepository::class);
+
+$r = $repo->resource(1);          // Returns Resource, fetches ticket #1
+echo $r->title;                   // Reads current title
+$r->title = 'Changed';            // Tracks old → new
+$r->state_id = 3;                 // Tracks old → new
+$r->save();                       // PUT {title, state_id} only
+$r->destroy();                    // DELETE
+```
+
+Use this for interactive workflows where you read, modify, then write. For single-field changes, prefer `patch()`.
+
+### Choosing the right update method
+
+`patch()` is the only update method. It accepts arrays, `TicketUpdateDTO`, or any DTO (via `toArray()`). Zammad uses HTTP PUT for all updates and merges the payload with the existing resource. Null values are excluded from all request bodies, so absent fields are never overwritten.
+
+| Signature | What it sends | Use case |
+|-----------|---------------|----------|
+| `patch($id, $array)` | Only the explicit array keys | Change one or two known fields. **Safest.** |
+| `patch($id, $updateDto)` | Only the non-null DTO fields | IDE autocomplete on the mutable fields. |
+| `patch($id, $dto)` | All non-null properties of the DTO (`toArray()`) | Replace multiple fields using a full DTO. |
+| `resource($id)->save()` | Only actually changed fields (tracked) | Interactive editing with change tracking. |
+
+```php
+$repo = $client->repo(TicketRepository::class);
+
+// Array — simplest for ad-hoc changes
+$repo->patch(1, ['title' => 'New title', 'state_id' => 3]);
+
+// TicketUpdateDTO — type-safe, IDE-friendly
+$repo->patch(1, new TicketUpdateDTO(title: 'New title'));
+
+// Full DTO — send a modified TicketDTO
+$ticket = $repo->find(1);
+$repo->patch(1, new TicketDTO(
+    title: $ticket->title,
+    group_id: 2, // changed from original
+));
+
+// Stateful resource — tracks property changes
+$r = $repo->resource(1);
+$r->title = 'Changed';
+$r->state_id = 3;
+$r->save(); // Sends only {title, state_id}
+```
+
+### Deleting
+
+All repositories expose a `delete()` method. Repositories implementing `DeletableInterface` perform the actual API call. Other repositories throw a `BadMethodCallException` — catchable, unlike a fatal error.
+
+| Repository | `delete()` | Notes |
+|-----------|:----------:|-------|
+| `TicketRepository` | ✓ | |
+| `UserRepository` | ✓ | |
+| `GroupRepository` | ✓ | |
+| `OrganizationRepository` | ✓ | |
+| `TextModuleRepository` | ✓ | |
+| `TagRepository` | exception | Throws `BadMethodCallException`; use `add()` / `remove()` |
+| `LinkRepository` | exception | Throws `BadMethodCallException`; use `add()` / `remove()` |
+| `TicketArticleRepository` | exception | Zammad API does not allow article deletion |
+| `TicketStateRepository` | exception | System resource, read-only |
+| `TicketPriorityRepository` | exception | System resource, read-only |
+
+```php
+$client->repo(TicketRepository::class)->delete(1);
+$client->repo(UserRepository::class)->delete(1);
+```
+
+### Searching
+
+```php
+$repo = $client->repo(TicketRepository::class);
+
+// Full-text search — returns a lazy Generator (page by page)
+// Use foreach directly; count()/array access requires iterator_to_array()
+foreach ($repo->search('some text') as $ticket) {
+    echo $ticket->title;
 }
-else {
-    // Do something with $tickets array
+
+// Field-specific search
+foreach ($repo->search('title:Error AND priority_id:1') as $ticket) {
+    echo $ticket->number;
+}
+
+// PaginatedList — count(), totalCount(), page navigation
+$list = $repo->searchList('error', ['per_page' => 25]);
+echo $list->totalCount();
+$list->page(2);
+$list->each(function ($t) { echo $t->title; });
+```
+
+### Listing all
+
+```php
+$repo = $client->repo(TicketRepository::class);
+
+// Lazy Generator — pages fetched on demand, memory-efficient
+// Use in foreach; need count? Use list() for PaginatedList instead.
+foreach ($repo->all() as $ticket) {
+    echo $ticket->title;
+}
+
+// PaginatedList — count(), page navigation, each() callback
+$list = $repo->list();
+echo $list->count();                    // Items on current page
+$list->page(2);                         // Jump to page 2
+$list->pageNext();                      // Next page
+$list->each(function ($t) { echo $t->title; });
+```
+
+### Ticket articles
+
+```php
+$repo = $client->repo(TicketArticleRepository::class);
+
+// All articles for a ticket (paginated)
+foreach ($repo->getForTicket(1) as $article) {
+    echo $article->body;
+}
+
+// Download raw attachment content
+$binary = $repo->getAttachmentContent(
+    ticketId: 1, articleId: 5, attachmentId: 23,
+);
+```
+
+### Tags
+
+```php
+$repo = $client->repo(TagRepository::class);
+
+$repo->add('Ticket', $ticketId, 'urgent');
+$repo->remove('Ticket', $ticketId, 'urgent');
+
+foreach ($repo->all(['object' => 'Ticket', 'o_id' => $ticketId]) as $tag) {
+    echo $tag->value;
+}
+
+$results = $repo->tagSearch('urg'); // Autocomplete
+```
+
+### CSV import
+
+```php
+$csv = file_get_contents('users.csv');
+$result = $client->repo(UserRepository::class)->import($csv);           // Returns import summary array
+$result = $client->repo(OrganizationRepository::class)->import($csv);   // Returns import summary array
+$client->repo(TextModuleRepository::class)->import($csv);               // Returns import summary array
+```
+
+All `import()` methods return an `array` — the Zammad API response containing import statistics (rows processed, skipped, errors).
+CSV format follows Zammad's import specification (header row with field names matching API field names).
+
+## Error Handling
+
+All errors are typed exceptions:
+
+```php
+use ZammadAPIClient\Exceptions\{
+    AuthenticationException,
+    ForbiddenException,
+    NotFoundException,
+    ValidationException,
+    RateLimitException,
+    ServerErrorException,
+    NetworkException,
+};
+
+try {
+    $client->repo(TicketRepository::class)->find(999999);
+} catch (NotFoundException $e) {
+    echo $e->getMessage();          // "Resource not found: tickets/999999"
+} catch (ValidationException $e) {
+    print_r($e->errors);            // Per-field validation messages
+} catch (AuthenticationException $e) {
+    // Invalid credentials (401)
+} catch (ForbiddenException $e) {
+    // Valid credentials but insufficient permissions (403)
+} catch (RateLimitException $e) {
+    echo $e->retryAfterSeconds;     // Auto-retried, thrown on exhaustion (429)
+} catch (ServerErrorException $e) {
+    // Server error (5xx)
+} catch (NetworkException $e) {
+    // DNS, timeout, connection refused
 }
 ```
 
-Note: You cannot use a `Resource` object that contains data (either via `get`, `search`, `all` or by setting values on a new object) to execute `all`. Use a new `Resource` object instead.
+| Exception | HTTP | Auto-retry | Properties |
+|-----------|------|:----------:|------------|
+| `AuthenticationException` | 401 | no | `$e->getMessage()` |
+| `ForbiddenException` | 403 | no | `$e->getMessage()` |
+| `NotFoundException` | 404 | no | `$e->getMessage()` |
+| `ValidationException` | 422 | no | `$e->errors` (array, per-field) |
+| `RateLimitException` | 429 | yes | `$e->retryAfterSeconds` |
+| `ServerErrorException` | 5xx | no | `$e->getMessage()` |
+| `NetworkException` | — | no | DNS, timeout, connection refused |
 
-### Deleting a Resource object
-To be able to delete a `Resource` object that exists in Zammad, you must first fetch it from Zammad, either via `get`, `all` or `search`.
-You can also delete a newly created `Resource` object that has not been sent to Zammad yet. But this should only rarely be necessary because you can simply create a new `Resource` object via the `Client` object.
-To delete a `Resource` object, simply call `delete` on it:
+## Data Transfer Objects (DTOs)
+
+Each repository returns typed DTOs. Below are the fields for each DTO. Fields marked **yes** have no default and are required in the constructor. Fields marked **creation** are nullable in the type signature but required by the Zammad API when creating a new resource — omitting them will result in a `ValidationException` (422).
+
+The `id` field is available both as a property (`$dto->id`) and a convenience method (`$dto->id()`). Both return the same server-assigned ID; prefer the property for readability.
+
+### TicketDTO
+
+| Field | Type | Required | Notes |
+|-------|------|:--------:|-------|
+| `title` | `string` | yes | Subject line of the ticket |
+| `group_id` | `?int` | — | Group responsible for the ticket |
+| `priority_id` | `?int` | — | References TicketPriority; resolve by name via `TicketPriorityRepository` |
+| `state_id` | `?int` | — | References TicketState; resolve by name via `TicketStateRepository` |
+| `organization_id` | `?int` | — | Derived from customer's organization |
+| `customer_id` | `?int` | **creation** | End-user who submitted the ticket (Zammad requires this on create) |
+| `owner_id` | `?int` | — | Agent assigned to the ticket |
+| `number` | `?string` | — | Human-readable ticket number (read-only) |
+| `id` | `?int` | — | Server-assigned (null before creation) |
+| `pending_time` | `?DateTimeImmutable` | — | ISO 8601 datetime for pending states |
+| `article` | `?array` | — | Optional initial article. Array shape: `{ subject: string, body: string, type: string, internal?: bool, content_type?: string, ... }`. Use `TicketArticleType` enum constants (e.g. `TicketArticleType::Note->value`) for type-safe `type` values. |
+| `created_at` | `?DateTimeImmutable` | — | Server-assigned (read-only) |
+| `updated_at` | `?DateTimeImmutable` | — | Server-assigned (read-only) |
+| `customFields` | `array` | — | Zammad custom fields (`string => mixed`). Named camelCase per Zammad API convention.
+
+### TicketUpdateDTO
+
+Used with `patch()` for partial ticket updates. Only non-null fields are sent to the API.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `title` | `?string` | |
+| `state_id` | `?int` | |
+| `priority_id` | `?int` | |
+| `group_id` | `?int` | |
+| `owner_id` | `?int` | |
+| `customer_id` | `?int` | |
+| `note` | `?string` | Adds an internal note (article type 'note') on update |
+| `pending_time` | `?DateTimeImmutable` | ISO 8601 datetime for pending states |
+
 ```php
-$ticket->delete();
+// Example: reassign ticket and leave an internal note
+$client->repo(TicketRepository::class)->patch(42, new TicketUpdateDTO(
+    owner_id: 7,
+    note: 'Reassigned from support queue.',
+));
 ```
 
-This clears the object from all data and if possible deletes it in Zammad. The PHP object itself remains. You can reuse it for another `Resource` object or simply drop it.
+### UserDTO
 
-### Working with tags
+| Field | Type | Required | Notes |
+|-------|------|:--------:|-------|
+| `login` | `?string` | — | Unique username |
+| `email` | `?string` | — | Primary email address |
+| `firstname` | `?string` | — | |
+| `lastname` | `?string` | — | |
+| `phone` | `?string` | — | |
+| `organization_id` | `?int` | — | Primary organization |
+| `organization_ids` | `?array` | — | Array of secondary organization IDs |
+| `role_ids` | `?array` | — | Array of role IDs (e.g. `[2]` for Agent) |
+| `active` | `?bool` | — | Whether the user account is active |
+| `id` | `?int` | — | Server-assigned |
+| `created_at` | `?DateTimeImmutable` | — | Read-only |
+| `updated_at` | `?DateTimeImmutable` | — | Read-only |
+| `customFields` | `array` | — | |
 
-#### Adding a tag to an object
+### OrganizationDTO
 
-Zammad can assign tags to an object. Currently this is only supported for ticket objects.
+| Field | Type | Required | Notes |
+|-------|------|:--------:|-------|
+| `name` | `string` | yes | Display name |
+| `note` | `?string` | — | |
+| `active` | `?bool` | — | |
+| `id` | `?int` | — | Server-assigned |
+| `created_at` | `?DateTimeImmutable` | — | Read-only |
+| `updated_at` | `?DateTimeImmutable` | — | Read-only |
+| `customFields` | `array` | — | |
+
+### GroupDTO
+
+| Field | Type | Required | Notes |
+|-------|------|:--------:|-------|
+| `name` | `string` | yes | Display name |
+| `note` | `?string` | — | |
+| `active` | `?bool` | — | |
+| `id` | `?int` | — | Server-assigned |
+| `created_at` | `?DateTimeImmutable` | — | Read-only |
+| `updated_at` | `?DateTimeImmutable` | — | Read-only |
+| `customFields` | `array` | — | |
+
+### TicketArticleDTO
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `ticket_id` | `?int` | Parent ticket |
+| `type` | `?string` | Channel type: `TicketArticleType::Note->value` (`'note'`), `Email` (`'email'`), `Phone` (`'phone'`), `Sms` (`'sms'`), `Web` (`'web'`) |
+| `body` | `?string` | Message content |
+| `content_type` | `?string` | MIME type: `'text/plain'` or `'text/html'` |
+| `subject` | `?string` | Subject line for email-type articles |
+| `from` | `?string` | Sender address/name |
+| `to` | `?string` | Recipient address |
+| `cc` | `?string` | CC address |
+| `internal` | `?bool` | Whether it's an internal note (hidden from customer) |
+| `in_reply_to` | `?string` | Message-ID for threading |
+| `reply_to` | `?string` | Reply-To address |
+| `message_id` | `?string` | Message-ID of this article |
+| `origin_by_id` | `?int` | User who created the article (for impersonation) |
+| `sender` | `?string` | Read-only: `'Customer'`, `'Agent'`, etc. |
+| `type_id` | `?int` | Read-only |
+| `sender_id` | `?int` | Read-only |
+| `created_by_id` | `?int` | Read-only |
+| `updated_by_id` | `?int` | Read-only |
+| `created_by` | `?string` | Read-only |
+| `updated_by` | `?string` | Read-only |
+| `time_unit` | `?float` | Time accounting (minutes) |
+| `attachments` | `?array` | Array of `{filename, data (base64), mime-type?}` |
+| `id` | `?int` | Server-assigned |
+| `created_at` | `?DateTimeImmutable` | Read-only |
+| `updated_at` | `?DateTimeImmutable` | Read-only |
+
+### TicketStateDTO
+
+| Field | Type | Required | Notes |
+|-------|------|:--------:|-------|
+| `name` | `string` | yes | Display label (e.g. `'open'`, `'closed'`) |
+| `state_type_id` | `?int` | — | Determines Zammad's automation behaviour |
+| `note` | `?string` | — | |
+| `active` | `?bool` | — | |
+| `id` | `?int` | — | Server-assigned |
+| `created_at` | `?DateTimeImmutable` | — | Read-only |
+| `updated_at` | `?DateTimeImmutable` | — | Read-only |
+
+### TicketPriorityDTO
+
+| Field | Type | Required | Notes |
+|-------|------|:--------:|-------|
+| `name` | `string` | yes | Display label (e.g. `'2 normal'`, `'3 high'`) |
+| `note` | `?string` | — | |
+| `active` | `?bool` | — | |
+| `id` | `?int` | — | Server-assigned |
+| `created_at` | `?DateTimeImmutable` | — | Read-only |
+| `updated_at` | `?DateTimeImmutable` | — | Read-only |
+
+### TextModuleDTO
+
+| Field | Type | Required | Notes |
+|-------|------|:--------:|-------|
+| `name` | `string` | yes | Display name |
+| `keywords` | `?string` | — | Space-separated search keywords |
+| `content` | `?string` | — | Template body with optional `#{...}` variables |
+| `note` | `?string` | — | |
+| `active` | `?bool` | — | |
+| `id` | `?int` | — | Server-assigned |
+| `created_at` | `?DateTimeImmutable` | — | Read-only |
+| `updated_at` | `?DateTimeImmutable` | — | Read-only |
+
+### TagDTO
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | `?int` | Tag-assignment ID |
+| `object` | `?string` | Object class name (e.g. `'Ticket'`) |
+| `o_id` | `?int` | Numeric ID of the tagged object |
+| `value` | `?string` | Tag string (e.g. `'urgent'`, `'bug'`) |
+
+### LinkDTO
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | `?int` | Server-assigned |
+| `link_type_id` | `?int` | |
+| `link_type` | `?string` | `'normal'`, `'parent'`, or `'child'` |
+| `link_object_source` | `?string` | Source object type |
+| `link_object_source_value` | `?int` | Source object ID |
+| `link_object_target` | `?string` | Target object type |
+| `link_object_target_value` | `?int` | Target object ID |
+| `created_at` | `?DateTimeImmutable` | Read-only |
+| `updated_at` | `?DateTimeImmutable` | Read-only |
+
+## Impersonation
 
 ```php
-use ZammadAPIClient\ResourceType;
+use ZammadAPIClient\Endpoints\Tickets\TicketRepository;
 
-// The third parameter 'Ticket' is the object type for which the ID will be given as first parameter.
-$client->resource( ResourceType::TAG )->add( $ticket_id, 'tag 1', 'Ticket' );
-```
+// Temporary — auto-cleanup via finally
+// Accepts user ID (int), login, or email (string)
+$client->performOnBehalfOf(1, fn() => $client->repo(TicketRepository::class)->find(42));
+$client->performOnBehalfOf('agent@example.com', fn() => $client->repo(TicketRepository::class)->find(42));
 
-
-#### Remove a tag from an object
-
-```php
-use ZammadAPIClient\ResourceType;
-
-$client->resource( ResourceType::TAG )->remove( $ticket_id, 'tag 1', 'Ticket' );
-```
-
-#### Getting all tags assigned to an object
-
-```php
-use ZammadAPIClient\ResourceType;
-
-// The second parameter 'Ticket' is the object type for which the ID will be given as first parameter.
-$tag = $client->resource( ResourceType::TAG )->get( $ticket_id, 'Ticket' );
-
-// [ 'tag 1', 'tag 2' ]
-$tags = $tag->getValue('tags')
-```
-
-#### Search for Tags
-
-```php
-use ZammadAPIClient\ResourceType;
-
-$tags = $client->resource( ResourceType::TAG )->search('my tag');
-```
-### Linking Tickets
-
-#### Linking two Tickets
-
-Zammad can link two or more Ticket objects. Allowed Link Types are `normal`, `parent` or `child`.
-
-```php
-use ZammadAPIClient\ResourceType;
-
-// First parameter $sourceTicket is the Ticket that should be linked
-// Second parameter $targetTicket is the Ticket that $sourceTicket should be linked to
-// Third parameter is the LinkType the $sourceTicket will be linked to $targetTicket with.
-$client->resource( ResourceType::LINK )->add( $sourceTicket, $targetTicket, 'normal' );
-```
-
-### Object import
-
-Besides the usual methods available for objects, there is also a method available to import these via CSV. Example for text module CSV import:
-
-```php
-use ZammadAPIClient\ResourceType;
-
-$text_modules_csv_string = file_get_contents('text_modules.csv');
-
-$client->resource( ResourceType::TEXT_MODULE )->import($text_modules_csv_string);
-
-```
-
-See __Available resource types and their access methods__ below for resource types that support CSV import.
-
-### Handling Zammad errors
-When you access Zammad, you **always** will get a `Resource` object (or an array of such objects) in return, regardless if Zammad returned data or executed your request. In case of errors (e. g. that above ticket with ID 34 does not exist in Zammad), you will get a `Resource` object with a set error which can be checked with the following code:
-```php
-if ( $ticket->hasError() ) {
-    print $ticket->getError();
-}
-```
-
-If you additionally need more detailed information about connection/request errors, you can access the `Response` object of the `Client` object. It holds the response of the last request that was made.
-```php
-$last_response = $client->getLastResponse();
-```
-With this object, you can e. g. get the HTTP status code and the body of the last response.
-
-### Executing an API call on behalf of another user
-If you want Zammad to execute an API call on behalf of another user than the one you used for authentication, use the following code before executing the API call(s):
-```php
-$client->setOnBehalfOfUser('myuser');
-```
-This sets the `From` HTTP header. Any API call after above code will use this setting. If you want to return to using the user you used for authentication, call:
-```php
+// Persistent — same parameter types
+$client->setOnBehalfOfUser(1);
+// ... all subsequent requests act as user #1 ...
 $client->unsetOnBehalfOfUser();
 ```
 
-Using this setting will be ignored by Zammad before version 2.4.
+## Development
 
-## Available resource types and their access methods
-
-To be able to use the 'short form' for the resource type, add a
-```php
-use ZammadAPIClient\ResourceType;
+```bash
+composer install
+make test             # Unit tests (<1s, no Docker, no Zammad needed)
+make test-integration # Integration tests (requires a running Zammad instance)
 ```
 
-to your code. You then can reference the resource type like
-```php
-$client->resource( ResourceType::TICKET );
-```
+### Unit tests
 
-|Resource type|get|all|search|save|delete|add|remove|import|
-|-------------|:-:|:-:|:----:|:--:|:----:|:-:|:----:|:----:|
-| TICKET|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|&ndash;|&ndash;|
-| TICKET_ARTICLE|&#10004;|&ndash;|&#10004;|&#10004;|&#10004;|&ndash;|&ndash;|&ndash;|
-| TICKET_STATE|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|&ndash;|&ndash;|&ndash;|
-| TICKET_PRIORITY|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|&ndash;|&ndash;|&ndash;|
-| TEXT_MODULE|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|&ndash;|&ndash;|&#10004;|
-| ORGANIZATION|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|&ndash;|&#10004;|
-| GROUP|&#10004;|&#10004;|&ndash;|&#10004;|&#10004;|&ndash;|&ndash;|&ndash;|
-| USER|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|&ndash;|&#10004;|
-| TAG|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&#10004;|&ndash;|
-| LINK|&#10004;|&ndash;|&ndash;|&ndash;|&ndash;|&#10004;|&#10004;|&ndash;|
+No environment variables needed. Unit tests mock the HTTP layer and run fully isolated.
 
+### Integration tests
 
-## Publishing
-
-1. Add release to [CHANGELOG.md](CHANGELOG.md)
-2. Commit, tag and push.
-3. As a logged-in user, use the "update" button on the [packagist.org page of zammad-api-client-php](https://packagist.org/packages/zammad/zammad-api-client-php) to create the new version automatically from the git tag.
-
-## Contributing
-
-Bug reports and pull requests are welcome on [GitHub](https://github.com/zammad/zammad-api-client-php). This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
-
-### Running tests
-
-Tests require a running Zammad instance with API access enabled. Set the following environment variables:
+These require a running Zammad instance and authentication credentials:
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL` | Yes | — | URL to Zammad (e.g. `http://localhost:3000/`) |
-| `ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_USERNAME` | Yes | — | Username for authentication |
-| `ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_PASSWORD` | Yes | — | Password for authentication |
-| `ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_TIMEOUT` | No | `30` | Request timeout in seconds |
+| `ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL` | Yes | `http://localhost:3000` | Zammad server URL (without /api/v1) |
+| `ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_TOKEN` | No | — | Token authentication (preferred) |
+| `ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_USERNAME` | No* | — | Username for basic auth |
+| `ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_PASSWORD` | No* | — | Password for basic auth |
 
-**Note:** Only username/password authentication is supported for tests.
+\* Either `ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_TOKEN` or `USERNAME`+`PASSWORD` must be set.
 
-```bash
-ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL="http://localhost:3000/" \
-ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_USERNAME="admin@example.com" \
-ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_PASSWORD="test" \
-ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_TIMEOUT=120 \
-vendor/bin/phpunit
-```
+## Migration from v2
+
+See [docs/migration-v3-examples.md](docs/migration-v3-examples.md) for side-by-side code examples.
+v2 reference documentation is preserved in [docs/v2-reference.md](docs/v2-reference.md).
+
+| v2 | v3 |
+|----|----|
+| `new Client(['url' => ..., 'http_token' => ...])` | `ZammadClient::withToken($url, ...)` |
+| `$client->resource(TICKET)->get(1)` | `$client->repo(TicketRepository::class)->find(1)` |
+| `$ticket->getValue('title')` | `$ticket->title` |
+| `$ticket->getValues()` | `$ticket->toArray()` |
+| `$ticket->setValue('title', 'x'); $ticket->save()` | `$client->repo(TicketRepository::class)->patch(1, ['title' => 'x'])` |
+| `if ($ticket->hasError()) { $ticket->getError(); }` | `catch (NotFoundException $e) { $e->getMessage(); }` |
+| `$client->resource(TICKET)->search('term')` | `$client->repo(TicketRepository::class)->search('term')` |
+| `$client->resource(TICKET)->all()` | `$client->repo(TicketRepository::class)->all()` |
+| `$ticket->delete()` | `$client->repo(TicketRepository::class)->delete($id)` |
+| `$client->resource(TAG)->add($ticketId, 'tag', 'Ticket')` | `$client->repo(TagRepository::class)->add('Ticket', $ticketId, 'tag')` *(order changed)* |
+
+## License
+
+AGPL-3.0 or MIT.
