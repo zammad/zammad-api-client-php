@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -e
+
+echo "→ phpcs (PSR-12)"
+vendor/bin/phpcs --standard=PSR12 src/
+
+echo "→ phpstan (level=max)"
+vendor/bin/phpstan analyse src/ --level=max
+
+echo "→ phpunit (unit suite)"
+XDEBUG_MODE=off php vendor/bin/phpunit --testsuite=unit --display-skipped --no-coverage

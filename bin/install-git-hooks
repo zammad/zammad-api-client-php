@@ -1,0 +1,15 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+$source = __DIR__ . '/pre-commit';
+$target = dirname(__DIR__) . '/.git/hooks/pre-commit';
+
+if (! is_dir(dirname($target))) {
+    return;
+}
+
+copy($source, $target);
+chmod($target, 0755);
+echo "Git hooks installed.\n";

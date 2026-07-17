@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<ruleset name="zammad-api-client-php">
+    <description>PSR-12 coding standard for the Zammad PHP API client.</description>
+
+    <file>src</file>
+    <file>test</file>
+    <file>examples</file>
+
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+    <arg value="sp"/>
+
+    <rule ref="PSR12"/>
+</ruleset>
