@@ -1,22 +1,17 @@
 <?php
 
-function IncludeIfExists($File)
-{
-    if ( file_exists($File) ) {
-        return include $File;
-    }
-}
+declare(strict_types=1);
 
-if (
-    ( !$Loader = IncludeIfExists( __DIR__.'/../vendor/autoload.php' ) )
-    && ( !$Loader = IncludeIfExists( __DIR__.'/../../../.composer/autoload.php' ) )
-) {
-    die(
-        'You must set up the project dependencies, run the following commands:' . PHP_EOL
-        . 'curl -s http://getcomposer.org/installer | php' . PHP_EOL
-        . 'php composer.phar install' . PHP_EOL
+use Composer\Autoload\ClassLoader;
+
+$autoloadFile = __DIR__ . '/../vendor/autoload.php';
+
+if (!file_exists($autoloadFile)) {
+    throw new RuntimeException(
+        'Composer autoloader not found. Run "composer install" first.',
     );
 }
 
-$Loader->add( 'ZammadAPIClient', __DIR__ );
-return $Loader;
+/** @var ClassLoader $loader */
+$loader = require $autoloadFile;
+$loader->add('ZammadAPIClient\\Tests\\', __DIR__);
