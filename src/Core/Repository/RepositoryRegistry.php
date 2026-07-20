@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ZammadAPIClient\Core;
+namespace ZammadAPIClient\Core\Repository;
 
 use InvalidArgumentException;
 use ZammadAPIClient\Core\Contracts\DTOInterface;

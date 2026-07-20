@@ -8,7 +8,7 @@ namespace ZammadAPIClient\Core\Contracts;
  * Stateless service that fetches a single page of DTOs from a backend.
  *
  * The fetcher is responsible for HTTP communication and response parsing;
- * {@see \ZammadAPIClient\Core\PaginatedList} owns caching and iteration logic.
+ * {@see \ZammadAPIClient\Core\Repository\PaginatedList} owns caching and iteration logic.
  *
  * Implementations may be replaced for testing (mock), caching (decorator), or
  * alternative backends without touching the list logic.

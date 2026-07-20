@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ZammadAPIClient\Core;
+namespace ZammadAPIClient\Core\Repository;
 
 use BadMethodCallException;
 use Generator;
@@ -26,7 +26,7 @@ use ZammadAPIClient\Core\Contracts\RequestHandlerInterface;
  *
  * All repositories are instantiated via {@see \ZammadAPIClient\ZammadClient::repo()},
  * which injects the shared `RequestHandler` and the wiring defined in
- * {@see \ZammadAPIClient\Core\RepositoryRegistry::DEFINITIONS}.
+ * {@see \ZammadAPIClient\Core\Repository\RepositoryRegistry::DEFINITIONS}.
  *
  * @template T of DTOInterface
  * @implements RepositoryInterface<T>
@@ -66,10 +66,13 @@ abstract class AbstractRepository implements RepositoryInterface
      * Returns the JSON array key that contains the resource list in paginated responses.
      *
      * Zammad's list endpoints wrap results in a keyed array (e.g. `{"tickets": [...], "assets": {...}}`).
-     * Each endpoint uses a different key; subclasses declare the correct one here so
-     * {@see self::extractItems()} can locate the items without guessing.
+     * Each endpoint uses a different key; the default is the resource path.
+     * Subclasses may override this when the list key differs from the path.
      */
-    abstract protected function getListKey(): string;
+    protected function getListKey(): string
+    {
+        return $this->resourcePath;
+    }
 
     /**
      * Fetches a single resource by its Zammad-assigned ID.
@@ -287,6 +290,20 @@ abstract class AbstractRepository implements RepositoryInterface
     public function getIterator(): Traversable
     {
         return $this->all();
+    }
+
+    /**
+     * Returns the total number of resources via search.
+     *
+     * Delegates to `searchList('*')` which fetches the first page
+     * with `with_total_count=true`. One API call, no memory overhead.
+     *
+     * Override this method if the endpoint does not support the
+     * standard `/search` path (e.g. links, tags).
+     */
+    public function totalCount(): int
+    {
+        return $this->searchList('*')->page(1)->getTotalCount() ?? 0;
     }
 
     /**

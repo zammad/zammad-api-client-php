@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ZammadAPIClient\Endpoints\Links;
 
 use InvalidArgumentException;
-use ZammadAPIClient\Core\AbstractRepository;
+use ZammadAPIClient\Core\Repository\AbstractRepository;
 
 /**
  * Repository for the `/api/v1/links` endpoint.
@@ -23,11 +23,6 @@ use ZammadAPIClient\Core\AbstractRepository;
  */
 final class LinkRepository extends AbstractRepository
 {
-    protected function getListKey(): string
-    {
-        return 'links';
-    }
-
     /**
      * Lists all links for a given Zammad object.
      *

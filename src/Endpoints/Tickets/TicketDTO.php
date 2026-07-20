@@ -6,7 +6,7 @@ namespace ZammadAPIClient\Endpoints\Tickets;
 
 use DateTimeImmutable;
 use ZammadAPIClient\Core\Contracts\DTOInterface;
-use ZammadAPIClient\Core\DtoHydrator;
+use ZammadAPIClient\Core\Repository\DtoHydrator;
 use ZammadAPIClient\Core\Traits\HasTimestamps;
 use ZammadAPIClient\Core\Traits\SerializesToArray;
 

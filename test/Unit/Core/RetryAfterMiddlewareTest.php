@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use ZammadAPIClient\Core\RetryAfterMiddleware;
+use ZammadAPIClient\Core\Transport\RetryAfterMiddleware;
 
 #[Group('unit')]
 final class RetryAfterMiddlewareTest extends TestCase

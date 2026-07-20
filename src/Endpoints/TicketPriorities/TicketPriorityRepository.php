@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Endpoints\TicketPriorities;
 
-use ZammadAPIClient\Core\AbstractRepository;
+use ZammadAPIClient\Core\Repository\AbstractRepository;
 
 /**
  * Repository for the `/api/v1/ticket_priorities` endpoint.
@@ -18,11 +18,4 @@ use ZammadAPIClient\Core\AbstractRepository;
  */
 final class TicketPriorityRepository extends AbstractRepository
 {
-    /**
-     * Returns 'ticket_priorities' — the JSON array key in Zammad's paginated priority list response.
-     */
-    protected function getListKey(): string
-    {
-        return 'ticket_priorities';
-    }
 }

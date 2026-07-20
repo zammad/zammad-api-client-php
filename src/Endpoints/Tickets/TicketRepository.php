@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Endpoints\Tickets;
 
-use ZammadAPIClient\Core\AbstractRepository;
+use ZammadAPIClient\Core\Repository\AbstractRepository;
 use ZammadAPIClient\Core\Contracts\DeletableInterface;
 use ZammadAPIClient\Endpoints\TicketArticles\TicketArticleDTO;
 
@@ -20,17 +20,6 @@ use ZammadAPIClient\Endpoints\TicketArticles\TicketArticleDTO;
  */
 final class TicketRepository extends AbstractRepository implements DeletableInterface
 {
-    /**
-     * Returns 'tickets' — the JSON array key in Zammad's paginated ticket list response.
-     *
-     * Zammad wraps results in `{"tickets": [...], "assets": {...}}`; this key
-     * tells {@see \ZammadAPIClient\Core\AbstractRepository::extractItems()} where to find the items.
-     */
-    protected function getListKey(): string
-    {
-        return 'tickets';
-    }
-
     /**
      * Streams all articles belonging to the given ticket.
      *

@@ -49,10 +49,11 @@ interface RequestHandlerInterface
      * Use this instead of {@see self::get()} when the endpoint returns binary
      * data (e.g. ticket attachment content) that cannot be JSON-decoded.
      *
-     * @param array<string, mixed> $query URL query parameters.
+     * @param array<string, mixed> $query   URL query parameters.
+     * @param array<string, string> $headers Additional HTTP headers to send.
      * @throws \ZammadAPIClient\Exceptions\NetworkException On transport failure.
      */
-    public function getRaw(string $uri, array $query = []): string;
+    public function getRaw(string $uri, array $query = [], array $headers = []): string;
 
     /**
      * Performs a GET request and returns the decoded JSON body.
@@ -94,18 +95,4 @@ interface RequestHandlerInterface
      * Useful for inspecting response headers after a repository call.
      */
     public function getLastResponse(): ?ResponseInterface;
-
-    /**
-     * Sets or clears the user identifier for API impersonation.
-     *
-     * When non-null the value is forwarded as the `From` HTTP header,
-     * causing Zammad to execute the request as the given user.
-     * The value may be a user ID, login, or email. Pass null to
-     * remove impersonation.
-     *
-     * @see https://docs.zammad.org/en/latest/api/intro.html#actions-on-behalf-of-other-users
-     */
-    public function setOnBehalfOfUser(int|string|null $userId): void;
-
-    public function getOnBehalfOfUser(): int|string|null;
 }

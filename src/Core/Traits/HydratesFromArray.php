@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Core\Traits;
 
-use ZammadAPIClient\Core\DtoHydrator;
+use ZammadAPIClient\Core\Repository\DtoHydrator;
 
 /**
  * Provides a reflection-based `fromArray()` implementation for DTOs.
  *
- * Delegates to {@see \ZammadAPIClient\Core\DtoHydrator::hydrate()}, which
+ * Delegates to {@see \ZammadAPIClient\Core\Repository\DtoHydrator::hydrate()}, which
  * inspects the consuming class's constructor to determine parameter names and
  * types, then maps matching keys from the raw API array using
  * {@see \ZammadAPIClient\Core\Cast}. The constructor is the sole schema
@@ -18,7 +18,7 @@ use ZammadAPIClient\Core\DtoHydrator;
  * When the API field name differs from the constructor parameter, or when
  * a fallback key must be tried (e.g. `owner_id` vs `assigned_to_id`),
  * override `fromArray()` in the specific DTO, normalise the array, and then
- * delegate to {@see \ZammadAPIClient\Core\DtoHydrator::hydrate()}.
+ * delegate to {@see \ZammadAPIClient\Core\Repository\DtoHydrator::hydrate()}.
  */
 trait HydratesFromArray
 {

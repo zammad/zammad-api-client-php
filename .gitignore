@@ -2,3 +2,5 @@
 /.phpunit.cache/
 /composer.lock
 /build/
+/.opencode/
+/playground.php
