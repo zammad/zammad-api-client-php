@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Endpoints\TicketArticles;
 
-use ZammadAPIClient\Core\AbstractRepository;
+use ZammadAPIClient\Core\Repository\AbstractRepository;
 
 /**
  * Repository for the `/api/v1/ticket_articles` endpoint.
@@ -22,16 +22,6 @@ use ZammadAPIClient\Core\AbstractRepository;
  */
 final class TicketArticleRepository extends AbstractRepository
 {
-    /**
-     * Returns 'ticket_articles' — the JSON array key in Zammad's article list response.
-     *
-     * Zammad wraps paginated results in `{"ticket_articles": [...], "assets": {...}}`.
-     */
-    protected function getListKey(): string
-    {
-        return 'ticket_articles';
-    }
-
     /**
      * Streams all articles belonging to the given ticket, including relation data.
      *

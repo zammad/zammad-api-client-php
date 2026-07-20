@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Endpoints\Groups;
 
-use ZammadAPIClient\Core\AbstractRepository;
+use ZammadAPIClient\Core\Repository\AbstractRepository;
 use ZammadAPIClient\Core\Contracts\DeletableInterface;
 
 /**
@@ -18,11 +18,6 @@ use ZammadAPIClient\Core\Contracts\DeletableInterface;
  */
 final class GroupRepository extends AbstractRepository implements DeletableInterface
 {
-    protected function getListKey(): string
-    {
-        return 'groups';
-    }
-
     public function delete(int $id): void
     {
         $this->handler->delete("{$this->resourcePath}/{$id}");

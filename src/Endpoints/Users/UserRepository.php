@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Endpoints\Users;
 
-use ZammadAPIClient\Core\AbstractRepository;
+use ZammadAPIClient\Core\Repository\AbstractRepository;
 use ZammadAPIClient\Core\Contracts\DeletableInterface;
 
 /**
@@ -19,14 +19,6 @@ use ZammadAPIClient\Core\Contracts\DeletableInterface;
  */
 final class UserRepository extends AbstractRepository implements DeletableInterface
 {
-    /**
-     * Returns 'users' — the JSON array key in Zammad's paginated user list response.
-     */
-    protected function getListKey(): string
-    {
-        return 'users';
-    }
-
     /**
      * Bulk-imports users from a CSV string.
      *

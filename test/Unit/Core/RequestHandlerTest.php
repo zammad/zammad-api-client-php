@@ -14,7 +14,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use ZammadAPIClient\Core\RequestHandler;
+use ZammadAPIClient\Core\Transport\RequestHandler;
 use ZammadAPIClient\Exceptions\AuthenticationException;
 use ZammadAPIClient\Exceptions\ForbiddenException;
 use ZammadAPIClient\Exceptions\NetworkException;
@@ -144,28 +144,6 @@ final class RequestHandlerTest extends TestCase
         self::assertSame($binary, $this->handler->getRaw('ticket_attachment/1/2/3'));
     }
 
-    public function testOnBehalfOfHeaderIsApplied(): void
-    {
-        $this->httpClient->response = new Response(200, [], '{}');
-        $this->handler->setOnBehalfOfUser(7);
-
-        $this->handler->get('tickets');
-
-        self::assertNotNull($this->httpClient->lastRequest);
-        self::assertSame('7', $this->httpClient->lastRequest->getHeaderLine('From'));
-    }
-
-    public function testOnBehalfOfWithStringLogin(): void
-    {
-        $this->httpClient->response = new Response(200, [], '{}');
-        $this->handler->setOnBehalfOfUser('agent@example.com');
-
-        $this->handler->get('tickets');
-
-        self::assertNotNull($this->httpClient->lastRequest);
-        self::assertSame('agent@example.com', $this->httpClient->lastRequest->getHeaderLine('From'));
-    }
-
     public function testNonJsonBodyOn200ThrowsNetworkException(): void
     {
         $this->httpClient->response = new Response(200, [], '<html>proxy error</html>');
@@ -187,20 +165,6 @@ final class RequestHandlerTest extends TestCase
         $this->handler->get('tickets');
 
         self::assertNotNull($this->handler->getLastResponse());
-    }
-
-    public function testGetOnBehalfOfUserReturnsSetValue(): void
-    {
-        self::assertNull($this->handler->getOnBehalfOfUser());
-
-        $this->handler->setOnBehalfOfUser(7);
-        self::assertSame(7, $this->handler->getOnBehalfOfUser());
-
-        $this->handler->setOnBehalfOfUser('user@example.com');
-        self::assertSame('user@example.com', $this->handler->getOnBehalfOfUser());
-
-        $this->handler->setOnBehalfOfUser(null);
-        self::assertNull($this->handler->getOnBehalfOfUser());
     }
 
     public function testGetRawWithQueryParamsAppendsToUri(): void

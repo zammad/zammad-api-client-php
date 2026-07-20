@@ -6,7 +6,7 @@ namespace ZammadAPIClient\Tests\Unit\Core\Traits;
 
 use GuzzleHttp\Psr7\HttpFactory;
 use Psr\Http\Client\ClientInterface;
-use ZammadAPIClient\Core\RequestHandler;
+use ZammadAPIClient\Core\Transport\RequestHandler;
 
 /**
  * @mixin \PHPUnit\Framework\TestCase

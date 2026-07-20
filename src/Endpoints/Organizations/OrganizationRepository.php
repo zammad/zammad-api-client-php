@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Endpoints\Organizations;
 
-use ZammadAPIClient\Core\AbstractRepository;
+use ZammadAPIClient\Core\Repository\AbstractRepository;
 use ZammadAPIClient\Core\Contracts\DeletableInterface;
 
 /**
@@ -18,14 +18,6 @@ use ZammadAPIClient\Core\Contracts\DeletableInterface;
  */
 final class OrganizationRepository extends AbstractRepository implements DeletableInterface
 {
-    /**
-     * Returns 'organizations' — the JSON array key in Zammad's paginated organization list response.
-     */
-    protected function getListKey(): string
-    {
-        return 'organizations';
-    }
-
     /**
      * Bulk-imports organizations from a CSV string.
      *

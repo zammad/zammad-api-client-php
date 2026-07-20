@@ -6,7 +6,7 @@ namespace ZammadAPIClient\Tests\Unit\Core;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use ZammadAPIClient\Core\ResponseParser;
+use ZammadAPIClient\Core\Repository\ResponseParser;
 
 #[Group('unit')]
 final class ResponseParserTest extends TestCase
