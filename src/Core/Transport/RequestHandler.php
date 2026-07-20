@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ZammadAPIClient\Core;
+namespace ZammadAPIClient\Core\Transport;
 
 use InvalidArgumentException;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -28,7 +28,6 @@ use JsonException;
  *
  * This class is the only place in the library that touches the network. It:
  *  - Prepends $baseUrl to every relative URI.
- *  - Attaches the `From` header when impersonation is active.
  *  - Serialises PHP arrays as JSON request bodies via PSR-17 stream factories.
  *  - Deserialises JSON responses to plain arrays.
  *  - Maps HTTP error codes to typed domain exceptions before returning
@@ -45,7 +44,6 @@ final class RequestHandler implements RequestHandlerInterface
     private string $baseUrl;
     private LoggerInterface $logger;
     private ?ResponseInterface $lastResponse = null;
-    private int|string|null $onBehalfOfUser = null;
 
     /**
      * @param ClientInterface         $httpClient PSR-18 client (any implementation).
@@ -84,26 +82,6 @@ final class RequestHandler implements RequestHandlerInterface
     public function getLastResponse(): ?ResponseInterface
     {
         return $this->lastResponse;
-    }
-
-    /**
-     * Activates or deactivates API-level user impersonation.
-     *
-     * When $userId is non-null it is forwarded as the `From` HTTP
-     * header on every subsequent request, causing Zammad to execute actions
-     * as the given agent. The value may be a user ID, login, or email.
-     * Pass null to disable impersonation.
-     *
-     * @see https://docs.zammad.org/en/latest/api/intro.html#actions-on-behalf-of-other-users
-     */
-    public function setOnBehalfOfUser(int|string|null $userId): void
-    {
-        $this->onBehalfOfUser = $userId;
-    }
-
-    public function getOnBehalfOfUser(): int|string|null
-    {
-        return $this->onBehalfOfUser;
     }
 
     /**
@@ -148,15 +126,18 @@ final class RequestHandler implements RequestHandlerInterface
      * Unlike {@see self::get()}, the body is NOT JSON-decoded. Use this for
      * binary endpoints such as ticket attachment downloads.
      *
-     * @param array<string, mixed> $query URL query parameters to append.
+     * @param array<string, mixed>  $query   URL query parameters to append.
+     * @param array<string, string> $headers Additional HTTP headers to send.
      */
-    public function getRaw(string $uri, array $query = []): string
+    public function getRaw(string $uri, array $query = [], array $headers = []): string
     {
         if (!empty($query)) {
             $uri .= '?' . http_build_query($query);
         }
 
-        return (string) $this->dispatch('GET', $uri, [])->getBody();
+        $options = !empty($headers) ? ['headers' => $headers] : [];
+
+        return (string) $this->dispatch('GET', $uri, $options)->getBody();
     }
 
     /**
@@ -234,12 +215,6 @@ final class RequestHandler implements RequestHandlerInterface
     {
         $fullUri = $this->baseUrl . '/' . ltrim($uri, '/');
         $this->logger->debug("Zammad API request: {$method} {$fullUri}");
-
-        if ($this->onBehalfOfUser !== null) {
-            $headers = $options['headers'] ?? [];
-            $options['headers'] = is_array($headers) ? $headers : [];
-            $options['headers']['From'] = (string) $this->onBehalfOfUser;
-        }
 
         try {
             $request = $this->requestFactory->createRequest($method, $fullUri);

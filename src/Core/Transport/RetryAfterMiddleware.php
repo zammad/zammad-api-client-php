@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ZammadAPIClient\Core;
+namespace ZammadAPIClient\Core\Transport;
 
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;

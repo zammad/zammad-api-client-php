@@ -16,8 +16,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use ZammadAPIClient\Endpoints\TicketArticles\TicketArticleType;
 use ZammadAPIClient\Endpoints\Tickets\TicketDTO;
-use ZammadAPIClient\Endpoints\Tickets\TicketRepository;
 use ZammadAPIClient\Exceptions\NotFoundException;
+use ZammadAPIClient\Factory\GuzzleClientFactory;
 use ZammadAPIClient\ZammadClient;
 
 $url = getenv('ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL') ?: 'http://localhost:3000';
@@ -26,12 +26,13 @@ $user = getenv('ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_USERNAME') ?: 'admin@example.co
 $pass = getenv('ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_PASSWORD') ?: 'test';
 
 $client = $token !== ''
-    ? ZammadClient::withToken($url, $token)
-    : ZammadClient::withBasicAuth($url, $user, $pass);
+    ? new ZammadClient(GuzzleClientFactory::withToken($url, $token))
+    : new ZammadClient(GuzzleClientFactory::withBasicAuth($url, $user, $pass));
 
 echo "✓ Client connected to {$url}\n";
 
-$repo = $client->repo(TicketRepository::class);
+// Typed shortcut — `$client->ticket()` returns TicketRepository
+$repo = $client->ticket();
 
 // ── Caching reference data ──────────────────────────────────────
 // States and priorities rarely change. The simple static cache below
@@ -45,10 +46,10 @@ function memoize(string $key, callable $fn): mixed {
 }
 
 $priorities = memoize('priorities', fn() =>
-    [...$client->repo(\ZammadAPIClient\Endpoints\TicketPriorities\TicketPriorityRepository::class)->all()]
+    [...$client->ticketPriority()->all()]
 );
 $states = memoize('states', fn() =>
-    [...$client->repo(\ZammadAPIClient\Endpoints\TicketStates\TicketStateRepository::class)->all()]
+    [...$client->ticketState()->all()]
 );
 
 $normalPriorityId = null;
@@ -126,10 +127,10 @@ $repo->delete($created->id);
 echo "✓ Ticket #{$created->id} deleted\n";
 
 // ── Recipe 8: On-Behalf-Of impersonation ────────────────────────
-$client->performOnBehalfOf(1, function () use ($repo, $ticketId) {
-    echo "   (acting as user #1) Ticket #{$ticketId} title: "
-        . $repo->find($ticketId)->title . "\n";
-});
+$imp = new \ZammadAPIClient\Core\Transport\ImpersonationHandler($client->getHandler(), 1);
+$scoped = new ZammadClient($imp);
+echo "   (acting as user #1) Ticket #{$ticketId} title: "
+    . $scoped->ticket()->find($ticketId)->title . "\n";
 echo "✓ Impersonation complete\n";
 
 // ── Recipe 9: Search ────────────────────────────────────────────

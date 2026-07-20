@@ -6,7 +6,7 @@ namespace ZammadAPIClient\Endpoints\Tags;
 
 use Generator;
 use InvalidArgumentException;
-use ZammadAPIClient\Core\AbstractRepository;
+use ZammadAPIClient\Core\Repository\AbstractRepository;
 
 /**
  * Repository for the `/api/v1/tags` endpoint.
@@ -28,14 +28,6 @@ use ZammadAPIClient\Core\AbstractRepository;
  */
 final class TagRepository extends AbstractRepository
 {
-    /**
-     * Returns 'tags' — the JSON array key in Zammad's tag list response.
-     */
-    protected function getListKey(): string
-    {
-        return 'tags';
-    }
-
     /**
      * Streams tags for a specific object, paginated.
      *

@@ -10,8 +10,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use ZammadAPIClient\Core\PaginatedList;
-use ZammadAPIClient\Core\RequestHandler;
+use ZammadAPIClient\Core\Repository\PaginatedList;
+use ZammadAPIClient\Core\Transport\RequestHandler;
 use ZammadAPIClient\Endpoints\Tickets\TicketDTO;
 
 #[Group('unit')]

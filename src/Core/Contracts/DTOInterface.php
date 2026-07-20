@@ -30,7 +30,7 @@ interface DTOInterface extends JsonSerializable
      * Constructs a DTO from a raw API response array.
      *
      * Field names in $data are matched to constructor parameter names using
-     * reflection (via {@see \ZammadAPIClient\Core\DtoHydrator}). Unknown keys
+     * reflection (via {@see \ZammadAPIClient\Core\Repository\DtoHydrator}). Unknown keys
      * are silently ignored; missing keys resolve to the parameter's default
      * value or null for nullable parameters.
      *

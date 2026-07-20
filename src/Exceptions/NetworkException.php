@@ -8,7 +8,7 @@ namespace ZammadAPIClient\Exceptions;
  * Thrown when a transport-level error prevents the request from completing.
  *
  * Unlike HTTP error status codes (which are caught and mapped to typed
- * exceptions in {@see \ZammadAPIClient\Core\RequestHandler::dispatch()}),
+ * exceptions in {@see \ZammadAPIClient\Core\Transport\RequestHandler::dispatch()}),
  * this exception covers failures that occur before or after an HTTP response
  * is received:
  *  - DNS resolution failure.

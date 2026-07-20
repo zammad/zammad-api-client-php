@@ -7,11 +7,11 @@ namespace ZammadAPIClient\Tests\Unit\Core;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PHPUnit\Framework\Attributes\Group;
-use ZammadAPIClient\Core\AbstractRepository;
+use ZammadAPIClient\Core\Repository\AbstractRepository;
 use ZammadAPIClient\Core\Contracts\DTOInterface;
 use ZammadAPIClient\Core\Contracts\PatchableInterface;
 use ZammadAPIClient\Core\Contracts\RequestHandlerInterface;
-use ZammadAPIClient\Core\Resource;
+use ZammadAPIClient\Core\Repository\Resource;
 use ZammadAPIClient\Endpoints\Tickets\TicketDTO;
 
 #[Group('unit')]

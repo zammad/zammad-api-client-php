@@ -13,19 +13,29 @@
 - OpenAPI schema validation in integration tests
 - Framework bridges for Laravel and Symfony
 - `TicketArticleType` enum for article channel types
+- `ClientFactoryInterface` interface + `GuzzleClientFactory` — `createHandler()` baut den `RequestHandler`
+- `ImpersonationHandler` — stateless decorator fur API-Impersonation
+- `ImpersonationHandler` — scoped via `new ZammadClient(new ImpersonationHandler($handler, $userId))`
 
 ### Changed
 - **Breaking:** PHP >= 8.1 required
+- **Breaking:** `ZammadClient::withToken()` / `withOAuth2()` / `withBasicAuth()` → `new ZammadClient(GuzzleClientFactory::with*())` (Namespace `ZammadAPIClient\Factory`).
+  Non-Guzzle via `new ZammadClient(new RequestHandler($psr18Client, $psr17Factory, $url))`.
+- **Breaking:** `ZammadClient::withClient()` entfernt; `ZammadClient` constructor akzeptiert `RequestHandlerInterface|ClientFactoryInterface`
+- **Breaking:** `ZammadClient::setOnBehalfOfUser()` / `unsetOnBehalfOfUser()` / `onBehalfOf()` / `performOnBehalfOf()` entfernt.
+  Impersonation via `new ZammadClient(new ImpersonationHandler($handler, $userId))`.
+- **Breaking:** `RequestHandlerInterface::setOnBehalfOfUser()` / `getOnBehalfOfUser()` entfernt.
+  `RequestHandler` halt keinen Impersonation-State mehr.
+- **Breaking:** `RequestHandlerInterface::getRaw()` Signatur um `$headers`-Parameter erweitert
 - **Breaking:** `Client` class replaced by `ZammadClient` with repository accessors
 - **Breaking:** Array return values replaced by typed DTOs
 - **Breaking:** Guzzle used as default transport; `withClient()` supports any PSR-18 client
-
-### Deprecated
-- Magic resource accessor (`$client->ticket()`) — triggers `E_USER_DEPRECATED`. Use `$client->repo(TicketRepository::class)` instead. Removed in v4.0.
+- `getListKey()` in Repository-Klassen nicht mehr abstrakt; Default ist `$this->resourcePath`
 
 ### Removed
-- `ResourceType` constants — use typed repository methods
-- `AbstractResource` 640-line monolith — replaced by individual repositories
+- Magic resource accessor (`$client->ticket()`) — ersatzlos entfernt. Nutze `$client->repo(TicketRepository::class)`.
+- `ZammadClient::aliasMap()`, `resolveAlias()`, `__call()` — deprecated in v3.0, jetzt entfernt
+- Shared mutable Impersonation-State aus `RequestHandler` entfernt
 
 ---
 
