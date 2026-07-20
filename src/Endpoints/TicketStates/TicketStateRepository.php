@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Endpoints\TicketStates;
 
-use ZammadAPIClient\Core\AbstractRepository;
+use ZammadAPIClient\Core\Repository\AbstractRepository;
 
 /**
  * Repository for the `/api/v1/ticket_states` endpoint.
@@ -19,11 +19,4 @@ use ZammadAPIClient\Core\AbstractRepository;
  */
 final class TicketStateRepository extends AbstractRepository
 {
-    /**
-     * Returns 'ticket_states' — the JSON array key in Zammad's paginated state list response.
-     */
-    protected function getListKey(): string
-    {
-        return 'ticket_states';
-    }
 }

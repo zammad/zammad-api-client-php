@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ZammadAPIClient\Core;
+namespace ZammadAPIClient\Core\Repository;
 
 use ArrayAccess;
 use Countable;
@@ -10,6 +10,7 @@ use Iterator;
 use ZammadAPIClient\Core\Contracts\DTOInterface;
 use ZammadAPIClient\Core\Contracts\PageFetcherInterface;
 use ZammadAPIClient\Core\Contracts\RequestHandlerInterface;
+use ZammadAPIClient\Core\Transport\HttpPageFetcher;
 
 /**
  * @template T of DTOInterface
@@ -150,6 +151,10 @@ final class PaginatedList implements ArrayAccess, Countable, Iterator
      */
     public function getTotalCount(): ?int
     {
+        if ($this->totalCount === null) {
+            $this->fetchPage($this->currentPage);
+        }
+
         return $this->totalCount;
     }
 

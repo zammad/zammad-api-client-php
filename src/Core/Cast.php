@@ -19,7 +19,7 @@ use DateMalformedStringException;
  * a typed value or null. They never throw — a missing or uncastable value
  * always results in null or the supplied default.
  *
- * Used exclusively by {@see \ZammadAPIClient\Core\DtoHydrator}.
+ * Used exclusively by {@see \ZammadAPIClient\Core\Repository\DtoHydrator}.
  */
 final class Cast
 {

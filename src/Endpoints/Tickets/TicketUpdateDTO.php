@@ -7,7 +7,7 @@ namespace ZammadAPIClient\Endpoints\Tickets;
 use ZammadAPIClient\Core\Contracts\PatchableInterface;
 
 /**
- * Represents a partial ticket update payload for {@see \ZammadAPIClient\Core\AbstractRepository::patch()}.
+ * Represents a partial ticket update payload for {@see \ZammadAPIClient\Core\Repository\AbstractRepository::patch()}.
  *
  * Only the fields that should be changed need to be set; null fields are omitted
  * from the API request, leaving those fields unchanged on the server. This avoids
@@ -42,7 +42,7 @@ final class TicketUpdateDTO implements PatchableInterface
     /**
      * Returns only the non-null fields as an array for the API request body.
      *
-     * Called automatically by {@see \ZammadAPIClient\Core\AbstractRepository::patch()}
+     * Called automatically by {@see \ZammadAPIClient\Core\Repository\AbstractRepository::patch()}
      * when it detects a {@see \ZammadAPIClient\Core\Contracts\PatchableInterface}.
      *
      * @return array<string, mixed>

@@ -7,6 +7,7 @@ namespace ZammadAPIClient\Bridge;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use ZammadAPIClient\Factory\GuzzleClientFactory;
 use ZammadAPIClient\ZammadClient;
 
 /**
@@ -83,7 +84,9 @@ final class SymfonyBundle extends Bundle
                 $url   = $resolved['url']   ?? (string) ($_ENV['ZAMMAD_URL']   ?? 'http://127.0.0.1:8098/api/v1');
                 $token = $resolved['token'] ?? (string) ($_ENV['ZAMMAD_TOKEN'] ?? '');
 
-                $client = ZammadClient::withToken($url, $token);
+                $client = new ZammadClient(
+                    GuzzleClientFactory::withToken($url, $token),
+                );
                 $container->set(ZammadClient::class, $client);
                 $container->setAlias('zammad_client', ZammadClient::class);
                 $container->registerForAutoconfiguration(ZammadClient::class)->setAutowired(true);

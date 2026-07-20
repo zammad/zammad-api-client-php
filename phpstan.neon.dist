@@ -7,7 +7,3 @@ parameters:
     excludePaths:
         # Bridge classes require Laravel/Symfony packages at runtime only.
         - src/Bridge/
-    ignoreErrors:
-        -
-            message: '#return type with generic class.*does not specify its types#'
-            path: src/ZammadClient.php

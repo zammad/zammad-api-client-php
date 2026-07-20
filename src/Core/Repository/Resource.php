@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ZammadAPIClient\Core;
+namespace ZammadAPIClient\Core\Repository;
 
 use ZammadAPIClient\Core\Contracts\DTOInterface;
 use ZammadAPIClient\Core\Contracts\RequestHandlerInterface;

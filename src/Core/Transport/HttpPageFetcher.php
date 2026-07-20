@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ZammadAPIClient\Core;
+namespace ZammadAPIClient\Core\Transport;
 
 use ZammadAPIClient\Core\Contracts\DTOInterface;
 use ZammadAPIClient\Core\Contracts\PageFetcherInterface;
+use ZammadAPIClient\Core\Repository\ResponseParser;
 use ZammadAPIClient\Core\Contracts\RequestHandlerInterface;
 
 /**
@@ -64,8 +65,8 @@ final class HttpPageFetcher implements PageFetcherInterface
      */
     private function extractSearchResults(array $data): array
     {
-        /** @phpstan-ignore cast.int */
-        $total = (int) ($data['total_count'] ?? 0);
+        $raw = $data['total_count'] ?? 0;
+        $total = is_numeric($raw) ? (int) $raw : 0;
         $items = $data['records'] ?? [];
 
         return [
@@ -76,15 +77,17 @@ final class HttpPageFetcher implements PageFetcherInterface
 
     /**
      * @param array<string, mixed> $data
-     * @return array{items: list<T>, total_count: null}
+     * @return array{items: list<T>, total_count: ?int}
      */
     private function extractIndexResults(array $data): array
     {
         $listKey = $this->listKey ?? $this->inferListKey();
+        $raw = $data['total_count'] ?? null;
+        $total = is_numeric($raw) ? (int) $raw : null;
 
         return [
             'items'       => $this->hydrateItems(ResponseParser::extractItems($data, $listKey)),
-            'total_count' => null,
+            'total_count' => $total,
         ];
     }
 

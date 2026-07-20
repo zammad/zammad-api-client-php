@@ -7,7 +7,7 @@ namespace ZammadAPIClient\Tests\Unit\Core;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use ZammadAPIClient\Core\RepositoryRegistry;
+use ZammadAPIClient\Core\Repository\RepositoryRegistry;
 use ZammadAPIClient\Endpoints\Tickets\TicketDTO;
 use ZammadAPIClient\Endpoints\Tickets\TicketRepository;
 

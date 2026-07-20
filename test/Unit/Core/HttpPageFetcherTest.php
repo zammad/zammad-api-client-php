@@ -8,7 +8,7 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PHPUnit\Framework\Attributes\Group;
 use ZammadAPIClient\Core\Contracts\RequestHandlerInterface;
-use ZammadAPIClient\Core\HttpPageFetcher;
+use ZammadAPIClient\Core\Transport\HttpPageFetcher;
 use ZammadAPIClient\Endpoints\Tickets\TicketDTO;
 
 #[Group('unit')]
@@ -20,7 +20,7 @@ final class HttpPageFetcherTest extends MockeryTestCase
         $handler->expects('get')
             ->with('tickets', ['page' => '1', 'per_page' => '10'])
             ->once()
-            ->andReturn(['tickets' => [['id' => 1, 'title' => 'Hello']]]);
+            ->andReturn(['tickets' => [['id' => 1, 'title' => 'Hello']], 'total_count' => 42]);
 
         $fetcher = new HttpPageFetcher($handler, TicketDTO::class, 'tickets', 'tickets');
 
@@ -29,7 +29,7 @@ final class HttpPageFetcherTest extends MockeryTestCase
         self::assertCount(1, $result['items']);
         self::assertInstanceOf(TicketDTO::class, $result['items'][0]);
         self::assertSame(1, $result['items'][0]->id);
-        self::assertNull($result['total_count']);
+        self::assertSame(42, $result['total_count']);
     }
 
     public function testFetchSearchEndpoint(): void

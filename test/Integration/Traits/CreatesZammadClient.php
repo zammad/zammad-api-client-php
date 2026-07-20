@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Tests\Integration\Traits;
 
+use ZammadAPIClient\Factory\GuzzleClientFactory;
 use ZammadAPIClient\ZammadClient;
 
 /**
@@ -27,11 +28,15 @@ trait CreatesZammadClient
         }
 
         if ($token !== null && $token !== '') {
-            return ZammadClient::withToken($url, $token);
+            return new ZammadClient(
+                GuzzleClientFactory::withToken($url, $token),
+            );
         }
 
         if ($user !== null && $pass !== null) {
-            return ZammadClient::withBasicAuth($url, $user, $pass);
+            return new ZammadClient(
+                GuzzleClientFactory::withBasicAuth($url, $user, $pass),
+            );
         }
 
         self::markTestSkipped('Missing ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_TOKEN or USERNAME/PASSWORD.');

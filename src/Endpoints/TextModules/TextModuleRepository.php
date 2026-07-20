@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Endpoints\TextModules;
 
-use ZammadAPIClient\Core\AbstractRepository;
+use ZammadAPIClient\Core\Repository\AbstractRepository;
 use ZammadAPIClient\Core\Contracts\DeletableInterface;
 
 /**
@@ -19,11 +19,6 @@ use ZammadAPIClient\Core\Contracts\DeletableInterface;
  */
 final class TextModuleRepository extends AbstractRepository implements DeletableInterface
 {
-    protected function getListKey(): string
-    {
-        return 'text_modules';
-    }
-
     public function delete(int $id): void
     {
         $this->handler->delete("{$this->resourcePath}/{$id}");

@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ZammadAPIClient\Core;
+namespace ZammadAPIClient\Core\Repository;
 
 use DateTimeImmutable;
 use ReflectionClass;
 use ReflectionNamedType;
+use ZammadAPIClient\Core\Cast;
 
 /**
  * Type-driven DTO hydration: maps array keys onto constructor parameters using
