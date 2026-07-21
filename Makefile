@@ -1,4 +1,4 @@
-.PHONY: help test test-integration coverage clean
+.PHONY: help test test-integration coverage cookbook clean
 
 help: ## Show available make targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
@@ -36,13 +36,18 @@ test-integration: ## Run integration tests (needs Zammad instance)
 		echo "  Skip (test/Integration/ or vendor/ not present)"; \
 	fi
 
-clean: ## Remove build artifacts
-	rm -rf build/
-	rm -f .phpunit.cache
-
 coverage: ## Run unit tests with coverage report (build/coverage/html/)
 	@if [ -f vendor/bin/phpunit ] && [ -d test/Unit ]; then \
 		php -d xdebug.mode=coverage vendor/bin/phpunit --testsuite=unit; \
 	else \
 		echo "  Skip (test/Unit/ or vendor/ not present)"; \
 	fi
+
+cookbook: ## Run all cookbook recipes (needs Zammad instance)
+	@for f in examples/cookbook/0[1-6]*.php; do \
+		echo "=== $$f ===" && php "$$f"; \
+	done
+
+clean: ## Remove build artifacts
+	rm -rf build/
+	rm -f .phpunit.cache
