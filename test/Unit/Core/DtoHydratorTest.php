@@ -7,6 +7,8 @@ namespace ZammadAPIClient\Tests\Unit\Core;
 use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
+use ZammadAPIClient\Core\Traits\HydratesFromArray;
 use ZammadAPIClient\Endpoints\TicketStates\TicketStateDTO;
 use ZammadAPIClient\Endpoints\Users\UserDTO;
 
@@ -94,5 +96,67 @@ final class DtoHydratorTest extends TestCase
 
         self::assertNull($user->organization_id);
         self::assertSame([3], $user->organization_ids);
+    }
+
+    public function testRequireIntThrowsWhenFieldMissing(): void
+    {
+        $dtoClass = new class(0) {
+            use HydratesFromArray;
+            public function __construct(
+                public int $count,
+            ) {
+            }
+        };
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Required field "count" is missing from API response data.');
+
+        $dtoClass::fromArray([]);
+    }
+
+    public function testRequireIntThrowsWhenValueNotScalar(): void
+    {
+        $dtoClass = new class(0) {
+            use HydratesFromArray;
+            public function __construct(
+                public int $count,
+            ) {
+            }
+        };
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Required field "count" must be scalar, got array.');
+
+        $dtoClass::fromArray(['count' => ['nested']]);
+    }
+
+    public function testRequireBoolReturnsFalseWhenFieldMissing(): void
+    {
+        $dtoClass = new class(false) {
+            use HydratesFromArray;
+            public function __construct(
+                public bool $active,
+            ) {
+            }
+        };
+
+        $result = $dtoClass::fromArray([]);
+
+        self::assertFalse($result->active);
+    }
+
+    public function testRequireBoolCoercesToBool(): void
+    {
+        $dtoClass = new class(false) {
+            use HydratesFromArray;
+            public function __construct(
+                public bool $active,
+            ) {
+            }
+        };
+
+        $result = $dtoClass::fromArray(['active' => '1']);
+
+        self::assertTrue($result->active);
     }
 }
