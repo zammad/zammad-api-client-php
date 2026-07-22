@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Endpoints\TextModules;
 
-use DateTimeImmutable;
 use ZammadAPIClient\Core\Contracts\DTOInterface;
 use ZammadAPIClient\Core\Traits\HasTimestamps;
 use ZammadAPIClient\Core\Traits\HydratesFromArray;
@@ -24,8 +23,9 @@ use ZammadAPIClient\Core\Traits\SerializesToArray;
  *                 appearing in the inserted text.
  *  - `content`  — The template body, optionally containing `#{...}` variables.
  *
- * Server-assigned fields (`id`, `created_at`, `updated_at`) default to null
- * and are populated by the API after `create()` or `find()`.
+ * Server-assigned fields (`id`) default to null. Timestamp fields
+ * (`created_at`, `updated_at`) are provided by
+ * {@see \ZammadAPIClient\Core\Traits\HasTimestamps}.
  */
 final class TextModuleDTO implements DTOInterface
 {
@@ -40,8 +40,6 @@ final class TextModuleDTO implements DTOInterface
         public readonly ?string $note = null,
         public readonly ?bool $active = null,
         public readonly ?int $id = null,
-        public readonly ?DateTimeImmutable $created_at = null,
-        public readonly ?DateTimeImmutable $updated_at = null,
     ) {
     }
 }
