@@ -1,5 +1,12 @@
 # Zammad API Client for PHP
 
+> **v3 Release Candidate available!**  
+> A complete rewrite with typed DTOs, PSR-18 HTTP client, typed exceptions, PHP 8.1+.  
+> ```bash
+> composer require zammad/zammad-api-client-php:^3.0@RC
+> ```  
+> [v3 Documentation](https://github.com/zammad/zammad-api-client-php/blob/pre-release-v3/README.md) | [Migration guide](https://github.com/zammad/zammad-api-client-php/blob/pre-release-v3/docs/migration-v3-examples.md)
+
 This client can be used to access the API of the open source helpdesk [Zammad](http://www.zammad.org) via PHP.
 
 ## Zammad version support
