@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use ReflectionClass;
 use ReflectionNamedType;
 use ZammadAPIClient\Core\Cast;
+use ZammadAPIClient\Core\Traits\HasTimestamps;
 
 /**
  * Type-driven DTO hydration: maps array keys onto constructor parameters using
@@ -52,11 +53,23 @@ final class DtoHydrator
             $args[] = self::coerce($param['type'], $param['nullable'], $data, $param['name']);
         }
 
+        $timestamps = self::extractTimestamps($class, $data, $known);
+
         if ($customFieldsIndex !== null) {
             $args[$customFieldsIndex] = array_diff_key($data, array_flip($known));
         }
 
-        return new $class(...$args);
+        /** @var T $object */
+        $object = new $class(...$args);
+
+        if ($timestamps !== null) {
+            $ref = new ReflectionClass($object);
+            foreach ($timestamps as $field => $value) {
+                $ref->getProperty($field)->setValue($object, $value);
+            }
+        }
+
+        return $object;
     }
 
     /**
@@ -134,5 +147,34 @@ final class DtoHydrator
         }
 
         return self::$metaCache[$class] = $meta;
+    }
+
+    /**
+     * For classes that use {@see HasTimestamps}: extracts `created_at` and
+     * `updated_at` from $data, coerces them via {@see Cast::dateTime()}, and
+     * removes them so they don't leak into customFields.
+     *
+     * @param class-string    $class
+     * @param array<string, mixed> $data
+     * @param list<string>    $known
+     * @return null|array<string, ?DateTimeImmutable>
+     */
+    private static function extractTimestamps(string $class, array &$data, array &$known): ?array
+    {
+        if (!in_array(HasTimestamps::class, class_uses($class))) {
+            return null;
+        }
+
+        $result = [];
+
+        foreach (['created_at', 'updated_at'] as $field) {
+            if (array_key_exists($field, $data)) {
+                $result[$field] = Cast::dateTime($data, $field);
+            }
+            $known[] = $field;
+            unset($data[$field]);
+        }
+
+        return $result;
     }
 }

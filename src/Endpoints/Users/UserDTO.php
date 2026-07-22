@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Endpoints\Users;
 
-use DateTimeImmutable;
 use ZammadAPIClient\Core\Contracts\DTOInterface;
 use ZammadAPIClient\Core\Traits\HasTimestamps;
 use ZammadAPIClient\Core\Traits\HydratesFromArray;
@@ -28,6 +27,9 @@ use ZammadAPIClient\Core\Traits\SerializesToArray;
  * All fields are nullable because the minimum required fields for creation
  * differ between agents (need `login`) and customers (need `email`), and
  * partial construction is common when building a DTO just to update one field.
+ *
+ * Timestamp fields (`created_at`, `updated_at`) are provided by
+ * {@see \ZammadAPIClient\Core\Traits\HasTimestamps}.
  */
 final class UserDTO implements DTOInterface
 {
@@ -51,8 +53,6 @@ final class UserDTO implements DTOInterface
         public readonly ?array $role_ids = null,
         public readonly ?bool $active = null,
         public readonly ?int $id = null,
-        public readonly ?DateTimeImmutable $created_at = null,
-        public readonly ?DateTimeImmutable $updated_at = null,
         public readonly array $customFields = [],
     ) {
     }

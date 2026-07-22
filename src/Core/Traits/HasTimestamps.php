@@ -7,11 +7,7 @@ namespace ZammadAPIClient\Core\Traits;
 use DateTimeImmutable;
 
 /**
- * Provides createdAt() / updatedAt() helpers for DTOs with timestamp properties.
- *
- * Consuming DTOs must declare:
- *  - `public ?DateTimeImmutable $created_at = null`
- *  - `public ?DateTimeImmutable $updated_at = null`
+ * Provides `created_at` / `updated_at` properties plus typed accessor helpers.
  *
  * The methods return the respective DateTimeImmutable or null, giving callers
  * a typed accessor alternative to accessing the raw property. IDE autocomplete
@@ -19,6 +15,9 @@ use DateTimeImmutable;
  */
 trait HasTimestamps
 {
+    public ?DateTimeImmutable $created_at = null;
+    public ?DateTimeImmutable $updated_at = null;
+
     public function createdAt(): ?DateTimeImmutable
     {
         return $this->created_at;

@@ -39,6 +39,9 @@ use ZammadAPIClient\Core\Traits\SerializesToArray;
  *
  * Because of the `owner_id` fallback, this DTO overrides `fromArray()` instead
  * of relying on the generic {@see \ZammadAPIClient\Core\Traits\HydratesFromArray} trait.
+ *
+ * Timestamp fields (`created_at`, `updated_at`) are provided by
+ * {@see \ZammadAPIClient\Core\Traits\HasTimestamps}.
  */
 final class TicketDTO implements DTOInterface
 {
@@ -61,8 +64,6 @@ final class TicketDTO implements DTOInterface
         public readonly ?int $id = null,
         public readonly ?DateTimeImmutable $pending_time = null,
         public readonly ?array $article = null,
-        public readonly ?DateTimeImmutable $created_at = null,
-        public readonly ?DateTimeImmutable $updated_at = null,
         public readonly array $customFields = [],
     ) {
     }

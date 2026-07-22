@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Endpoints\TicketArticles;
 
-use DateTimeImmutable;
 use ZammadAPIClient\Core\Contracts\DTOInterface;
 use ZammadAPIClient\Core\Traits\HasTimestamps;
 use ZammadAPIClient\Core\Traits\HydratesFromArray;
@@ -19,8 +18,6 @@ use ZammadAPIClient\Core\Traits\SerializesToArray;
  *
  * Read-only fields (set by Zammad):
  *  - `id`             — Server-assigned primary key.
- *  - `created_at`     — Timestamp of article creation.
- *  - `updated_at`     — Timestamp of last modification.
  *  - `type_id`        — Numeric ID of the article type (resolved to `type` name).
  *  - `sender_id`      — Numeric ID of the sender type (resolved to `sender` name).
  *  - `created_by_id`  — ID of the user who created the article.
@@ -29,6 +26,9 @@ use ZammadAPIClient\Core\Traits\SerializesToArray;
  *  - `updated_by`     — Identifier string of the last modifier.
  *  - `sender`         — Display name of the sender category (e.g. "Customer", "Agent").
  *  - `time_unit`      — Time accounting value (float, in minutes).
+ *
+ * Timestamp fields (`created_at`, `updated_at`) are provided by
+ * {@see \ZammadAPIClient\Core\Traits\HasTimestamps}.
  *
  * Writable fields (used when creating or updating):
  *  - `ticket_id`      — The parent ticket this article belongs to.
@@ -88,8 +88,6 @@ final class TicketArticleDTO implements DTOInterface
         public readonly ?float $time_unit = null,
         public readonly ?array $attachments = null,
         public readonly ?int $id = null,
-        public readonly ?DateTimeImmutable $created_at = null,
-        public readonly ?DateTimeImmutable $updated_at = null,
     ) {
     }
 }

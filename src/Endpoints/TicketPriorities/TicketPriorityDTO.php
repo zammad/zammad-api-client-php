@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Endpoints\TicketPriorities;
 
-use DateTimeImmutable;
 use ZammadAPIClient\Core\Contracts\DTOInterface;
 use ZammadAPIClient\Core\Traits\HasTimestamps;
 use ZammadAPIClient\Core\Traits\HydratesFromArray;
@@ -20,6 +19,9 @@ use ZammadAPIClient\Core\Traits\SerializesToArray;
  * The `name` field is the display label; Zammad uses the numeric `id` when
  * assigning a priority to a ticket via the `priority_id` field on
  * {@see \ZammadAPIClient\Endpoints\Tickets\TicketDTO}.
+ *
+ * Timestamp fields (`created_at`, `updated_at`) are provided by
+ * {@see \ZammadAPIClient\Core\Traits\HasTimestamps}.
  */
 final class TicketPriorityDTO implements DTOInterface
 {
@@ -32,8 +34,6 @@ final class TicketPriorityDTO implements DTOInterface
         public readonly ?string $note = null,
         public readonly ?bool $active = null,
         public readonly ?int $id = null,
-        public readonly ?DateTimeImmutable $created_at = null,
-        public readonly ?DateTimeImmutable $updated_at = null,
     ) {
     }
 }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Endpoints\Links;
 
-use DateTimeImmutable;
 use ZammadAPIClient\Core\Contracts\DTOInterface;
+use ZammadAPIClient\Core\Traits\HasTimestamps;
 use ZammadAPIClient\Core\Traits\HydratesFromArray;
 use ZammadAPIClient\Core\Traits\SerializesToArray;
 
@@ -19,9 +19,13 @@ use ZammadAPIClient\Core\Traits\SerializesToArray;
  *
  * Server-assigned fields default to null so the DTO can represent
  * the result of both creation and listing operations.
+ *
+ * Timestamp fields (`created_at`, `updated_at`) are provided by
+ * {@see \ZammadAPIClient\Core\Traits\HasTimestamps}.
  */
 final class LinkDTO implements DTOInterface
 {
+    use HasTimestamps;
     use HydratesFromArray;
     use SerializesToArray;
 
@@ -33,8 +37,6 @@ final class LinkDTO implements DTOInterface
         public readonly ?int $link_object_source_value = null,
         public readonly ?string $link_object_target = null,
         public readonly ?int $link_object_target_value = null,
-        public readonly ?DateTimeImmutable $created_at = null,
-        public readonly ?DateTimeImmutable $updated_at = null,
     ) {
     }
 }

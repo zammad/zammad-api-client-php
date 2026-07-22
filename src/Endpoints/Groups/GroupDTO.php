@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Endpoints\Groups;
 
-use DateTimeImmutable;
 use ZammadAPIClient\Core\Contracts\DTOInterface;
 use ZammadAPIClient\Core\Traits\HasTimestamps;
 use ZammadAPIClient\Core\Traits\HydratesFromArray;
@@ -17,9 +16,9 @@ use ZammadAPIClient\Core\Traits\SerializesToArray;
  * group, which determines which agents can see and work on it. Groups also control
  * SLA assignments, notification rules, and signature selection.
  *
- * Server-assigned fields (`id`, `created_at`, `updated_at`) default to null so
- * the DTO can be constructed before persisting. After a `create()` or `find()` call
- * the returned DTO will have these fields populated by the server.
+ * Server-assigned fields (`id`) default to null. Timestamp fields
+ * (`created_at`, `updated_at`) are provided by
+ * {@see \ZammadAPIClient\Core\Traits\HasTimestamps}.
  */
 final class GroupDTO implements DTOInterface
 {
@@ -35,8 +34,6 @@ final class GroupDTO implements DTOInterface
         public readonly ?string $note = null,
         public readonly ?bool $active = null,
         public readonly ?int $id = null,
-        public readonly ?DateTimeImmutable $created_at = null,
-        public readonly ?DateTimeImmutable $updated_at = null,
         public readonly array $customFields = [],
     ) {
     }
