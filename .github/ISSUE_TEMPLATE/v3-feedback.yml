@@ -1,0 +1,39 @@
+name: v3 RC Feedback
+description: Share your experience with the v3 Release Candidate
+title: "[v3 Feedback] "
+labels: ["Zammad API Client v3"]
+body:
+  - type: textarea
+    id: what-did-you-try
+    attributes:
+      label: What did you try?
+      description: Describe your use case (e.g., "migrated ticket CRUD from v2", "set up a new project with v3")
+    validations:
+      required: true
+  - type: textarea
+    id: what-worked
+    attributes:
+      label: What worked well?
+    validations:
+      required: false
+  - type: textarea
+    id: what-didnt-work
+    attributes:
+      label: What didn't work or is missing?
+      description: Bugs, missing features, migration issues, unclear documentation
+    validations:
+      required: false
+  - type: dropdown
+    id: feedback-type
+    attributes:
+      label: Feedback type
+      options:
+        - Bug report
+        - Missing feature
+        - Documentation
+        - Migration issue
+        - General feedback
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
