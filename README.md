@@ -6,7 +6,9 @@ PSR-compliant PHP client for the [Zammad](https://zammad.com) REST API. PHP 8.1+
 > ```bash
 > composer require zammad/zammad-api-client-php:^3.0@RC
 > ```
-> **We want your feedback!** [Tell us what you think](https://github.com/zammad/zammad-api-client-php/issues/new?template=v3-feedback.yml&labels=Zammad+API+Client+v3) — bugs, missing features, migration pain points.
+> **We want your feedback!**
+> [Report a bug](https://github.com/zammad/zammad-api-client-php/issues/new?template=v3-feedback.yml&labels=Zammad+API+Client+v3) ·
+> [Start a discussion](https://github.com/zammad/zammad-api-client-php/discussions)
 
 ## Quick Start
 
