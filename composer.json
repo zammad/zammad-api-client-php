@@ -1,6 +1,5 @@
 {
     "name": "zammad/zammad-api-client-php",
-    "version": "3.0.0-dev",
     "type": "library",
     "description": "PSR-compliant Zammad API client for PHP 8.1+",
     "homepage": "https://github.com/zammad/zammad-api-client-php",
