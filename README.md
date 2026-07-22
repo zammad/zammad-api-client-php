@@ -2,16 +2,13 @@
 
 PSR-compliant PHP client for the [Zammad](https://zammad.com) REST API. PHP 8.1+.
 
-## Quick Start
-
-> **Note:** v3 is under active development and not yet released as a stable Packagist version. Add the repository to your `composer.json`:
-> ```json
-> {
->     "minimum-stability": "dev",
->     "repositories": [{ "type": "vcs", "url": "https://github.com/zammad/zammad-api-client-php" }],
->     "require": { "zammad/zammad-api-client-php": "dev-epic-79/pre-merge-develop" }
-> }
+> **v3 Release Candidate available!** Install via Composer:
+> ```bash
+> composer require zammad/zammad-api-client-php:^3.0@RC
 > ```
+> **We want your feedback!** [Tell us what you think](https://github.com/zammad/zammad-api-client-php/issues/new?template=v3-feedback.yml&labels=Zammad+API+Client+v3) — bugs, missing features, migration pain points.
+
+## Quick Start
 
 ```php
 use ZammadAPIClient\Endpoints\Tickets\TicketDTO;
@@ -52,8 +49,6 @@ foreach ($client->repo(TicketRepository::class)->search('error') as $ticket) {
 ## Getting started
 
 ### Standalone PHP app
-
-> **Note:** Until a stable release, use the same VCS repository setup as in Quick Start above.
 
 ```php
 <?php
