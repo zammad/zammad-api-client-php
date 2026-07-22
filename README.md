@@ -7,7 +7,9 @@
 > ```  
 > [v3 Documentation](https://github.com/zammad/zammad-api-client-php/blob/pre-release-v3/README.md) | [Migration guide](https://github.com/zammad/zammad-api-client-php/blob/pre-release-v3/docs/migration-v3-examples.md)
 >
-> **We want your feedback!** Try the RC and [tell us what you think](https://github.com/zammad/zammad-api-client-php/issues/new?template=v3-feedback.yml&labels=Zammad+API+Client+v3) — bugs, missing features, migration pain points. All input welcome.
+> **We want your feedback!**
+> [Report a bug](https://github.com/zammad/zammad-api-client-php/issues/new?template=v3-feedback.yml&labels=Zammad+API+Client+v3) ·
+> [Start a discussion](https://github.com/zammad/zammad-api-client-php/discussions)
 
 This client can be used to access the API of the open source helpdesk [Zammad](http://www.zammad.org) via PHP.
 
