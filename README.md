@@ -5,7 +5,7 @@
 > ```bash
 > composer require zammad/zammad-api-client-php:^3.0@RC
 > ```  
-> [v3 Documentation](https://github.com/zammad/zammad-api-client-php/blob/pre-release-v3/README.md) | [Migration guide](https://github.com/zammad/zammad-api-client-php/blob/pre-release-v3/docs/migration-v3-examples.md)
+> [v3 Documentation](https://github.com/zammad/zammad-api-client-php/blob/release/3-0-0/README.md) | [Migration guide](https://github.com/zammad/zammad-api-client-php/blob/release/3-0-0/docs/migration-v3-examples.md)
 >
 > **We want your feedback!**
 > [Report a bug](https://github.com/zammad/zammad-api-client-php/issues/new?template=v3-feedback.yml&labels=Zammad+API+Client+v3) ·
