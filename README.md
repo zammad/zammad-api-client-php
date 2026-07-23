@@ -111,7 +111,7 @@ ZammadClient::withToken($url, 'your-token',
 
 ## Examples
 
-The primary example is [`examples/cookbook.php`](examples/cookbook.php) — nine runnable recipes covering tickets, stateful resources, pagination, error handling, impersonation, and search. Run it against any Zammad instance:
+The primary example is [`examples/cookbook.php`](examples/README.md)) — nine runnable recipes covering tickets, stateful resources, pagination, error handling, impersonation, and search. Run it against any Zammad instance:
 
 ```bash
 ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL=http://your-zammad:3000 \
