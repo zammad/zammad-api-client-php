@@ -6,7 +6,7 @@
  * Requirements:
  *   composer require symfony/http-client nyholm/psr7
  *
- * Run: php examples/cookbook/00-slim.php
+ * Run: php examples/cookbook/09-slim.php
  */
 
 declare(strict_types=1);

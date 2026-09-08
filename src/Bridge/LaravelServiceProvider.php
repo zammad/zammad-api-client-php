@@ -49,7 +49,6 @@ use ZammadAPIClient\ZammadClient;
  * **Usage**
  *
  * ```php
- * use ZammadAPIClient\Endpoints\Tickets\TicketRepository;
  * use ZammadAPIClient\ZammadClient;
  *
  * class TicketController
@@ -58,12 +57,12 @@ use ZammadAPIClient\ZammadClient;
  *
  *     public function show(int $id)
  *     {
- *         $ticket = $this->zammad->repo(TicketRepository::class)->find($id);
+ *         $ticket = $this->zammad->ticket()->find($id);
  *     }
  * }
  *
  * // Or resolve manually from the container:
- * $tickets = app(ZammadClient::class)->repo(TicketRepository::class)->all();
+ * $tickets = app(ZammadClient::class)->ticket()->all();
  * ```
  *
  * **Configuration precedence**

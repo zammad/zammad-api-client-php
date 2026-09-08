@@ -52,7 +52,7 @@ $title = $ticket->getValue('title');
 
 **v3:**
 ```php
-$ticket = $client->repo(TicketRepository::class)->find(1);
+$ticket = $client->ticket()->find(1);
 $title = $ticket->title;
 ```
 
@@ -86,7 +86,7 @@ $ticket->save();
 
 **v3:**
 ```php
-$ticket = $client->repo(TicketRepository::class)->create(new TicketDTO(
+$ticket = $client->ticket()->create(new TicketDTO(
     title: 'My ticket',
     group_id: 1,
 ));
@@ -107,15 +107,15 @@ $ticket->save();
 **v3:**
 ```php
 // Via array
-$client->repo(TicketRepository::class)->patch(1, ['title' => 'Updated']);
+$client->ticket()->patch(1, ['title' => 'Updated']);
 
 // Via TicketUpdateDTO
-$client->repo(TicketRepository::class)->patch(1, new TicketUpdateDTO(
+$client->ticket()->patch(1, new TicketUpdateDTO(
     title: 'Updated',
 ));
 
 // Via TicketDTO (same behavior — all non-null fields are sent)
-$client->repo(TicketRepository::class)->patch(1, new TicketDTO(
+$client->ticket()->patch(1, new TicketDTO(
     title: 'Updated',
     state_id: 3,
 ));
@@ -135,7 +135,7 @@ $ticket->save(); // Sends all values back to Zammad
 
 **v3:**
 ```php
-$resource = $client->repo(TicketRepository::class)->resource(1);
+$resource = $client->ticket()->resource(1);
 $resource->title = 'New';
 $resource->state_id = 3;
 $resource->save(); // Sends only {title, state_id}
@@ -156,7 +156,7 @@ $ticket->delete();
 
 **v3:**
 ```php
-$client->repo(TicketRepository::class)->delete(1);
+$client->ticket()->delete(1);
 ```
 
 ---
@@ -178,7 +178,7 @@ if (!is_array($tickets)) {
 **v3:**
 ```php
 try {
-    foreach ($client->repo(TicketRepository::class)->search('some text') as $ticket) {
+    foreach ($client->ticket()->search('some text') as $ticket) {
         echo $ticket->title;
     }
 } catch (NotFoundException $e) {
@@ -197,7 +197,7 @@ $tickets = $client->resource(ResourceType::TICKET)->all();
 
 **v3:**
 ```php
-foreach ($client->repo(TicketRepository::class)->all() as $ticket) {
+foreach ($client->ticket()->all() as $ticket) {
     echo $ticket->title;
 }
 ```
@@ -213,7 +213,7 @@ $page = $client->resource(ResourceType::TICKET)->all(1, 25);
 
 **v3:**
 ```php
-$list = $client->repo(TicketRepository::class)->list(['per_page' => 25]);
+$list = $client->ticket()->list(['per_page' => 25]);
 $list->page(1);      // First page
 $list->page(2);      // Second page
 $list->pageNext();   // Next page
@@ -236,7 +236,7 @@ if ($ticket->hasError()) {
 **v3:**
 ```php
 try {
-    $ticket = $client->repo(TicketRepository::class)->find(999);
+    $ticket = $client->ticket()->find(999);
 } catch (NotFoundException $e) {
     echo $e->getMessage();        // "Resource not found: tickets/999"
 } catch (ValidationException $e) {
@@ -264,7 +264,7 @@ $articles = $ticket->getTicketArticles();
 
 **v3:**
 ```php
-foreach ($client->repo(TicketArticleRepository::class)->getForTicket(1) as $article) {
+foreach ($client->ticketArticle()->getForTicket(1) as $article) {
     echo $article->body;
 }
 ```
@@ -281,7 +281,7 @@ $content = $ticket_article->getAttachmentContent(23);
 
 **v3:**
 ```php
-$content = $client->repo(TicketArticleRepository::class)->getAttachmentContent(
+$content = $client->ticketArticle()->getAttachmentContent(
     ticketId: 1,
     articleId: 5,
     attachmentId: 23,
@@ -303,14 +303,14 @@ $tags = $tag->getValue('tags');
 
 **v3:**
 ```php
-$client->repo(TagRepository::class)->add('Ticket', $ticketId, 'urgent');
-$client->repo(TagRepository::class)->remove('Ticket', $ticketId, 'urgent');
+$client->tag()->add('Ticket', $ticketId, 'urgent');
+$client->tag()->remove('Ticket', $ticketId, 'urgent');
 
-foreach ($client->repo(TagRepository::class)->all(['object' => 'Ticket', 'o_id' => $ticketId]) as $tag) {
+foreach ($client->tag()->all(['object' => 'Ticket', 'o_id' => $ticketId]) as $tag) {
     echo $tag->value;
 }
 
-$results = $client->repo(TagRepository::class)->tagSearch('urg');
+$results = $client->tag()->tagSearch('urg');
 ```
 
 ---
@@ -326,7 +326,7 @@ $client->resource(ResourceType::USER)->import($csv);
 **v3:**
 ```php
 $csv = file_get_contents('users.csv');
-$client->repo(UserRepository::class)->import($csv);
+$client->user()->import($csv);
 ```
 
 ---
@@ -344,7 +344,7 @@ $client->unsetOnBehalfOfUser();
 ```php
 // Temporary (auto-cleanup on callback return or exception)
 $client->performOnBehalfOf(1, function () use ($client) {
-    $client->repo(TicketRepository::class)->find(42);
+    $client->ticket()->find(42);
 });
 
 // Persistent
@@ -353,34 +353,24 @@ $client->setOnBehalfOfUser(1);
 $client->unsetOnBehalfOfUser();
 ```
 
-> **Breaking:** v2 used a username string (`'myuser'`). v3 requires a **numeric user ID**. Use `$client->repo(UserRepository::class)->search('login:myuser')` to resolve a username to an ID if needed.
+> **Breaking:** v2 used a username string (`'myuser'`). v3 requires a **numeric user ID**. Use `$client->user()->search('login:myuser')` to resolve a username to an ID if needed.
 
 ---
 
-## Resource Access — Ruby-Style vs. repo()
+## Resource Access — Typed Accessors
 
-**v3 (explicit, recommended — type-safe with IDE autocomplete):**
-```php
-$client->repo(TicketRepository::class)->find(1);
-$client->repo(UserRepository::class)->find(1);
-$client->repo(OrganizationRepository::class)->find(1);
-$client->repo(GroupRepository::class)->find(1);
-$client->repo(TicketArticleRepository::class)->getForTicket(1);
-$client->repo(TicketStateRepository::class)->all();
-$client->repo(TicketPriorityRepository::class)->all();
-$client->repo(TagRepository::class)->add('Ticket', 1, 'urgent');
-$client->repo(TextModuleRepository::class)->find(1);
-```
-
-**v3 (Ruby-style convenience, deprecated in favor of repo()):**
+**v3 (recommended — typed accessors with IDE autocomplete):**
 ```php
 $client->ticket()->find(1);
 $client->user()->find(1);
 $client->organization()->find(1);
 $client->group()->find(1);
-$client->ticket_article()->getForTicket(1);
-$client->ticket_state()->all();
-$client->ticket_priority()->all();
+$client->ticketArticle()->getForTicket(1);
+$client->ticketState()->all();
+$client->ticketPriority()->all();
 $client->tag()->add('Ticket', 1, 'urgent');
-$client->text_module()->find(1);
+$client->textModule()->find(1);
+$client->link()->find(1);
 ```
+
+The underlying `repo()` method is `@internal` — prefer the typed accessors.

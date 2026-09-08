@@ -49,7 +49,6 @@ use ZammadAPIClient\ZammadClient;
  * **Usage**
  *
  * ```php
- * use ZammadAPIClient\Endpoints\Tickets\TicketRepository;
  * use ZammadAPIClient\ZammadClient;
  *
  * class TicketService
@@ -58,13 +57,13 @@ use ZammadAPIClient\ZammadClient;
  *
  *     public function findTicket(int $id)
  *     {
- *         return $this->zammad->repo(TicketRepository::class)->find($id);
+ *         return $this->zammad->ticket()->find($id);
  *     }
  * }
  *
  * // Or resolve manually from the container:
- * // $container->get(ZammadClient::class)->repo(TicketRepository::class)->all();
- * // $container->get('zammad_client')->repo(TicketRepository::class)->all();
+ * // $container->get(ZammadClient::class)->ticket()->all();
+ * // $container->get('zammad_client')->ticket()->all();
  * ```
  *
  * @see ZammadClient::withToken()

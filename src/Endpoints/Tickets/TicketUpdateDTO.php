@@ -15,7 +15,7 @@ use ZammadAPIClient\Core\Contracts\PatchableInterface;
  *
  * Example — change only the state and owner:
  * ```php
- * $client->repo(TicketRepository::class)->patch(42, new TicketUpdateDTO(
+ * $client->ticket()->patch(42, new TicketUpdateDTO(
  *     state_id: 3,
  *     owner_id: 7,
  * ));
