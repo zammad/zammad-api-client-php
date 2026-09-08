@@ -167,6 +167,26 @@ final class RequestHandlerTest extends TestCase
         self::assertNotNull($this->handler->getLastResponse());
     }
 
+    public function testRequestsSendAcceptJsonHeader(): void
+    {
+        $this->httpClient->response = new Response(200, [], '{}');
+
+        $this->handler->get('tickets');
+
+        self::assertNotNull($this->httpClient->lastRequest);
+        self::assertSame('application/json', $this->httpClient->lastRequest->getHeaderLine('Accept'));
+    }
+
+    public function testRequestsSendAcceptJsonHeaderOnPost(): void
+    {
+        $this->httpClient->response = new Response(201, [], '{}');
+
+        $this->handler->post('tickets', ['title' => 'x']);
+
+        self::assertNotNull($this->httpClient->lastRequest);
+        self::assertSame('application/json', $this->httpClient->lastRequest->getHeaderLine('Accept'));
+    }
+
     public function testGetRawWithQueryParamsAppendsToUri(): void
     {
         $this->httpClient->response = new Response(200, [], 'binary');
