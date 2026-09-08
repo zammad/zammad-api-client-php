@@ -217,7 +217,8 @@ final class RequestHandler implements RequestHandlerInterface
         $this->logger->debug("Zammad API request: {$method} {$fullUri}");
 
         try {
-            $request = $this->requestFactory->createRequest($method, $fullUri);
+            $request = $this->requestFactory->createRequest($method, $fullUri)
+                ->withHeader('Accept', 'application/json');
 
             if (isset($options['headers']) && is_array($options['headers'])) {
                 foreach ($options['headers'] as $name => $value) {
