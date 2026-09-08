@@ -33,7 +33,8 @@ use ZammadAPIClient\Endpoints\Users\UserRepository;
  * Adding a resource: one entry in DEFINITIONS.
  *
  * @internal This class is not intended for direct use by consumers.
- *           Access repositories via {@see \ZammadAPIClient\ZammadClient::repo()}.
+ *           Access repositories via the client's typed accessors
+ *           (e.g. {@see \ZammadAPIClient\ZammadClient::ticket()}).
  */
 final class RepositoryRegistry
 {
@@ -54,7 +55,7 @@ final class RepositoryRegistry
     /**
      * Returns the API path and DTO class wired to the given repository.
      *
-     * Used by {@see \ZammadAPIClient\ZammadClient::repo()} to instantiate a
+     * Used by {@see \ZammadAPIClient\ZammadClient::repo()} (internal) to instantiate a
      * repository with the correct $resourcePath and $dtoClass arguments.
      *
      * @param class-string $repositoryClass Repository class whose wiring is requested.

@@ -18,6 +18,9 @@ use ZammadAPIClient\Endpoints\Users\UserRepository;
 
 trait RepositoryAccessors
 {
+    /**
+     * @internal The typed accessors below are the public API.
+     */
     abstract public function repo(string $repositoryClass): AbstractRepository;
 
     public function ticket(): TicketRepository

@@ -5,14 +5,14 @@
 | v2 | v3 |
 |---|---|
 | `new Client(['url' => ..., 'http_token' => ...])` | `ZammadClient::withToken($url, $token)` |
-| `$client->resource(TICKET)` | `$client->repo(TicketRepository::class)` |
-| `$ticket->get(1)` | `$client->repo(TicketRepository::class)->find(1)` |
+| `$client->resource(TICKET)` | `$client->ticket()` |
+| `$ticket->get(1)` | `$client->ticket()->find(1)` |
 | `$ticket->getValue('title')` | `$ticket->title` |
 | `$ticket->getValues()` | `$ticket->toArray()` |
-| `$ticket->setValue('title', 'x'); $ticket->save()` | `$client->repo(TicketRepository::class)->patch(1, ['title' => 'x'])` |
-| `$ticket->search('term')` | `$client->repo(TicketRepository::class)->search('term')` |
-| `$ticket->all()` | `$client->repo(TicketRepository::class)->all()` |
-| `$ticket->delete()` | `$client->repo(TicketRepository::class)->delete($id)` |
+| `$ticket->setValue('title', 'x'); $ticket->save()` | `$client->ticket()->patch(1, ['title' => 'x'])` |
+| `$ticket->search('term')` | `$client->ticket()->search('term')` |
+| `$ticket->all()` | `$client->ticket()->all()` |
+| `$ticket->delete()` | `$client->ticket()->delete($id)` |
 | `if ($ticket->hasError())` | `catch (NotFoundException\|ValidationException $e)` |
 
 ## Why Migrate?
@@ -50,15 +50,13 @@ $client = \ZammadAPIClient\ZammadClient::withToken(
 ### 3. Replace Resource Access
 
 ```php
-use ZammadAPIClient\Endpoints\Tickets\TicketRepository;
-
 // v2
 $ticket = $client->resource(\ZammadAPIClient\ResourceType::TICKET);
 $ticket->get(1);
 $title = $ticket->getValue('title');
 
 // v3
-$tickets = $client->repo(TicketRepository::class);
+$tickets = $client->ticket();
 $ticket = $tickets->find(1);
 $title = $ticket->title;
 ```
@@ -66,8 +64,6 @@ $title = $ticket->title;
 ### 4. Replace Error Handling
 
 ```php
-use ZammadAPIClient\Endpoints\Tickets\TicketRepository;
-
 // v2
 $ticket->get(999);
 if ($ticket->hasError()) {
@@ -76,7 +72,7 @@ if ($ticket->hasError()) {
 
 // v3
 try {
-    $ticket = $client->repo(TicketRepository::class)->find(999);
+    $ticket = $client->ticket()->find(999);
 } catch (\ZammadAPIClient\Exceptions\NotFoundException $e) {
     $error = $e->getMessage();
 }
@@ -87,5 +83,5 @@ try {
 Register the repository in `RepositoryRegistry::DEFINITIONS` (path + DTO class). No changes to `ZammadClient` are required:
 
 ```php
-$tickets = $client->repo(TicketRepository::class);
+$tickets = $client->ticket();
 ```

@@ -31,9 +31,9 @@
 - **Breaking:** Array return values replaced by typed DTOs
 - **Breaking:** Guzzle used as default transport; `withClient()` supports any PSR-18 client
 - `getListKey()` in Repository-Klassen nicht mehr abstrakt; Default ist `$this->resourcePath`
+- Typed repository accessors (`$client->ticket()`, `$client->user()`, …) are the recommended public API; the underlying `repo()` method is `@internal`.
 
 ### Removed
-- Magic resource accessor (`$client->ticket()`) — ersatzlos entfernt. Nutze `$client->repo(TicketRepository::class)`.
 - `ZammadClient::aliasMap()`, `resolveAlias()`, `__call()` — deprecated in v3.0, jetzt entfernt
 - Shared mutable Impersonation-State aus `RequestHandler` entfernt
 
