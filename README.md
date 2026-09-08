@@ -14,19 +14,18 @@ PSR-compliant PHP client for the [Zammad](https://zammad.com) REST API. PHP 8.1+
 
 ```php
 use ZammadAPIClient\Endpoints\Tickets\TicketDTO;
-use ZammadAPIClient\Endpoints\Tickets\TicketRepository;
 use ZammadAPIClient\ZammadClient;
 
 $client = ZammadClient::withToken('https://zammad.example', 'your-token');
 
 // Fetch
-$ticket = $client->repo(TicketRepository::class)->find(1);
+$ticket = $client->ticket()->find(1);
 echo $ticket->title; // typed property, IDE autocomplete
 
 // Create (customer_id is required on creation; article is optional)
 // For production code, resolve priority_id/state_id by name via
-// TicketPriorityRepository / TicketStateRepository. See examples/cookbook.php.
-$created = $client->repo(TicketRepository::class)->create(new TicketDTO(
+// TicketPriorityRepository / TicketStateRepository. See examples/cookbook/.
+$created = $client->ticket()->create(new TicketDTO(
     title: 'Hello from v3',
     customer_id: 1,
     group_id: 1,
@@ -40,10 +39,10 @@ $created = $client->repo(TicketRepository::class)->create(new TicketDTO(
 ));
 
 // Partial update
-$client->repo(TicketRepository::class)->patch($created->id, ['title' => 'Updated']);
+$client->ticket()->patch($created->id, ['title' => 'Updated']);
 
 // Search
-foreach ($client->repo(TicketRepository::class)->search('error') as $ticket) {
+foreach ($client->ticket()->search('error') as $ticket) {
     echo $ticket->title;
 }
 ```
@@ -111,12 +110,12 @@ ZammadClient::withToken($url, 'your-token',
 
 ## Examples
 
-The primary example is [`examples/cookbook.php`](examples/cookbook/README.md))) — nine runnable recipes covering tickets, stateful resources, pagination, error handling, impersonation, and search. Run it against any Zammad instance:
+The primary example is the [`examples/cookbook/`](examples/cookbook/README.md) directory — runnable recipes covering tickets, stateful resources, pagination, error handling, impersonation, and search. Run them against any Zammad instance:
 
 ```bash
 ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL=http://your-zammad:3000 \
 ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_TOKEN=your-token \
-php examples/cookbook.php
+php examples/cookbook/01-quick-start.php
 ```
 
 > The env vars are named `...UNIT_TESTS...` for historical reasons. They are used by integration tests and the cookbook example. Unit tests (`make test`) need no env vars.
@@ -129,10 +128,11 @@ This library offers three interaction styles. Choose based on your use case:
 
 | Style | API | Best for |
 |-------|-----|----------|
-| **Repository + DTOs** (recommended) | `$repo->find()`, `create()`, `patch()`, `delete()` | Type-safe CRUD, IDE autocomplete, explicit intent. Use this by default. |
-| **Stateful Resource** | `$repo->resource($id)->save()` / `destroy()` | Interactive editing — mutate properties step by step, only changes are sent. |
+| **Repository + DTOs** (recommended) | `$client->ticket()->find()`, `create()`, `patch()`, `delete()` | Type-safe CRUD, IDE autocomplete, explicit intent. Use this by default. |
+| **Stateful Resource** | `$client->ticket()->resource($id)->save()` / `destroy()` | Interactive editing — mutate properties step by step, only changes are sent. |
 | **Raw HTTP** | `$client->getHandler()->get()`, `delete()`, etc. | Calling endpoints that have no dedicated repository. Escape hatch. |
-| **Magic accessor** (deprecated) | `$client->ticket()->find(1)` | Triggers `E_USER_DEPRECATED`. Removed in v4. Migrate to `repo()`. |
+
+Repositories are accessed via typed accessors: `$client->ticket()`, `$client->user()`, `$client->organization()`, `$client->group()`, `$client->ticketArticle()`, `$client->ticketState()`, `$client->ticketPriority()`, `$client->tag()`, `$client->textModule()`, `$client->link()`. The underlying `repo()` method is internal.
 
 ### Connecting
 
@@ -146,16 +146,16 @@ $client = ZammadClient::withToken('https://zammad.example', 'your-token');
 ### Fetching
 
 ```php
-// Access via typed repository — autocomplete, type-safe
-$ticket = $client->repo(TicketRepository::class)->find(1);
-$user   = $client->repo(UserRepository::class)->find(1);
-$group  = $client->repo(GroupRepository::class)->find(1);
+// Access via typed accessor — autocomplete, type-safe
+$ticket = $client->ticket()->find(1);
+$user   = $client->user()->find(1);
+$group  = $client->group()->find(1);
 ```
 
 ### Accessing values
 
 ```php
-$ticket = $client->repo(TicketRepository::class)->find(1);
+$ticket = $client->ticket()->find(1);
 
 echo $ticket->title;          // Typed property, IDE autocomplete
 echo $ticket->state_id;       // ?int
@@ -168,7 +168,7 @@ $id   = $ticket->id;          // Server-assigned ID (null before create)
 ### Creating
 
 ```php
-$ticket = $client->repo(TicketRepository::class)->create(new TicketDTO(
+$ticket = $client->ticket()->create(new TicketDTO(
     title: 'My ticket',
     customer_id: 1,
     group_id: 1,
@@ -187,7 +187,7 @@ echo $ticket->id; // Server-assigned after creation
 ### Updating
 
 ```php
-$repo = $client->repo(TicketRepository::class);
+$repo = $client->ticket();
 
 // Send a DTO — only non-null fields are transmitted
 $repo->patch(1, new TicketDTO(title: 'New title', group_id: 1));
@@ -204,7 +204,7 @@ $repo->patch(1, new TicketUpdateDTO(title: 'New title'));
 `$repo->resource($id)` returns a `Resource` wrapper — **not a DTO**. Properties are accessed and mutated via `__get`/`__set` magic (not typed properties), and changes are automatically tracked. `save()` sends only modified fields; `destroy()` sends DELETE.
 
 ```php
-$repo = $client->repo(TicketRepository::class);
+$repo = $client->ticket();
 
 $r = $repo->resource(1);          // Returns Resource, fetches ticket #1
 echo $r->title;                   // Reads current title
@@ -228,7 +228,7 @@ Use this for interactive workflows where you read, modify, then write. For singl
 | `resource($id)->save()` | Only actually changed fields (tracked) | Interactive editing with change tracking. |
 
 ```php
-$repo = $client->repo(TicketRepository::class);
+$repo = $client->ticket();
 
 // Array — simplest for ad-hoc changes
 $repo->patch(1, ['title' => 'New title', 'state_id' => 3]);
@@ -268,14 +268,14 @@ All repositories expose a `delete()` method. Repositories implementing `Deletabl
 | `TicketPriorityRepository` | exception | System resource, read-only |
 
 ```php
-$client->repo(TicketRepository::class)->delete(1);
-$client->repo(UserRepository::class)->delete(1);
+$client->ticket()->delete(1);
+$client->user()->delete(1);
 ```
 
 ### Searching
 
 ```php
-$repo = $client->repo(TicketRepository::class);
+$repo = $client->ticket();
 
 // Full-text search — returns a lazy Generator (page by page)
 // Use foreach directly; count()/array access requires iterator_to_array()
@@ -298,7 +298,7 @@ $list->each(function ($t) { echo $t->title; });
 ### Listing all
 
 ```php
-$repo = $client->repo(TicketRepository::class);
+$repo = $client->ticket();
 
 // Lazy Generator — pages fetched on demand, memory-efficient
 // Use in foreach; need count? Use list() for PaginatedList instead.
@@ -317,7 +317,7 @@ $list->each(function ($t) { echo $t->title; });
 ### Ticket articles
 
 ```php
-$repo = $client->repo(TicketArticleRepository::class);
+$repo = $client->ticketArticle();
 
 // All articles for a ticket (paginated)
 foreach ($repo->getForTicket(1) as $article) {
@@ -333,7 +333,7 @@ $binary = $repo->getAttachmentContent(
 ### Tags
 
 ```php
-$repo = $client->repo(TagRepository::class);
+$repo = $client->tag();
 
 $repo->add('Ticket', $ticketId, 'urgent');
 $repo->remove('Ticket', $ticketId, 'urgent');
@@ -349,9 +349,9 @@ $results = $repo->tagSearch('urg'); // Autocomplete
 
 ```php
 $csv = file_get_contents('users.csv');
-$result = $client->repo(UserRepository::class)->import($csv);           // Returns import summary array
-$result = $client->repo(OrganizationRepository::class)->import($csv);   // Returns import summary array
-$client->repo(TextModuleRepository::class)->import($csv);               // Returns import summary array
+$result = $client->user()->import($csv);           // Returns import summary array
+$result = $client->organization()->import($csv);   // Returns import summary array
+$client->textModule()->import($csv);               // Returns import summary array
 ```
 
 All `import()` methods return an `array` — the Zammad API response containing import statistics (rows processed, skipped, errors).
@@ -373,7 +373,7 @@ use ZammadAPIClient\Exceptions\{
 };
 
 try {
-    $client->repo(TicketRepository::class)->find(999999);
+    $client->ticket()->find(999999);
 } catch (NotFoundException $e) {
     echo $e->getMessage();          // "Resource not found: tickets/999999"
 } catch (ValidationException $e) {
@@ -443,7 +443,7 @@ Used with `patch()` for partial ticket updates. Only non-null fields are sent to
 
 ```php
 // Example: reassign ticket and leave an internal note
-$client->repo(TicketRepository::class)->patch(42, new TicketUpdateDTO(
+$client->ticket()->patch(42, new TicketUpdateDTO(
     owner_id: 7,
     note: 'Reassigned from support queue.',
 ));
@@ -583,12 +583,10 @@ $client->repo(TicketRepository::class)->patch(42, new TicketUpdateDTO(
 ## Impersonation
 
 ```php
-use ZammadAPIClient\Endpoints\Tickets\TicketRepository;
-
 // Temporary — auto-cleanup via finally
 // Accepts user ID (int), login, or email (string)
-$client->performOnBehalfOf(1, fn() => $client->repo(TicketRepository::class)->find(42));
-$client->performOnBehalfOf('agent@example.com', fn() => $client->repo(TicketRepository::class)->find(42));
+$client->performOnBehalfOf(1, fn() => $client->ticket()->find(42));
+$client->performOnBehalfOf('agent@example.com', fn() => $client->ticket()->find(42));
 
 // Persistent — same parameter types
 $client->setOnBehalfOfUser(1);
@@ -629,15 +627,15 @@ v2 reference documentation is preserved in [docs/v2-reference.md](docs/v2-refere
 | v2 | v3 |
 |----|----|
 | `new Client(['url' => ..., 'http_token' => ...])` | `ZammadClient::withToken($url, ...)` |
-| `$client->resource(TICKET)->get(1)` | `$client->repo(TicketRepository::class)->find(1)` |
+| `$client->resource(TICKET)->get(1)` | `$client->ticket()->find(1)` |
 | `$ticket->getValue('title')` | `$ticket->title` |
 | `$ticket->getValues()` | `$ticket->toArray()` |
-| `$ticket->setValue('title', 'x'); $ticket->save()` | `$client->repo(TicketRepository::class)->patch(1, ['title' => 'x'])` |
+| `$ticket->setValue('title', 'x'); $ticket->save()` | `$client->ticket()->patch(1, ['title' => 'x'])` |
 | `if ($ticket->hasError()) { $ticket->getError(); }` | `catch (NotFoundException $e) { $e->getMessage(); }` |
-| `$client->resource(TICKET)->search('term')` | `$client->repo(TicketRepository::class)->search('term')` |
-| `$client->resource(TICKET)->all()` | `$client->repo(TicketRepository::class)->all()` |
-| `$ticket->delete()` | `$client->repo(TicketRepository::class)->delete($id)` |
-| `$client->resource(TAG)->add($ticketId, 'tag', 'Ticket')` | `$client->repo(TagRepository::class)->add('Ticket', $ticketId, 'tag')` *(order changed)* |
+| `$client->resource(TICKET)->search('term')` | `$client->ticket()->search('term')` |
+| `$client->resource(TICKET)->all()` | `$client->ticket()->all()` |
+| `$ticket->delete()` | `$client->ticket()->delete($id)` |
+| `$client->resource(TAG)->add($ticketId, 'tag', 'Ticket')` | `$client->tag()->add('Ticket', $ticketId, 'tag')` *(order changed)* |
 
 ## License
 

@@ -48,6 +48,8 @@ final class ZammadClient implements ZammadClientInterface
     /**
      * Returns a memoized repository for the given repository class.
      *
+     * @internal Use the typed accessors (e.g. {@see self::ticket()}) instead.
+     *
      * @template T of AbstractRepository
      * @param class-string<T> $repositoryClass
      * @return T

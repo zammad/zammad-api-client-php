@@ -11,6 +11,8 @@ interface ClientInterface
     /**
      * Returns a memoized repository for the given endpoint.
      *
+     * @internal Use the typed accessors on the concrete client instead.
+     *
      * @template T of AbstractRepository
      * @param class-string<T> $repositoryClass
      * @return T

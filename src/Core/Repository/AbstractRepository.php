@@ -24,8 +24,9 @@ use ZammadAPIClient\Core\Contracts\RequestHandlerInterface;
  *     the resource list in paginated list responses (varies per endpoint).
  *  3. Optionally add endpoint-specific convenience methods (e.g. `getForTicket`).
  *
- * All repositories are instantiated via {@see \ZammadAPIClient\ZammadClient::repo()},
- * which injects the shared `RequestHandler` and the wiring defined in
+ * All repositories are obtained via the typed accessors on the client (e.g.
+ * {@see \ZammadAPIClient\ZammadClient::ticket()}), which inject the shared
+ * `RequestHandler` and the wiring defined in
  * {@see \ZammadAPIClient\Core\Repository\RepositoryRegistry::DEFINITIONS}.
  *
  * @template T of DTOInterface

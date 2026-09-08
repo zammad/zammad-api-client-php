@@ -12,15 +12,15 @@ cp .env.example .env
 | File | Description |
 |---|---|
 | `00-plain.php` | Guzzle setup (used by recipes 01-06). Standalone, copy-paste-ready. |
-| `00-laravel.php` | Laravel service container setup. |
-| `00-symfony.php` | Symfony bundle setup. |
-| `00-slim.php` | Non-Guzzle setup (Symfony HttpClient + Nyholm PSR-17). |
 | `01-quick-start.php` | Client instantiation + find ticket #1. |
 | `02-crud.php` | Create, read, and delete tickets. |
 | `03-listing.php` | `all()` streaming, `list()` pagination, `totalCount()`. |
 | `04-updates.php` | `patch()` partial update + `TicketUpdateDTO`. |
 | `05-impersonation.php` | `ImpersonationHandler` for scoped on-behalf-of requests. |
 | `06-search.php` | Full-text search via `search()` and `searchList()`. |
+| `07-laravel.php` | Laravel service container setup. |
+| `08-symfony.php` | Symfony bundle setup. |
+| `09-slim.php` | Non-Guzzle setup (Symfony HttpClient + Nyholm PSR-17). |
 
 ## Run
 
