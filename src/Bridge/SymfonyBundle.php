@@ -42,7 +42,7 @@ use ZammadAPIClient\ZammadClient;
  * - Set the environment variables (`.env` or `.env.local`):
  *
  *   ```env
- *   ZAMMAD_URL=https://zammad.example.com/api/v1
+ *   ZAMMAD_URL=https://zammad.example.com
  *   ZAMMAD_TOKEN=your-api-token
  *   ```
  *
@@ -80,7 +80,7 @@ final class SymfonyBundle extends Bundle
                     $resolved = array_merge($resolved, $config);
                 }
 
-                $url   = $resolved['url']   ?? (string) ($_ENV['ZAMMAD_URL']   ?? 'http://127.0.0.1:8098/api/v1');
+                $url   = $resolved['url']   ?? (string) ($_ENV['ZAMMAD_URL']   ?? 'http://127.0.0.1:8098');
                 $token = $resolved['token'] ?? (string) ($_ENV['ZAMMAD_TOKEN'] ?? '');
 
                 $client = new ZammadClient(

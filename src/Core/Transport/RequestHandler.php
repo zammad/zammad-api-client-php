@@ -39,6 +39,8 @@ use JsonException;
  */
 final class RequestHandler implements RequestHandlerInterface
 {
+    public const API_VERSION = 'v1';
+
     private ClientInterface $httpClient;
     private RequestFactoryInterface $requestFactory;
     private StreamFactoryInterface $streamFactory;
@@ -49,7 +51,7 @@ final class RequestHandler implements RequestHandlerInterface
     /**
      * @param ClientInterface         $httpClient PSR-18 client (any implementation).
      * @param RequestFactoryInterface $factory    PSR-17 factory; must also implement {@see StreamFactoryInterface}.
-     * @param string                  $baseUrl    Base URL incl. API prefix.
+     * @param string                  $baseUrl    Base URL; the API prefix (`/api/v1`) is appended if missing.
      * @param LoggerInterface         $logger     PSR-3 logger; defaults to NullLogger.
      * @param int                     $maxRetries Max retries on HTTP 429 (0 = disable).
      */
@@ -70,8 +72,19 @@ final class RequestHandler implements RequestHandlerInterface
             : $httpClient;
         $this->requestFactory = $factory;
         $this->streamFactory = $factory;
-        $this->baseUrl = $baseUrl;
+        $this->baseUrl = self::normalizeBaseUrl($baseUrl);
         $this->logger = $logger;
+    }
+
+    /**
+     * Ensures the base URL ends with the Zammad API prefix (`/api/v1`).
+     *
+     * A trailing `/api` or `/api/vN` is stripped first so the prefix is never
+     * duplicated and the version is always the one this client targets.
+     */
+    private static function normalizeBaseUrl(string $url): string
+    {
+        return preg_replace('#/api(?:/v\d+)?$#', '', rtrim($url, '/')) . '/api/' . self::API_VERSION;
     }
 
     /**

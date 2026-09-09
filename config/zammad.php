@@ -3,8 +3,10 @@
 return [
 
     /** Zammad API Base URL
-     * Full URL to your Zammad instance including the API prefix, e.g.:
-     * https://zammad.example.com/api/v1
+     * Full URL to your Zammad instance, e.g.:
+     * https://zammad.example.com
+     *
+     * The API prefix (`/api/v1`) is appended automatically.
     */
     'url' => env('ZAMMAD_URL', 'http://127.0.0.1:8098'),
 

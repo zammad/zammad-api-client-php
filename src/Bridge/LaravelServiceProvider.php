@@ -40,7 +40,7 @@ use ZammadAPIClient\ZammadClient;
  * - Set your credentials in `.env`:
  *
  *   ```env
- *   ZAMMAD_URL=https://zammad.example.com/api/v1
+ *   ZAMMAD_URL=https://zammad.example.com
  *   ZAMMAD_TOKEN=your-api-token
  *   ```
  *
@@ -69,7 +69,7 @@ use ZammadAPIClient\ZammadClient;
  *
  * 1. `config/zammad.php` values (after `vendor:publish`)
  * 2. `ZAMMAD_URL` / `ZAMMAD_TOKEN` environment variables (`.env`)
- * 3. Built-in defaults (`http://127.0.0.1:8098/api/v1`, empty token)
+ * 3. Built-in defaults (`http://127.0.0.1:8098`, empty token)
  *
  * @see ZammadClient::withToken()
  */
