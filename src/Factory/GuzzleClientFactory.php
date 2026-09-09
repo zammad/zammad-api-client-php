@@ -48,6 +48,9 @@ final class GuzzleClientFactory implements ClientFactoryInterface
         return new self($url, 'Basic ' . base64_encode("{$user}:{$pass}"), $config);
     }
 
+    /**
+     * Creates a request handler configured with this factory's credentials.
+     */
     public function createHandler(): RequestHandlerInterface
     {
         $config = $this->config ?? new ConnectionConfig();

@@ -73,6 +73,11 @@ final class SymfonyBundle extends Bundle
     public function getContainerExtension(): ?ExtensionInterface
     {
         return new class implements ExtensionInterface {
+            /**
+             * Registers the configured Zammad client with the container.
+             *
+             * @param array<int, array<string, mixed>> $configs
+             */
             public function load(array $configs, ContainerBuilder $container): void
             {
                 $resolved = [];

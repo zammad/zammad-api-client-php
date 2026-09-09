@@ -18,6 +18,9 @@ namespace ZammadAPIClient\Exceptions;
  */
 final class BadRequestException extends \RuntimeException implements ZammadException
 {
+    /**
+     * Creates an HTTP 400 exception with the API-provided message.
+     */
     public function __construct(string $message = 'Bad request')
     {
         parent::__construct($message, 400);
