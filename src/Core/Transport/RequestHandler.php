@@ -263,6 +263,9 @@ final class RequestHandler implements RequestHandlerInterface
         throw $this->mapError($status, $uri, $response);
     }
 
+    /**
+     * Maps an unsuccessful HTTP response to its corresponding domain exception.
+     */
     private function mapError(int $status, string $uri, ResponseInterface $response): ZammadException
     {
         $raw = (string) $response->getBody();
@@ -282,6 +285,9 @@ final class RequestHandler implements RequestHandlerInterface
         };
     }
 
+    /**
+     * Builds a validation exception from a raw HTTP 422 response body.
+     */
     private function validationError(string $raw): ValidationException
     {
         return new ValidationException(

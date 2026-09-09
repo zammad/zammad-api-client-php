@@ -129,6 +129,9 @@ final class RequestHandlerTest extends TestCase
         $this->handler->get('tickets');
     }
 
+    /**
+     * Verifies that HTTP 403 responses map to the forbidden exception.
+     */
     public function testForbiddenMapsToTypedException(): void
     {
         $this->httpClient->response = new Response(403, [], '');
@@ -137,6 +140,9 @@ final class RequestHandlerTest extends TestCase
         $this->handler->get('tickets');
     }
 
+    /**
+     * Verifies that HTTP 400 responses preserve the API error message.
+     */
     public function testBadRequestMapsToBadRequestException(): void
     {
         $this->httpClient->response = new Response(400, [], (string) json_encode(['error' => 'invalid filter']));
@@ -149,6 +155,9 @@ final class RequestHandlerTest extends TestCase
         }
     }
 
+    /**
+     * Verifies that server exceptions preserve the API error message.
+     */
     public function testServerErrorIncludesBodyMessage(): void
     {
         $this->httpClient->response = new Response(500, [], (string) json_encode(['error' => 'boom']));
@@ -161,6 +170,9 @@ final class RequestHandlerTest extends TestCase
         }
     }
 
+    /**
+     * Verifies that validation errors use the human-readable error field.
+     */
     public function testValidationExceptionReadsErrorHuman(): void
     {
         $this->httpClient->response = new Response(422, [], (string) json_encode(['error_human' => 'human readable']));
@@ -173,6 +185,9 @@ final class RequestHandlerTest extends TestCase
         }
     }
 
+    /**
+     * Verifies that validation details are extracted from the errors field.
+     */
     public function testValidationExceptionExtractsErrorsKey(): void
     {
         $this->httpClient->response = new Response(
@@ -189,6 +204,9 @@ final class RequestHandlerTest extends TestCase
         }
     }
 
+    /**
+     * Verifies that raw requests return the response body without decoding it.
+     */
     public function testGetRawReturnsUndecodedBody(): void
     {
         $binary = "PNG\x00\x01binary-not-json";
@@ -197,6 +215,9 @@ final class RequestHandlerTest extends TestCase
         self::assertSame($binary, $this->handler->getRaw('ticket_attachment/1/2/3'));
     }
 
+    /**
+     * Verifies that raw requests accept responses of any content type.
+     */
     public function testGetRawSendsWildcardAccept(): void
     {
         $this->httpClient->response = new Response(200, [], 'binary');
@@ -207,6 +228,9 @@ final class RequestHandlerTest extends TestCase
         self::assertSame('*/*', $this->httpClient->lastRequest->getHeaderLine('Accept'));
     }
 
+    /**
+     * Verifies that supported base URL forms resolve to the v1 API path.
+     */
     public function testNormalizesBaseUrlToApiV1(): void
     {
         $this->httpClient->response = new Response(200, [], '{}');
@@ -228,6 +252,9 @@ final class RequestHandlerTest extends TestCase
         }
     }
 
+    /**
+     * Verifies that a successful response with invalid JSON is rejected.
+     */
     public function testNonJsonBodyOn200ThrowsNetworkException(): void
     {
         $this->httpClient->response = new Response(200, [], '<html>proxy error</html>');
@@ -296,9 +323,15 @@ final class RequestHandlerTest extends TestCase
         );
     }
 
+    /**
+     * Verifies that PSR client failures are wrapped as network exceptions.
+     */
     public function testDispatchCatchesClientException(): void
     {
         $httpClient = new class implements ClientInterface {
+            /**
+             * Simulates a PSR client transport failure.
+             */
             public function sendRequest(RequestInterface $request): ResponseInterface
             {
                 throw new class extends \RuntimeException implements ClientExceptionInterface {
