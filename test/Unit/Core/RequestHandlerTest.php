@@ -207,6 +207,27 @@ final class RequestHandlerTest extends TestCase
         self::assertSame('*/*', $this->httpClient->lastRequest->getHeaderLine('Accept'));
     }
 
+    public function testNormalizesBaseUrlToApiV1(): void
+    {
+        $this->httpClient->response = new Response(200, [], '{}');
+
+        $cases = [
+            'https://zammad.example'        => 'https://zammad.example/api/v1/tickets',
+            'https://zammad.example/'       => 'https://zammad.example/api/v1/tickets',
+            'https://zammad.example/api'    => 'https://zammad.example/api/v1/tickets',
+            'https://zammad.example/api/'   => 'https://zammad.example/api/v1/tickets',
+            'https://zammad.example/api/v1' => 'https://zammad.example/api/v1/tickets',
+            'https://zammad.example/api/v2' => 'https://zammad.example/api/v1/tickets',
+        ];
+
+        foreach ($cases as $baseUrl => $expected) {
+            $handler = new RequestHandler($this->httpClient, $this->httpFactory, $baseUrl, maxRetries: 0);
+            $handler->get('tickets');
+
+            self::assertSame($expected, (string) $this->httpClient->lastRequest->getUri(), "URL: {$baseUrl}");
+        }
+    }
+
     public function testNonJsonBodyOn200ThrowsNetworkException(): void
     {
         $this->httpClient->response = new Response(200, [], '<html>proxy error</html>');

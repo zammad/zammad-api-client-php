@@ -42,23 +42,4 @@ final class GuzzleClientFactoryTest extends MockeryTestCase
 
         self::assertInstanceOf(ClientInterface::class, $client);
     }
-
-    public function testNormalizeUrlAppendsApiV1(): void
-    {
-        $method = new \ReflectionMethod(GuzzleClientFactory::class, 'normalizeUrl');
-
-        $cases = [
-            'https://zammad.example'          => 'https://zammad.example/api/v1',
-            'https://zammad.example/'         => 'https://zammad.example/api/v1',
-            'https://zammad.example/api'      => 'https://zammad.example/api/v1',
-            'https://zammad.example/api/'     => 'https://zammad.example/api/v1',
-            'https://zammad.example/api/v1'   => 'https://zammad.example/api/v1',
-            'https://zammad.example/api/v1/'  => 'https://zammad.example/api/v1',
-            'https://zammad.example/api/v2'   => 'https://zammad.example/api/v2',
-        ];
-
-        foreach ($cases as $input => $expected) {
-            self::assertSame($expected, $method->invoke(null, $input), "URL: {$input}");
-        }
-    }
 }
