@@ -52,8 +52,6 @@ final class GuzzleClientFactory implements ClientFactoryInterface
     {
         $config = $this->config ?? new ConnectionConfig();
 
-        $url = self::normalizeUrl($this->url);
-
         $httpClient = new GuzzleClient([
             'headers'         => [
                 'User-Agent'    => self::USER_AGENT,
@@ -68,24 +66,9 @@ final class GuzzleClientFactory implements ClientFactoryInterface
         return new RequestHandler(
             $httpClient,
             new HttpFactory(),
-            $url,
+            $this->url,
             logger: $config->logger ?? new NullLogger(),
             maxRetries: $config->maxRetries,
         );
-    }
-
-    private static function normalizeUrl(string $url): string
-    {
-        $url = rtrim($url, '/');
-
-        if (preg_match('#/api/v\d+$#', $url)) {
-            return $url;
-        }
-
-        if (str_ends_with($url, '/api')) {
-            return $url . '/v1';
-        }
-
-        return $url . '/api/v1';
     }
 }
