@@ -14,6 +14,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use ZammadAPIClient\Core\Contracts\RequestHandlerInterface;
 use ZammadAPIClient\Exceptions\AuthenticationException;
+use ZammadAPIClient\Exceptions\BadRequestException;
 use ZammadAPIClient\Exceptions\ForbiddenException;
 use ZammadAPIClient\Exceptions\NetworkException;
 use ZammadAPIClient\Exceptions\NotFoundException;
@@ -135,7 +136,8 @@ final class RequestHandler implements RequestHandlerInterface
             $uri .= '?' . http_build_query($query);
         }
 
-        $options = !empty($headers) ? ['headers' => $headers] : [];
+        $headers += ['Accept' => '*/*'];
+        $options = ['headers' => $headers];
 
         return (string) $this->dispatch('GET', $uri, $options)->getBody();
     }
@@ -250,33 +252,57 @@ final class RequestHandler implements RequestHandlerInterface
 
     private function mapError(int $status, string $uri, ResponseInterface $response): ZammadException
     {
+        $raw = (string) $response->getBody();
+
         return match (true) {
-            $status === 401 => new AuthenticationException('Invalid credentials'),
-            $status === 403 => new ForbiddenException("Access denied: {$uri}"),
-            $status === 404 => new NotFoundException("Resource not found: {$uri}"),
-            $status === 422 => $this->validationError($response),
+            $status === 400 => new BadRequestException($this->extractErrorMessage($raw) ?? 'Bad request'),
+            $status === 401 => new AuthenticationException($this->extractErrorMessage($raw) ?? 'Invalid credentials'),
+            $status === 403 => new ForbiddenException($this->extractErrorMessage($raw) ?? "Access denied: {$uri}"),
+            $status === 404 => new NotFoundException($this->extractErrorMessage($raw) ?? "Resource not found: {$uri}"),
+            $status === 422 => $this->validationError($raw),
             $status === 429 => new RateLimitException(
                 'Too many requests',
                 (int) ($response->getHeaderLine('Retry-After') ?: 60),
             ),
-            $status >= 500 => new ServerErrorException("Server error: {$status}"),
-            default => new NetworkException("Unexpected status: {$status}"),
+            $status >= 500 => new ServerErrorException($this->extractErrorMessage($raw) ?? "Server error: {$status}"),
+            default => new NetworkException($this->extractErrorMessage($raw) ?? "Unexpected status: {$status}"),
         };
     }
 
-    private function validationError(ResponseInterface $response): ValidationException
+    private function validationError(string $raw): ValidationException
     {
-        $raw = (string) $response->getBody();
+        return new ValidationException(
+            $this->extractErrorMessage($raw) ?? $this->extractValidationMessage($raw),
+            $this->extractValidationErrors($this->decodeLenient($raw)),
+        );
+    }
+
+    /**
+     * Extracts a human-readable message from an error response body.
+     *
+     * Prefers the JSON `error`/`error_human` fields; falls back to the raw
+     * body for non-HTML text responses. Returns null when no usable message
+     * can be extracted (callers then supply a generic fallback).
+     */
+    private function extractErrorMessage(string $raw): ?string
+    {
+        if ($raw === '') {
+            return null;
+        }
+
         $body = $this->decodeLenient($raw);
 
-        $message = is_string($body['error'] ?? null)
-            ? $body['error']
-            : $this->extractValidationMessage($raw);
+        $message = $body['error'] ?? $body['error_human'] ?? null;
+        if (is_string($message) && $message !== '') {
+            return $message;
+        }
 
-        return new ValidationException(
-            $message,
-            $this->extractValidationErrors($body),
-        );
+        $trimmed = trim($raw);
+        if ($trimmed === '' || str_starts_with($trimmed, '<')) {
+            return null;
+        }
+
+        return substr($trimmed, 0, 200);
     }
 
     /**
@@ -285,7 +311,7 @@ final class RequestHandler implements RequestHandlerInterface
      */
     private function extractValidationErrors(array $body): array
     {
-        $details = $body['details'] ?? $body['error_details'] ?? null;
+        $details = $body['details'] ?? $body['error_details'] ?? $body['errors'] ?? null;
 
         return is_array($details) ? $details : [];
     }
