@@ -78,10 +78,14 @@ final class GuzzleClientFactory implements ClientFactoryInterface
     {
         $url = rtrim($url, '/');
 
-        if (!str_contains($url, '/api/')) {
-            $url .= '/api/v1';
+        if (preg_match('#/api/v\d+$#', $url)) {
+            return $url;
         }
 
-        return $url;
+        if (str_ends_with($url, '/api')) {
+            return $url . '/v1';
+        }
+
+        return $url . '/api/v1';
     }
 }

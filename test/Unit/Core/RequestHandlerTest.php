@@ -16,6 +16,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use ZammadAPIClient\Core\Transport\RequestHandler;
 use ZammadAPIClient\Exceptions\AuthenticationException;
+use ZammadAPIClient\Exceptions\BadRequestException;
 use ZammadAPIClient\Exceptions\ForbiddenException;
 use ZammadAPIClient\Exceptions\NetworkException;
 use ZammadAPIClient\Exceptions\NotFoundException;
@@ -136,12 +137,74 @@ final class RequestHandlerTest extends TestCase
         $this->handler->get('tickets');
     }
 
+    public function testBadRequestMapsToBadRequestException(): void
+    {
+        $this->httpClient->response = new Response(400, [], (string) json_encode(['error' => 'invalid filter']));
+
+        try {
+            $this->handler->get('tickets');
+            self::fail('Expected BadRequestException');
+        } catch (BadRequestException $e) {
+            self::assertSame('invalid filter', $e->getMessage());
+        }
+    }
+
+    public function testServerErrorIncludesBodyMessage(): void
+    {
+        $this->httpClient->response = new Response(500, [], (string) json_encode(['error' => 'boom']));
+
+        try {
+            $this->handler->get('tickets');
+            self::fail('Expected ServerErrorException');
+        } catch (ServerErrorException $e) {
+            self::assertSame('boom', $e->getMessage());
+        }
+    }
+
+    public function testValidationExceptionReadsErrorHuman(): void
+    {
+        $this->httpClient->response = new Response(422, [], (string) json_encode(['error_human' => 'human readable']));
+
+        try {
+            $this->handler->post('tickets', ['x' => 1]);
+            self::fail('Expected ValidationException');
+        } catch (ValidationException $e) {
+            self::assertSame('human readable', $e->getMessage());
+        }
+    }
+
+    public function testValidationExceptionExtractsErrorsKey(): void
+    {
+        $this->httpClient->response = new Response(
+            422,
+            [],
+            (string) json_encode(['error' => 'bad', 'errors' => ['title' => 'required']]),
+        );
+
+        try {
+            $this->handler->post('tickets', ['x' => 1]);
+            self::fail('Expected ValidationException');
+        } catch (ValidationException $e) {
+            self::assertSame(['title' => 'required'], $e->errors);
+        }
+    }
+
     public function testGetRawReturnsUndecodedBody(): void
     {
         $binary = "PNG\x00\x01binary-not-json";
         $this->httpClient->response = new Response(200, [], $binary);
 
         self::assertSame($binary, $this->handler->getRaw('ticket_attachment/1/2/3'));
+    }
+
+    public function testGetRawSendsWildcardAccept(): void
+    {
+        $this->httpClient->response = new Response(200, [], 'binary');
+
+        $this->handler->getRaw('ticket_attachment/1/2/3');
+
+        self::assertNotNull($this->httpClient->lastRequest);
+        self::assertSame('*/*', $this->httpClient->lastRequest->getHeaderLine('Accept'));
     }
 
     public function testNonJsonBodyOn200ThrowsNetworkException(): void
