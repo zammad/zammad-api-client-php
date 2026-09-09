@@ -301,7 +301,8 @@ final class RequestHandlerTest extends TestCase
         $httpClient = new class implements ClientInterface {
             public function sendRequest(RequestInterface $request): ResponseInterface
             {
-                throw new class extends \RuntimeException implements ClientExceptionInterface {};
+                throw new class extends \RuntimeException implements ClientExceptionInterface {
+                };
             }
         };
 
