@@ -22,6 +22,15 @@ jobs:
           if [ -d src ]; then vendor/bin/phpstan analyse src/ --level=max; else echo "→ Skip (src/ not yet present)"; fi
       - run: |
           if [ -d test/Unit ]; then vendor/bin/phpunit --testsuite=unit --display-skipped; else echo "→ Skip (test/Unit/ not yet present)"; fi
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: |
+            junit.xml
+            coverage.xml
+          if-no-files-found: ignore
 
   integration:
     runs-on: ubuntu-latest
