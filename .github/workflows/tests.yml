@@ -70,9 +70,16 @@ jobs:
           RAILS_ENV=test bundle exec rake zammad:ci:test:start zammad:setup:auto_wizard
       - name: Run integration tests
         run: |
-          set -x
-          if [ -d test/Integration ]; then vendor/bin/phpunit --testsuite=integration --group=integration --display-skipped; else echo "→ Skip (test/Integration/ not yet present)"; fi
+         set -x
+          if [ -d test/Integration ]; then vendor/bin/phpunit --testsuite=integration --group=integration --display-skipped --log-junit junit-integration.xml; else echo "→ Skip (test/Integration/ not yet present)"; fi
         env:
           ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL: http://localhost:3000/api/v1
           ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_USERNAME: admin@example.com
           ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_PASSWORD: test
+      - name: Upload integration test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: junit-integration.xml
+          if-no-files-found: ignore    
