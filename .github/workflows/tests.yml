@@ -51,6 +51,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
+          extensions: xdebug
       - name: Install dependencies
         run: composer install --no-interaction
       - name: Dump autoload
@@ -71,7 +72,7 @@ jobs:
       - name: Run integration tests
         run: |
          set -x
-          if [ -d test/Integration ]; then vendor/bin/phpunit --testsuite=integration --group=integration --display-skipped --log-junit junit-integration.xml; else echo "→ Skip (test/Integration/ not yet present)"; fi
+          if [ -d test/Integration ]; then XDEBUG_MODE=coverage vendor/bin/phpunit --testsuite=integration --group=integration --display-skipped --log-junit junit-integration.xml; else echo "→ Skip (test/Integration/ not yet present)"; fi
         env:
           ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL: http://localhost:3000/api/v1
           ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_USERNAME: admin@example.com
@@ -81,5 +82,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: integration-test-results
-          path: junit-integration.xml
+          path: |
+            junit-integration.xml
+            coverage-integration.xml
           if-no-files-found: ignore    
