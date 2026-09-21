@@ -22,7 +22,7 @@ Using Laravel or Symfony? See [Framework integration](#framework-integration) to
 resolve `ZammadClient` from the container instead of constructing it by hand.
 
 **2. Connect** — point the client at your Zammad instance and pass a
-[personal access token](https://admin-docs.zammad.org/en/latest/settings/access-token.html):
+[personal access token](https://docs.zammad.org/en/latest/api/intro.html):
 
 ```php
 require __DIR__ . '/vendor/autoload.php'; // skip if your framework autoloads
