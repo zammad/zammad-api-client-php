@@ -1,6 +1,8 @@
 # Zammad API Client for PHP (v3)
 
-[![Tests](https://github.com/zammad/zammad-api-client-php/actions/workflows/tests.yml/badge.svg)](https://github.com/zammad/zammad-api-client-php/actions/workflows/tests.yml) 
+[![Tests](https://github.com/zammad/zammad-api-client-php/actions/workflows/tests.yml/badge.svg)](https://github.com/zammad/zammad-api-client-php/actions/workflows/tests.yml)
+[![Latest Stable Version](https://poser.pugx.org/zammad/zammad-api-client-php/v)](https://packagist.org/packages/zammad/zammad-api-client-php)
+[![Total Downloads](https://poser.pugx.org/zammad/zammad-api-client-php/downloads)](https://packagist.org/packages/zammad/zammad-api-client-php)
 
 PSR-compliant PHP client for the [Zammad](https://zammad.com) REST API. PHP 8.1+.
 
@@ -10,11 +12,30 @@ PSR-compliant PHP client for the [Zammad](https://zammad.com) REST API. PHP 8.1+
 
 ## Quick Start
 
+**1. Install** via [Composer](https://getcomposer.org/) (published on [Packagist](https://packagist.org/packages/zammad/zammad-api-client-php)):
+
+```bash
+composer require zammad/zammad-api-client-php
+```
+
+Using Laravel or Symfony? See [Framework integration](#framework-integration) to
+resolve `ZammadClient` from the container instead of constructing it by hand.
+
+**2. Connect** — point the client at your Zammad instance and pass a
+[personal access token](https://admin-docs.zammad.org/en/latest/settings/access-token.html):
+
 ```php
-use ZammadAPIClient\Endpoints\Tickets\TicketDTO;
+require __DIR__ . '/vendor/autoload.php'; // skip if your framework autoloads
+
 use ZammadAPIClient\ZammadClient;
 
 $client = ZammadClient::withToken('https://zammad.example', 'your-token');
+```
+
+**3. Try it** — fetch, create, update and search tickets:
+
+```php
+use ZammadAPIClient\Endpoints\Tickets\TicketDTO;
 
 // Fetch
 $ticket = $client->ticket()->find(1);
@@ -45,80 +66,10 @@ foreach ($client->ticket()->search('error') as $ticket) {
 }
 ```
 
-## Getting started
-
-### Standalone PHP app
-
-```php
-<?php
-require_once __DIR__ . '/vendor/autoload.php';
-
-use ZammadAPIClient\ZammadClient;
-
-$client = ZammadClient::withToken('https://zammad.example', getenv('ZAMMAD_TOKEN'));
-```
-
-### Laravel
-
-```bash
-# 1. Register the provider in config/app.php (skip if using auto-discovery, Laravel 5.5+)
-```
-Add `ZammadAPIClient\Bridge\LaravelServiceProvider::class` to `config/app.php`.
-
-```bash
-# 2. Publish the default config to config/zammad.php
-php artisan vendor:publish --tag=zammad-config
-```
-Then inject `ZammadClient` via the container.
-
-### Symfony
-
-Register `ZammadAPIClient\Bridge\SymfonyBundle` in `config/bundles.php`.
-
-## Authentication
-
-```php
-// Token — sends Authorization: Token token=your-token (Zammad personal access token)
-ZammadClient::withToken($url, 'your-token');
-
-// OAuth2 — sends Authorization: Bearer your-oauth-token (OAuth2 access token)
-ZammadClient::withOAuth2($url, 'your-oauth-token');
-
-// Basic Auth — sends Authorization: Basic base64(user:pass)
-ZammadClient::withBasicAuth($url, 'admin@example.com', 'test');
-
-// Options
-ZammadClient::withToken($url, 'your-token',
-    new ConnectionConfig(verifySsl: false, maxRetries: 5),
-);
-
-// Pass a PSR-3 Logger to log HTTP requests and retries
-ZammadClient::withToken($url, 'your-token',
-    new ConnectionConfig(logger: $myLogger),
-);
-```
-
-| ConnectionConfig property | Type | Default | Description |
-|---------------------------|------|---------|-------------|
-| `maxRetries` | `int` | `3` | Number of retries on HTTP 429 before throwing `RateLimitException` |
-| `verifySsl` | `bool` | `true` | Verify SSL certificate of the Zammad server |
-| `timeout` | `int` | `30` | Total request timeout in seconds |
-| `connectTimeout` | `int` | `10` | Connection timeout in seconds |
-| `logger` | `?LoggerInterface` | `null` | PSR-3 Logger for HTTP request/retry logging |
-
-## Examples
-
-The primary example is the [`examples/cookbook/`](examples/cookbook/README.md) directory — runnable recipes covering tickets, stateful resources, pagination, error handling, impersonation, and search. Run them against any Zammad instance:
-
-```bash
-ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL=http://your-zammad:3000 \
-ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_TOKEN=your-token \
-php examples/cookbook/01-quick-start.php
-```
-
-> The env vars are named `...UNIT_TESTS...` for historical reasons. They are used by integration tests and the cookbook example. Unit tests (`make test`) need no env vars.
-
-For user and organization CRUD examples, refer to the integration tests in [`test/Integration/`](test/Integration/) (`UserIntegrationTest.php`, `OrganizationIntegrationTest.php`). Side-by-side v2→v3 migration examples are in [`docs/migration-v3-examples.md`](docs/migration-v3-examples.md).
+That's it. The rest of this README covers [authentication options](#authentication),
+the [three interaction styles](#how-to-use), every [DTO](#data-transfer-objects-dtos)
+and [error handling](#error-handling). Runnable recipes live in
+[`examples/cookbook/`](examples/cookbook/README.md).
 
 ## How to use
 
@@ -354,6 +305,127 @@ $client->textModule()->import($csv);               // Returns import summary arr
 
 All `import()` methods return an `array` — the Zammad API response containing import statistics (rows processed, skipped, errors).
 CSV format follows Zammad's import specification (header row with field names matching API field names).
+
+## Examples
+
+The primary example is the [`examples/cookbook/`](examples/cookbook/README.md) directory — runnable recipes covering tickets, stateful resources, pagination, error handling, impersonation, and search. Run them against any Zammad instance:
+
+```bash
+ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL=http://your-zammad:3000 \
+ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_TOKEN=your-token \
+php examples/cookbook/01-quick-start.php
+```
+
+> The env vars are named `...UNIT_TESTS...` for historical reasons. They are used by integration tests and the cookbook example. Unit tests (`make test`) need no env vars.
+
+For user and organization CRUD examples, refer to the integration tests in [`test/Integration/`](test/Integration/) (`UserIntegrationTest.php`, `OrganizationIntegrationTest.php`). Side-by-side v2→v3 migration examples are in [`docs/migration-v3-examples.md`](docs/migration-v3-examples.md).
+
+## Authentication
+
+```php
+// Token — sends Authorization: Token token=your-token (Zammad personal access token)
+ZammadClient::withToken($url, 'your-token');
+
+// OAuth2 — sends Authorization: Bearer your-oauth-token (OAuth2 access token)
+ZammadClient::withOAuth2($url, 'your-oauth-token');
+
+// Basic Auth — sends Authorization: Basic base64(user:pass)
+ZammadClient::withBasicAuth($url, 'admin@example.com', 'test');
+
+// Options
+ZammadClient::withToken($url, 'your-token',
+    new ConnectionConfig(verifySsl: false, maxRetries: 5),
+);
+
+// Pass a PSR-3 Logger to log HTTP requests and retries
+ZammadClient::withToken($url, 'your-token',
+    new ConnectionConfig(logger: $myLogger),
+);
+```
+
+| ConnectionConfig property | Type | Default | Description |
+|---------------------------|------|---------|-------------|
+| `maxRetries` | `int` | `3` | Number of retries on HTTP 429 before throwing `RateLimitException` |
+| `verifySsl` | `bool` | `true` | Verify SSL certificate of the Zammad server |
+| `timeout` | `int` | `30` | Total request timeout in seconds |
+| `connectTimeout` | `int` | `10` | Connection timeout in seconds |
+| `logger` | `?LoggerInterface` | `null` | PSR-3 Logger for HTTP request/retry logging |
+
+## Framework integration
+
+Prefer to resolve `ZammadClient` from your framework's container instead of
+constructing it by hand? Bridges are provided for Laravel and Symfony — configure
+credentials once, then inject the same shared client everywhere.
+
+Full runnable setups: [`examples/cookbook/07-laravel.php`](examples/cookbook/07-laravel.php)
+and [`examples/cookbook/08-symfony.php`](examples/cookbook/08-symfony.php).
+
+### Laravel
+
+The service provider is auto-discovered (Laravel 5.5+). Publish the config and set
+your credentials in `.env`:
+
+```bash
+php artisan vendor:publish --tag=zammad-config   # copies config to config/zammad.php
+```
+
+```env
+ZAMMAD_URL=https://zammad.example
+ZAMMAD_TOKEN=your-token
+```
+
+Then inject the shared `ZammadClient` anywhere via the container:
+
+```php
+use ZammadAPIClient\ZammadClient;
+
+class TicketController
+{
+    public function __construct(private ZammadClient $zammad) {}
+
+    public function show(int $id)
+    {
+        return $this->zammad->ticket()->find($id);
+    }
+}
+
+// Or resolve manually: app(ZammadClient::class)
+```
+
+For older Laravel versions, register `ZammadAPIClient\Bridge\LaravelServiceProvider::class`
+in `config/app.php` manually.
+
+### Symfony
+
+Register the bundle in `config/bundles.php`:
+
+```php
+ZammadAPIClient\Bridge\SymfonyBundle::class => ['all' => true],
+```
+
+Configure credentials in `config/packages/zammad.yaml`:
+
+```yaml
+zammad:
+    url: '%env(ZAMMAD_URL)%'
+    token: '%env(ZAMMAD_TOKEN)%'
+```
+
+Then type-hint `ZammadClient` in any service — autowiring injects the shared instance:
+
+```php
+use ZammadAPIClient\ZammadClient;
+
+class TicketService
+{
+    public function __construct(private ZammadClient $zammad) {}
+
+    public function findTicket(int $id)
+    {
+        return $this->zammad->ticket()->find($id);
+    }
+}
+```
 
 ## Error Handling
 
