@@ -2,9 +2,12 @@
 
 ## Setup
 
+The recipes read their configuration from environment variables (via `getenv()`).
+Export your Zammad URL and token before running them:
+
 ```bash
-cp .env.example .env
-# Edit .env with your Zammad URL + token
+export ZAMMAD_URL=https://zammad.example
+export ZAMMAD_TOKEN=your-token
 ```
 
 ## Recipes
