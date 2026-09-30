@@ -10,6 +10,8 @@ use ZammadAPIClient\Endpoints\Groups\GroupDTO;
 use ZammadAPIClient\Endpoints\Groups\GroupRepository;
 use ZammadAPIClient\Endpoints\Links\LinkDTO;
 use ZammadAPIClient\Endpoints\Links\LinkRepository;
+use ZammadAPIClient\Endpoints\Roles\RoleDTO;
+use ZammadAPIClient\Endpoints\Roles\RoleRepository;
 use ZammadAPIClient\Endpoints\Tags\TagDTO;
 use ZammadAPIClient\Endpoints\Tags\TagRepository;
 use ZammadAPIClient\Endpoints\TextModules\TextModuleDTO;
@@ -45,6 +47,7 @@ final class RepositoryRegistry
         OrganizationRepository::class => ['path' => 'organizations', 'dto' => OrganizationDTO::class],
         GroupRepository::class => ['path' => 'groups', 'dto' => GroupDTO::class],
         LinkRepository::class => ['path' => 'links', 'dto' => LinkDTO::class],
+        RoleRepository::class => ['path' => 'roles', 'dto' => RoleDTO::class],
         TicketArticleRepository::class => ['path' => 'ticket_articles', 'dto' => TicketArticleDTO::class],
         TicketStateRepository::class => ['path' => 'ticket_states', 'dto' => TicketStateDTO::class],
         TicketPriorityRepository::class => ['path' => 'ticket_priorities', 'dto' => TicketPriorityDTO::class],

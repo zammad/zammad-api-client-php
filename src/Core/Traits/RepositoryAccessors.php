@@ -8,6 +8,7 @@ use ZammadAPIClient\Core\Repository\AbstractRepository;
 use ZammadAPIClient\Endpoints\Groups\GroupRepository;
 use ZammadAPIClient\Endpoints\Links\LinkRepository;
 use ZammadAPIClient\Endpoints\Organizations\OrganizationRepository;
+use ZammadAPIClient\Endpoints\Roles\RoleRepository;
 use ZammadAPIClient\Endpoints\Tags\TagRepository;
 use ZammadAPIClient\Endpoints\TextModules\TextModuleRepository;
 use ZammadAPIClient\Endpoints\TicketArticles\TicketArticleRepository;
@@ -41,6 +42,11 @@ trait RepositoryAccessors
     public function group(): GroupRepository
     {
         return $this->repo(GroupRepository::class);
+    }
+
+    public function role(): RoleRepository
+    {
+        return $this->repo(RoleRepository::class);
     }
 
     public function ticketArticle(): TicketArticleRepository
