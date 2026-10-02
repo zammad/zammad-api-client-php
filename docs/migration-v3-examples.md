@@ -365,6 +365,7 @@ $client->ticket()->find(1);
 $client->user()->find(1);
 $client->organization()->find(1);
 $client->group()->find(1);
+$client->role()->all();
 $client->ticketArticle()->getForTicket(1);
 $client->ticketState()->all();
 $client->ticketPriority()->all();

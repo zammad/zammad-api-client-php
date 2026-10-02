@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use ZammadAPIClient\Endpoints\Groups\GroupDTO;
 use ZammadAPIClient\Endpoints\Links\LinkDTO;
 use ZammadAPIClient\Endpoints\Organizations\OrganizationDTO;
+use ZammadAPIClient\Endpoints\Roles\RoleDTO;
 use ZammadAPIClient\Endpoints\Tags\TagDTO;
 use ZammadAPIClient\Endpoints\TextModules\TextModuleDTO;
 use ZammadAPIClient\Endpoints\TicketArticles\TicketArticleDTO;
@@ -36,6 +37,10 @@ final class DTOTest extends TestCase
             'OrganizationDTO' => [
                 OrganizationDTO::class,
                 ['id' => 1, 'name' => 'Zammad GmbH', 'active' => true, 'note' => 'Our company'],
+            ],
+            'RoleDTO' => [
+                RoleDTO::class,
+                ['id' => 2, 'name' => 'Agent', 'note' => 'Access to tickets', 'active' => true],
             ],
             'TagDTO' => [
                 TagDTO::class,

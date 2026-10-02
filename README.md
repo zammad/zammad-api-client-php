@@ -81,7 +81,7 @@ This library offers three interaction styles. Choose based on your use case:
 | **Stateful Resource** | `$client->ticket()->resource($id)->save()` / `destroy()` | Interactive editing — mutate properties step by step, only changes are sent. |
 | **Raw HTTP** | `$client->getHandler()->get()`, `delete()`, etc. | Calling endpoints that have no dedicated repository. Escape hatch. |
 
-Repositories are accessed via typed accessors: `$client->ticket()`, `$client->user()`, `$client->organization()`, `$client->group()`, `$client->ticketArticle()`, `$client->ticketState()`, `$client->ticketPriority()`, `$client->tag()`, `$client->textModule()`, `$client->link()`. The underlying `repo()` method is internal.
+Repositories are accessed via typed accessors: `$client->ticket()`, `$client->user()`, `$client->organization()`, `$client->group()`, `$client->role()`, `$client->ticketArticle()`, `$client->ticketState()`, `$client->ticketPriority()`, `$client->tag()`, `$client->textModule()`, `$client->link()`. The underlying `repo()` method is internal.
 
 ### Connecting
 
@@ -215,6 +215,7 @@ All repositories expose a `delete()` method. Repositories implementing `Deletabl
 | `TicketArticleRepository` | exception | Zammad API does not allow article deletion |
 | `TicketStateRepository` | exception | System resource, read-only |
 | `TicketPriorityRepository` | exception | System resource, read-only |
+| `RoleRepository` | exception | The API does not allow deleting roles; patch `active` to `false` |
 
 ```php
 $client->ticket()->delete(1);
@@ -293,6 +294,29 @@ foreach ($repo->all(['object' => 'Ticket', 'o_id' => $ticketId]) as $tag) {
 
 $results = $repo->tagSearch('urg'); // Autocomplete
 ```
+
+### Roles
+
+Roles bundle permissions. A user carries them via `role_ids`, so the usual task is
+resolving a role name to its numeric ID before creating or updating a user:
+
+```php
+$roles = [];
+foreach ($client->role()->all() as $role) {
+    $roles[$role->name] = $role->id; // 'Admin' => 1, 'Agent' => 2, 'Customer' => 3
+}
+
+$client->user()->create(new UserDTO(
+    email: 'agent@example.com',
+    firstname: 'New',
+    lastname: 'Agent',
+    role_ids: [$roles['Agent']],
+));
+```
+
+Reading roles requires a token with admin permissions — `/api/v1/roles` is admin-only
+and otherwise answers with `ForbiddenException`. Roles cannot be deleted through the
+API; deactivate one with `$client->role()->patch($id, ['active' => false])` instead.
 
 ### CSV import
 
@@ -530,7 +554,7 @@ $client->ticket()->patch(42, new TicketUpdateDTO(
 | `phone` | `?string` | — | |
 | `organization_id` | `?int` | — | Primary organization |
 | `organization_ids` | `?array` | — | Array of secondary organization IDs |
-| `role_ids` | `?array` | — | Array of role IDs (e.g. `[2]` for Agent) |
+| `role_ids` | `?array` | — | Array of role IDs (e.g. `[2]` for Agent); resolve by name via `$client->role()` |
 | `active` | `?bool` | — | Whether the user account is active |
 | `id` | `?int` | — | Server-assigned |
 | `created_at` | `?DateTimeImmutable` | — | Read-only |
@@ -560,6 +584,17 @@ $client->ticket()->patch(42, new TicketUpdateDTO(
 | `created_at` | `?DateTimeImmutable` | — | Read-only |
 | `updated_at` | `?DateTimeImmutable` | — | Read-only |
 | `customFields` | `array` | — | |
+
+### RoleDTO
+
+| Field | Type | Required | Notes |
+|-------|------|:--------:|-------|
+| `name` | `string` | yes | Display label (e.g. `'Agent'`, `'Customer'`) |
+| `note` | `?string` | — | |
+| `active` | `?bool` | — | |
+| `id` | `?int` | — | Server-assigned; used in `UserDTO::$role_ids` |
+| `created_at` | `?DateTimeImmutable` | — | Read-only |
+| `updated_at` | `?DateTimeImmutable` | — | Read-only |
 
 ### TicketArticleDTO
 
@@ -688,6 +723,9 @@ These require a running Zammad instance and authentication credentials:
 | `ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_PASSWORD` | No* | — | Password for basic auth |
 
 \* Either `ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_TOKEN` or `USERNAME`+`PASSWORD` must be set.
+
+The credentials need admin permissions: some suites touch admin-only endpoints
+(e.g. `RoleIntegrationTest` reads `/api/v1/roles`).
 
 ## Migration from v2
 
