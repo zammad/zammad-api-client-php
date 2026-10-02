@@ -15,6 +15,8 @@ use ZammadAPIClient\Endpoints\Links\LinkDTO;
 use ZammadAPIClient\Endpoints\Links\LinkRepository;
 use ZammadAPIClient\Endpoints\Organizations\OrganizationDTO;
 use ZammadAPIClient\Endpoints\Organizations\OrganizationRepository;
+use ZammadAPIClient\Endpoints\Roles\RoleDTO;
+use ZammadAPIClient\Endpoints\Roles\RoleRepository;
 use ZammadAPIClient\Endpoints\Tags\TagDTO;
 use ZammadAPIClient\Endpoints\Tags\TagRepository;
 use ZammadAPIClient\Endpoints\TextModules\TextModuleDTO;
@@ -49,6 +51,7 @@ final class RepositoryAccessorsTest extends MockeryTestCase
             'user' => ['user', UserRepository::class, 'users', UserDTO::class],
             'organization' => ['organization', OrganizationRepository::class, 'organizations', OrganizationDTO::class],
             'group' => ['group', GroupRepository::class, 'groups', GroupDTO::class],
+            'role' => ['role', RoleRepository::class, 'roles', RoleDTO::class],
             'ticketArticle' => [
                 'ticketArticle', TicketArticleRepository::class, 'ticket_articles', TicketArticleDTO::class,
             ],

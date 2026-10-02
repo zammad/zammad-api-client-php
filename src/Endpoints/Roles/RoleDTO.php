@@ -11,6 +11,16 @@ use ZammadAPIClient\Core\Traits\SerializesToArray;
 
 /**
  * Represents a Zammad role resource (`/api/v1/roles`).
+ *
+ * A role is a named bundle of permissions. The default Zammad installation
+ * ships with "Admin", "Agent" and "Customer"; administrators can add more.
+ *
+ * The `name` field is the display label; Zammad uses the numeric `id` when
+ * assigning roles to a user via the `role_ids` field on
+ * {@see \ZammadAPIClient\Endpoints\Users\UserDTO}.
+ *
+ * Timestamp fields (`created_at`, `updated_at`) are provided by
+ * {@see \ZammadAPIClient\Core\Traits\HasTimestamps}.
  */
 final class RoleDTO implements DTOInterface
 {
