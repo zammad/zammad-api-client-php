@@ -3,7 +3,7 @@
 ## [3.0.0] — unreleased
 
 ### Added
-- `RoleRepository` / `RoleDTO` for `/api/v1/roles`, accessible via `$client->role()` — resolve role names to the IDs needed for `UserDTO::$role_ids`
+- `RoleRepository` / `RoleDTO` for `/api/v1/roles`, accessible via `$client->role()` — resolve role names to the IDs needed for `UserDTO::$role_ids`; `permission_ids` and `group_ids` are writable on create and update
 - PSR-18 / PSR-17 compliant HTTP layer (`RequestHandler`, `RetryAfterMiddleware`)
 - Typed DTOs for all 11 resources (`Ticket`, `User`, `Organization`, `Group`, `Role`, `TicketArticle`, `TicketState`, `TicketPriority`, `Tag`, `TextModule`, `Link`)
 - Repository pattern with generator-based pagination (`AbstractRepository`)

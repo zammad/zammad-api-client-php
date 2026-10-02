@@ -26,11 +26,14 @@ use ZammadAPIClient\Core\Repository\AbstractRepository;
  *       role_ids: [$roles['Agent']],
  *   ));
  *
- * Listing and reading roles requires admin permissions (`admin.role` or
- * `admin.user`); a token limited to agent permissions receives a 403 and the
- * client raises {@see \ZammadAPIClient\Exceptions\ForbiddenException}.
+ * Permissions differ per method. `all()` and `find()` are open to agent,
+ * admin and customer tokens; a customer however only sees `id`, `active`,
+ * `permission_ids` and `group_ids`, with `name` replaced by the placeholder
+ * `"Role_<id>"`. `search()`, `searchList()`, `totalCount()`, `create()` and
+ * `patch()` require `admin.role` and otherwise raise
+ * {@see \ZammadAPIClient\Exceptions\ForbiddenException}.
  *
- * Roles cannot be removed through the API, so this repository does not
+ * Zammad exposes no DELETE route for roles, so this repository does not
  * implement {@see \ZammadAPIClient\Core\Contracts\DeletableInterface}:
  * `delete()` throws a `BadMethodCallException`. Deactivate a role by patching
  * `active` to `false` instead.

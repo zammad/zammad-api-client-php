@@ -40,7 +40,8 @@ final class DTOTest extends TestCase
             ],
             'RoleDTO' => [
                 RoleDTO::class,
-                ['id' => 2, 'name' => 'Agent', 'note' => 'Access to tickets', 'active' => true],
+                ['id' => 2, 'name' => 'Agent', 'note' => 'Access to tickets', 'active' => true,
+                    'default_at_signup' => false, 'permission_ids' => [10, 11]],
             ],
             'TagDTO' => [
                 TagDTO::class,

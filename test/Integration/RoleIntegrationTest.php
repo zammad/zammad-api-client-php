@@ -14,10 +14,11 @@ use ZammadAPIClient\ZammadClient;
 
 /**
  * Roles are reference data: these tests read the roles a Zammad installation
- * ships with instead of creating new ones, because the API offers no way to
- * delete a role again.
+ * ships with instead of creating new ones, because Zammad exposes no DELETE
+ * route for roles — a created role could not be cleaned up again.
  *
- * Requires a token with admin permissions — `/api/v1/roles` is admin-only.
+ * Requires a token with `admin.role`: listing is open to agents too, but
+ * totalCount() goes through `/roles/search`, which is admin-only.
  */
 #[Group('integration')]
 final class RoleIntegrationTest extends TestCase
@@ -112,6 +113,40 @@ final class RoleIntegrationTest extends TestCase
         } finally {
             self::$client->repo(UserRepository::class)->delete($user->id);
         }
+    }
+
+    /**
+     * Roles carry their permissions as IDs; group access is a map of group ID
+     * to access level and is only populated for agent roles.
+     */
+    public function testRolesCarryPermissionIds(): void
+    {
+        $agentRole = null;
+        foreach (self::$client->role()->all() as $role) {
+            if ($role->name === 'Agent') {
+                $agentRole = $role;
+                break;
+            }
+        }
+
+        self::assertNotNull($agentRole, 'Agent role should exist');
+        self::assertIsArray($agentRole->permission_ids);
+        self::assertNotEmpty($agentRole->permission_ids, 'Agent role should grant permissions');
+        self::assertIsArray($agentRole->group_ids);
+    }
+
+    /**
+     * totalCount() goes through /api/v1/roles/search with with_total_count —
+     * that route exists for roles, but needs an admin token.
+     */
+    public function testTotalCountMatchesListing(): void
+    {
+        $listed = 0;
+        foreach (self::$client->role()->all() as $role) {
+            $listed++;
+        }
+
+        self::assertSame($listed, self::$client->role()->totalCount());
     }
 
     /**
