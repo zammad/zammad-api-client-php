@@ -215,7 +215,7 @@ All repositories expose a `delete()` method. Repositories implementing `Deletabl
 | `TicketArticleRepository` | exception | Zammad API does not allow article deletion |
 | `TicketStateRepository` | exception | System resource, read-only |
 | `TicketPriorityRepository` | exception | System resource, read-only |
-| `RoleRepository` | exception | The API does not allow deleting roles; patch `active` to `false` |
+| `RoleRepository` | exception | Zammad exposes no DELETE route for roles; patch `active` to `false` |
 
 ```php
 $client->ticket()->delete(1);
@@ -314,9 +314,24 @@ $client->user()->create(new UserDTO(
 ));
 ```
 
-Reading roles requires a token with admin permissions — `/api/v1/roles` is admin-only
-and otherwise answers with `ForbiddenException`. Roles cannot be deleted through the
-API; deactivate one with `$client->role()->patch($id, ['active' => false])` instead.
+Permissions and group access come along as IDs, and are writable on create and update:
+
+```php
+$client->role()->create(new RoleDTO(
+    name: 'Supervisor',
+    permission_ids: [10, 11],
+    group_ids: [1 => 'full'],   // map of group ID to access level, agent roles only
+));
+```
+
+`all()` and `find()` work with agent, admin and customer tokens. A customer however
+only sees `id`, `active`, `permission_ids` and `group_ids` — Zammad replaces `name`
+with the placeholder `Role_<id>` — so resolving a role by name needs an agent or admin
+token. `search()`, `totalCount()`, `create()` and `patch()` require `admin.role` and
+otherwise raise a `ForbiddenException`.
+
+Zammad exposes no DELETE route for roles; deactivate one with
+`$client->role()->patch($id, ['active' => false])` instead.
 
 ### CSV import
 
@@ -589,9 +604,12 @@ $client->ticket()->patch(42, new TicketUpdateDTO(
 
 | Field | Type | Required | Notes |
 |-------|------|:--------:|-------|
-| `name` | `string` | yes | Display label (e.g. `'Agent'`, `'Customer'`) |
+| `name` | `string` | yes | Display label (e.g. `'Agent'`, `'Customer'`); masked as `Role_<id>` for customer tokens |
 | `note` | `?string` | — | |
 | `active` | `?bool` | — | |
+| `default_at_signup` | `?bool` | — | Role assigned to users who sign up themselves |
+| `permission_ids` | `?array` | — | IDs of the granted permissions; writable |
+| `group_ids` | `?array` | — | Map of group ID to access level (`[1 => 'full']`); agent roles only, writable |
 | `id` | `?int` | — | Server-assigned; used in `UserDTO::$role_ids` |
 | `created_at` | `?DateTimeImmutable` | — | Read-only |
 | `updated_at` | `?DateTimeImmutable` | — | Read-only |
@@ -725,7 +743,7 @@ These require a running Zammad instance and authentication credentials:
 \* Either `ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_TOKEN` or `USERNAME`+`PASSWORD` must be set.
 
 The credentials need admin permissions: some suites touch admin-only endpoints
-(e.g. `RoleIntegrationTest` reads `/api/v1/roles`).
+(e.g. `RoleIntegrationTest` calls `totalCount()`, which goes through `/api/v1/roles/search`).
 
 ## Migration from v2
 

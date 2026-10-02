@@ -19,6 +19,15 @@ use ZammadAPIClient\Core\Traits\SerializesToArray;
  * assigning roles to a user via the `role_ids` field on
  * {@see \ZammadAPIClient\Endpoints\Users\UserDTO}.
  *
+ * `permission_ids` and `group_ids` are writable on create and update: Zammad
+ * applies them as associations, so a role can be created with its permissions
+ * in a single request.
+ *
+ * Note that a customer token sees a reduced view of a role — Zammad replaces
+ * `name` with the placeholder `"Role_<id>"` and omits `note` and
+ * `default_at_signup`. Resolving a role by name therefore requires an agent or
+ * admin token.
+ *
  * Timestamp fields (`created_at`, `updated_at`) are provided by
  * {@see \ZammadAPIClient\Core\Traits\HasTimestamps}.
  */
@@ -28,10 +37,20 @@ final class RoleDTO implements DTOInterface
     use HydratesFromArray;
     use SerializesToArray;
 
+    /**
+     * @param array<int>|null $permission_ids IDs of the permissions this role grants.
+     * @param array<int|string, string|array<string>>|null $group_ids Map of group ID to
+     *        access level (e.g. `[1 => 'full', 42 => ['read', 'change']]`). Only
+     *        meaningful for roles that carry the `ticket.agent` permission —
+     *        Zammad clears it for all others.
+     */
     public function __construct(
         public readonly string $name,
         public readonly ?string $note = null,
         public readonly ?bool $active = null,
+        public readonly ?bool $default_at_signup = null,
+        public readonly ?array $permission_ids = null,
+        public readonly ?array $group_ids = null,
         public readonly ?int $id = null,
     ) {
     }
