@@ -1,8 +1,10 @@
-# Using an Alternative PSR-18 HTTP Client
+# Using a Custom HTTP Client
 
-The `ZammadClient` constructor accepts any PSR-18 `ClientInterface` implementation via `RequestHandlerInterface`. The factory methods (`withToken()`, `withOAuth2()`, `withBasicAuth()`) use Guzzle by default for convenience, but you can inject any PSR-18 client directly.
+The `ZammadClient` constructor accepts any PSR-18 `ClientInterface` implementation via `RequestHandlerInterface`. `ZammadClient::create()` uses Guzzle for convenience, but nothing is lost by building the handler yourself: credentials, retry behaviour and logging are configured the same way either side.
 
 Rate-limit retry (HTTP 429) is handled automatically by `RequestHandler` — no manual wiring needed.
+
+A runnable version of the setup below is in [`examples/cookbook/07-custom-http-client.php`](../examples/cookbook/07-custom-http-client.php).
 
 ## Symfony HttpClient
 
@@ -12,7 +14,8 @@ Requires `composer require symfony/http-client nyholm/psr7` (or `guzzlehttp/psr7
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\Psr18Client;
 use GuzzleHttp\Psr7\HttpFactory;
-use ZammadAPIClient\Core\RequestHandler;
+use ZammadAPIClient\Core\Auth;
+use ZammadAPIClient\Core\Transport\RequestHandler;
 use ZammadAPIClient\ZammadClient;
 
 $handler = new RequestHandler(
@@ -25,51 +28,26 @@ $handler = new RequestHandler(
     new HttpFactory(),
     'https://zammad.example',
     maxRetries: 3,
+    auth: Auth::token('your-zammad-api-token'),
 );
 
 $client = new ZammadClient($handler);
 ```
 
-### With Authentication Headers
+### Authentication
 
-Symfony's `Psr18Client` does not accept global default headers. Instead, configure them on the `RequestHandler` by passing them via `$options` on each `request()` call, or use a PSR-18 middleware to inject the `Authorization` header.
+Pass an `Auth` to the `RequestHandler`, as above. It applies the `Authorization`
+header to each outgoing request, so it does not rely on the PSR-18 client
+supporting client-level default headers — PSR-18 has no such concept, and
+Symfony's `Psr18Client` does not offer one.
 
-**Option A — Inject headers via a PSR-18 decorator middleware:**
+`Auth::token()`, `Auth::oauth2()` and `Auth::basic()` are the available schemes.
+If you need credentials that change at runtime (an OAuth2 token being refreshed,
+say), wrap your PSR-18 client in a decorator that sets the header per request and
+leave `auth` unset.
 
-```php
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\HttpClient\Psr18Client;
-
-final class AuthMiddleware implements ClientInterface
-{
-    public function __construct(
-        private ClientInterface $next,
-        private string $token,
-    ) {}
-
-    public function sendRequest(RequestInterface $request): ResponseInterface
-    {
-        return $this->next->sendRequest(
-            $request->withHeader('Authorization', "Token token={$this->token}")
-        );
-    }
-}
-
-$http = new AuthMiddleware(
-    new Psr18Client(HttpClient::create(['timeout' => 30])),
-    'your-zammad-api-token',
-);
-
-// Rate-limit retry is handled automatically by RequestHandler
-$handler = new RequestHandler($http, new HttpFactory(), 'https://zammad.example');
-```
-
-**Option B — Build the Guzzle client with auth headers, then swap to Symfony later:**
-
-If you're migrating away from Guzzle, start with `ZammadClient::withToken()` and refactor step by step.
+If you're migrating away from Guzzle, start with `ZammadClient::create()` and
+refactor step by step — the handler built above supports exactly the same options.
 
 ## Laravel
 
@@ -79,7 +57,8 @@ The `LaravelServiceProvider` binds `ZammadClient` as a singleton. To use Symfony
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\Psr18Client;
 use GuzzleHttp\Psr7\HttpFactory;
-use ZammadAPIClient\Core\RequestHandler;
+use ZammadAPIClient\Core\Auth;
+use ZammadAPIClient\Core\Transport\RequestHandler;
 use ZammadAPIClient\ZammadClient;
 
 class AppServiceProvider extends ServiceProvider
@@ -108,11 +87,17 @@ The `SymfonyBundle` can be extended or replaced entirely by defining your own se
 ```yaml
 # config/services.yaml
 services:
+    app.zammad_auth:
+        class: ZammadAPIClient\Core\Auth
+        factory: ['ZammadAPIClient\Core\Auth', 'token']
+        arguments:
+            $token: '%env(ZAMMAD_TOKEN)%'
+
     ZammadAPIClient\ZammadClient:
-        factory: ['ZammadAPIClient\ZammadClient', 'withToken']
+        factory: ['ZammadAPIClient\ZammadClient', 'create']
         arguments:
             $url: '%env(ZAMMAD_URL)%'
-            $token: '%env(ZAMMAD_TOKEN)%'
+            $auth: '@app.zammad_auth'
 
     # Or with a custom PSR-18 stack:
     app.zammad_client:
