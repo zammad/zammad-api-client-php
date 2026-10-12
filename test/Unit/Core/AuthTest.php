@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZammadAPIClient\Tests\Unit\Core;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ZammadAPIClient\Core\Auth;
@@ -72,11 +73,65 @@ final class AuthTest extends TestCase
         );
     }
 
+    /**
+     * A token read from a file or an environment variable commonly carries a
+     * trailing newline. Untrimmed it reaches PSR-7, which rejects it as an
+     * invalid header value and blames the transport; leading whitespace is
+     * worse, surviving into the header and coming back as a plain 401.
+     *
+     * @return iterable<string, array{string}>
+     */
+    public static function paddedTokens(): iterable
+    {
+        yield 'trailing newline' => ["secret\n"];
+        yield 'trailing space'   => ['secret '];
+        yield 'leading space'    => [' secret'];
+        yield 'leading tab'      => ["\tsecret"];
+        yield 'both sides'       => ["  secret\r\n"];
+    }
+
+    #[DataProvider('paddedTokens')]
+    public function testSurroundingWhitespaceIsStripped(string $padded): void
+    {
+        self::assertSame('Token token=secret', Auth::token($padded)->header());
+    }
+
+    public function testUsernameIsTrimmedButPasswordIsNot(): void
+    {
+        self::assertSame(
+            'Basic ' . base64_encode('admin: hunter2 '),
+            Auth::basic(' admin ', ' hunter2 ')->header(),
+        );
+    }
+
     public function testDebugOutputDoesNotLeakTheCredential(): void
     {
         $dump = print_r(Auth::token('super-secret'), true);
 
         self::assertStringNotContainsString('super-secret', $dump);
         self::assertStringContainsString('redacted', $dump);
+    }
+
+    /**
+     * An empty username throws from inside {@see Auth::basic()}, so that frame —
+     * password and all — lands in the stack trace. `#[\SensitiveParameter]` is what
+     * keeps the password out of it; without the attribute this test fails.
+     */
+    public function testStackTraceDoesNotLeakTheBasicAuthPassword(): void
+    {
+        if (PHP_VERSION_ID < 80200) {
+            self::markTestSkipped('#[\SensitiveParameter] is honoured from PHP 8.2 on.');
+        }
+        if (ini_get('zend.exception_ignore_args')) {
+            self::markTestSkipped('Arguments are stripped from traces by zend.exception_ignore_args.');
+        }
+
+        try {
+            Auth::basic('', 'hunter2');
+            self::fail('Expected an InvalidArgumentException for the empty username.');
+        } catch (InvalidArgumentException $e) {
+            self::assertStringNotContainsString('hunter2', $e->getTraceAsString());
+            self::assertStringContainsString('SensitiveParameterValue', $e->getTraceAsString());
+        }
     }
 }

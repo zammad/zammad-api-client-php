@@ -69,7 +69,11 @@ use ZammadAPIClient\ZammadClient;
  *
  * 1. `config/zammad.php` values (after `vendor:publish`)
  * 2. `ZAMMAD_URL` / `ZAMMAD_TOKEN` environment variables (`.env`)
- * 3. Built-in defaults (`http://127.0.0.1:8098`, empty token)
+ * 3. Built-in default URL (`http://127.0.0.1:8098`)
+ *
+ * A token is required: there is no usable default for it. If neither
+ * `config('zammad.token')` nor `ZAMMAD_TOKEN` is set, resolving
+ * {@see ZammadClient} from the container throws `InvalidArgumentException`.
  *
  * @see ZammadClient::create()
  */

@@ -51,9 +51,14 @@ final class Auth
      *
      * An empty password is permitted (RFC 7617); the username is required.
      *
+     * `$password` is marked `#[\SensitiveParameter]` so that it is redacted from
+     * stack traces: an empty username throws from this very frame, and PHP's
+     * default `zend.exception_ignore_args=0` would otherwise print the password
+     * as a literal argument. The attribute is inert on PHP 8.1.
+     *
      * @throws InvalidArgumentException If $user is empty.
      */
-    public static function basic(string $user, string $password): self
+    public static function basic(string $user, #[\SensitiveParameter] string $password): self
     {
         return new self(
             'Basic ' . base64_encode(self::requireNonEmpty($user, 'Username') . ':' . $password),
@@ -80,10 +85,21 @@ final class Auth
         return ['header' => '***redacted***'];
     }
 
+    /**
+     * Returns the value with surrounding whitespace removed.
+     *
+     * Trimming is not cosmetic. A credential read from a file or an environment
+     * variable commonly carries a trailing newline, which PSR-7 rejects as an
+     * invalid header value — the error then points at the transport rather than
+     * at the token. Leading whitespace is worse: it survives into the header and
+     * the request simply comes back 401.
+     */
     private static function requireNonEmpty(string $value, string $label): string
     {
-        return trim($value) === ''
+        $trimmed = trim($value);
+
+        return $trimmed === ''
             ? throw new InvalidArgumentException("{$label} must not be empty.")
-            : $value;
+            : $trimmed;
     }
 }

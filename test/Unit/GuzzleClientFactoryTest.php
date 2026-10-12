@@ -49,10 +49,9 @@ final class GuzzleClientFactoryTest extends MockeryTestCase
     }
 
     /**
-     * The three static helpers are deprecated but supported until v4.0, so these
-     * calls are deliberate: they pin down that the transitional path stays
-     * equivalent to constructing the factory with an explicit {@see Auth}.
-     * Do not remove them as leftovers — they go when the helpers do.
+     * The three static helpers are shorthand for constructing the factory with an
+     * explicit {@see Auth}, so these calls are deliberate: they pin down that both
+     * forms stay equivalent. Do not remove them as leftovers.
      *
      * @return iterable<string, array{GuzzleClientFactory, GuzzleClientFactory}>
      */

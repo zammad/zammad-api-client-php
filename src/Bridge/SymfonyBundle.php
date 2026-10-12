@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZammadAPIClient\Bridge;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use ZammadAPIClient\Core\Auth;
@@ -85,13 +86,24 @@ final class SymfonyBundle extends Bundle
                     $resolved = array_merge($resolved, $config);
                 }
 
-                $url   = $resolved['url']   ?? (string) ($_ENV['ZAMMAD_URL']   ?? 'http://127.0.0.1:8098');
-                $token = $resolved['token'] ?? (string) ($_ENV['ZAMMAD_TOKEN'] ?? '');
+                $container->setParameter('zammad.default_url', 'http://127.0.0.1:8098');
 
-                $client = ZammadClient::create($url, Auth::token($token));
-                $container->set(ZammadClient::class, $client);
-                $container->setAlias('zammad_client', ZammadClient::class);
-                $container->registerForAutoconfiguration(ZammadClient::class)->setAutowired(true);
+                $url   = $resolved['url']   ?? '%env(default:zammad.default_url:ZAMMAD_URL)%';
+                $token = $resolved['token'] ?? '%env(ZAMMAD_TOKEN)%';
+
+                $auth = (new Definition(Auth::class))
+                    ->setFactory([Auth::class, 'token'])
+                    ->setArguments([$token]);
+
+                $container->setDefinition(
+                    ZammadClient::class,
+                    (new Definition(ZammadClient::class))
+                        ->setFactory([ZammadClient::class, 'create'])
+                        ->setArguments([$url, $auth])
+                        ->setPublic(true),
+                );
+
+                $container->setAlias('zammad_client', ZammadClient::class)->setPublic(true);
             }
 
             public function getNamespace(): string

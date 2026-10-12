@@ -32,9 +32,7 @@ final class GuzzleClientFactory implements ClientFactoryInterface
     }
 
     /**
-     * @deprecated 3.2.0 Use the constructor with an {@see Auth} value instead:
-     *             `new GuzzleClientFactory($url, Auth::token($token))`.
-     *             Will be removed in v4.0.
+     * Shorthand for `new self($url, Auth::token($token))`.
      */
     public static function withToken(
         string $url,
@@ -45,9 +43,7 @@ final class GuzzleClientFactory implements ClientFactoryInterface
     }
 
     /**
-     * @deprecated 3.2.0 Use the constructor with an {@see Auth} value instead:
-     *             `new GuzzleClientFactory($url, Auth::oauth2($token))`.
-     *             Will be removed in v4.0.
+     * Shorthand for `new self($url, Auth::oauth2($token))`.
      */
     public static function withOAuth2(
         string $url,
@@ -58,14 +54,12 @@ final class GuzzleClientFactory implements ClientFactoryInterface
     }
 
     /**
-     * @deprecated 3.2.0 Use the constructor with an {@see Auth} value instead:
-     *             `new GuzzleClientFactory($url, Auth::basic($user, $pass))`.
-     *             Will be removed in v4.0.
+     * Shorthand for `new self($url, Auth::basic($user, $pass))`.
      */
     public static function withBasicAuth(
         string $url,
         string $user,
-        string $pass,
+        #[\SensitiveParameter] string $pass,
         ?ConnectionConfig $config = null,
     ): self {
         return new self($url, Auth::basic($user, $pass), $config);

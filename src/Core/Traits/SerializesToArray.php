@@ -105,8 +105,9 @@ trait SerializesToArray
      * The consuming class must declare `public readonly ?int $id = null`.
      * This method reads it directly; no property access indirection is used.
      *
-     * @deprecated Use the `$dto->id` property directly. The method will be
-     *             removed in v4.0 alongside the DTOInterface contract change.
+     * Required by {@see \ZammadAPIClient\Core\Contracts\DTOInterface} and used
+     * internally by {@see \ZammadAPIClient\Core\Repository\Resource}. Reading
+     * `$dto->id` directly is equivalent and reads better in application code.
      */
     public function id(): ?int
     {
