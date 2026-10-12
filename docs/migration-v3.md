@@ -4,7 +4,7 @@
 
 | v2 | v3 |
 |---|---|
-| `new Client(['url' => ..., 'http_token' => ...])` | `ZammadClient::withToken($url, $token)` |
+| `new Client(['url' => ..., 'http_token' => ...])` | `ZammadClient::create($url, Auth::token($token))` |
 | `$client->resource(TICKET)` | `$client->ticket()` |
 | `$ticket->get(1)` | `$client->ticket()->find(1)` |
 | `$ticket->getValue('title')` | `$ticket->title` |
@@ -41,9 +41,9 @@ $client = new \ZammadAPIClient\Client([
 ]);
 
 // v3
-$client = \ZammadAPIClient\ZammadClient::withToken(
+$client = \ZammadAPIClient\ZammadClient::create(
     'https://zammad.example',
-    'your-token'
+    \ZammadAPIClient\Core\Auth::token('your-token')
 );
 ```
 

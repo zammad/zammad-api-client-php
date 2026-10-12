@@ -27,9 +27,10 @@ resolve `ZammadClient` from the container instead of constructing it by hand.
 ```php
 require __DIR__ . '/vendor/autoload.php'; // skip if your framework autoloads
 
+use ZammadAPIClient\Core\Auth;
 use ZammadAPIClient\ZammadClient;
 
-$client = ZammadClient::withToken('https://zammad.example', 'your-token');
+$client = ZammadClient::create('https://zammad.example', Auth::token('your-token'));
 ```
 
 **3. Try it** — fetch, create, update and search tickets:
@@ -86,10 +87,11 @@ Repositories are accessed via typed accessors: `$client->ticket()`, `$client->us
 ### Connecting
 
 ```php
+use ZammadAPIClient\Core\Auth;
 use ZammadAPIClient\ZammadClient;
 
-// ZammadClient normalizes the URL — /api/v1 is appended automatically
-$client = ZammadClient::withToken('https://zammad.example', 'your-token');
+// The URL is normalized — /api/v1 is appended automatically
+$client = ZammadClient::create('https://zammad.example', Auth::token('your-token'));
 ```
 
 ### Fetching
@@ -361,26 +363,48 @@ For user and organization CRUD examples, refer to the integration tests in [`tes
 
 ## Authentication
 
+Credentials are a value of their own. `Auth` has a private constructor, so the
+only way to build one is through the three named constructors below — an empty
+token or username is rejected right there instead of surfacing as a 401 later.
+
 ```php
+use ZammadAPIClient\Core\Auth;
+use ZammadAPIClient\Core\ConnectionConfig;
+use ZammadAPIClient\ZammadClient;
+
 // Token — sends Authorization: Token token=your-token (Zammad personal access token)
-ZammadClient::withToken($url, 'your-token');
+$client = ZammadClient::create($url, Auth::token('your-token'));
 
 // OAuth2 — sends Authorization: Bearer your-oauth-token (OAuth2 access token)
-ZammadClient::withOAuth2($url, 'your-oauth-token');
+$client = ZammadClient::create($url, Auth::oauth2('your-oauth-token'));
 
 // Basic Auth — sends Authorization: Basic base64(user:pass)
-ZammadClient::withBasicAuth($url, 'admin@example.com', 'test');
+$client = ZammadClient::create($url, Auth::basic('admin@example.com', 'test'));
 
 // Options
-ZammadClient::withToken($url, 'your-token',
+$client = ZammadClient::create($url, Auth::token('your-token'),
     new ConnectionConfig(verifySsl: false, maxRetries: 5),
 );
 
 // Pass a PSR-3 Logger to log HTTP requests and retries
-ZammadClient::withToken($url, 'your-token',
+$client = ZammadClient::create($url, Auth::token('your-token'),
     new ConnectionConfig(logger: $myLogger),
 );
 ```
+
+The credential is applied per request by the transport layer, so it works the
+same with any PSR-18 client. Guzzle is only the default — to use another one,
+build the handler yourself:
+
+```php
+use ZammadAPIClient\Core\Transport\RequestHandler;
+
+$handler = new RequestHandler($psr18Client, $psr17Factory, $url, auth: Auth::token('your-token'));
+$client  = new ZammadClient($handler);
+```
+
+Runnable example: [`examples/cookbook/07-custom-http-client.php`](examples/cookbook/07-custom-http-client.php).
+Container wiring and security notes: [Custom HTTP client](docs/custom-http-client.md).
 
 | ConnectionConfig property | Type | Default | Description |
 |---------------------------|------|---------|-------------|
@@ -396,8 +420,8 @@ Prefer to resolve `ZammadClient` from your framework's container instead of
 constructing it by hand? Bridges are provided for Laravel and Symfony — configure
 credentials once, then inject the same shared client everywhere.
 
-Full runnable setups: [`examples/cookbook/07-laravel.php`](examples/cookbook/07-laravel.php)
-and [`examples/cookbook/08-symfony.php`](examples/cookbook/08-symfony.php).
+Full runnable setups: [`examples/cookbook/08-laravel.php`](examples/cookbook/08-laravel.php)
+and [`examples/cookbook/09-symfony.php`](examples/cookbook/09-symfony.php).
 
 ### Laravel
 
@@ -705,17 +729,23 @@ $client->ticket()->patch(42, new TicketUpdateDTO(
 
 ## Impersonation
 
-```php
-// Temporary — auto-cleanup via finally
-// Accepts user ID (int), login, or email (string)
-$client->performOnBehalfOf(1, fn() => $client->ticket()->find(42));
-$client->performOnBehalfOf('agent@example.com', fn() => $client->ticket()->find(42));
+Impersonation is scoped to its own client instance — wrap the handler in an
+`ImpersonationHandler`. The original client keeps acting as the authenticated
+user, so there is no state to reset and nothing can leak between calls.
 
-// Persistent — same parameter types
-$client->setOnBehalfOfUser(1);
-// ... all subsequent requests act as user #1 ...
-$client->unsetOnBehalfOfUser();
+```php
+use ZammadAPIClient\Core\Transport\ImpersonationHandler;
+
+// Accepts user ID (int), login, or email (string)
+$asUser = new ZammadClient(new ImpersonationHandler($client->getHandler(), 1));
+$ticket = $asUser->ticket()->find(42);
+
+$asAgent = new ZammadClient(new ImpersonationHandler($client->getHandler(), 'agent@example.com'));
+
+// $client itself is unaffected
 ```
+
+A runnable recipe is in [`examples/cookbook/05-impersonation.php`](examples/cookbook/05-impersonation.php).
 
 ## Development
 
@@ -752,7 +782,7 @@ v2 reference documentation is preserved in [docs/v2-reference.md](docs/v2-refere
 
 | v2 | v3 |
 |----|----|
-| `new Client(['url' => ..., 'http_token' => ...])` | `ZammadClient::withToken($url, ...)` |
+| `new Client(['url' => ..., 'http_token' => ...])` | `ZammadClient::create($url, Auth::token(...))` |
 | `$client->resource(TICKET)->get(1)` | `$client->ticket()->find(1)` |
 | `$ticket->getValue('title')` | `$ticket->title` |
 | `$ticket->getValues()` | `$ticket->toArray()` |
