@@ -730,13 +730,20 @@ $client->ticket()->patch(42, new TicketUpdateDTO(
 ## Impersonation
 
 Impersonation is scoped to its own client instance — wrap the handler in an
-`ImpersonationHandler`. The original client keeps acting as the authenticated
-user, so there is no state to reset and nothing can leak between calls.
+`ImpersonationHandler`. It decorates the handler you hand it, so the credentials
+of the original client carry over; the only thing it adds is the `From` header.
+That original client keeps acting as the authenticated user, so there is no state
+to reset and nothing can leak between calls.
 
 ```php
+use ZammadAPIClient\Core\Auth;
 use ZammadAPIClient\Core\Transport\ImpersonationHandler;
+use ZammadAPIClient\ZammadClient;
 
-// Accepts user ID (int), login, or email (string)
+$client = ZammadClient::create('https://zammad.example', Auth::token('your-token'));
+
+// Accepts user ID (int), login, or email (string); no credentials needed here —
+// they come from $client's handler
 $asUser = new ZammadClient(new ImpersonationHandler($client->getHandler(), 1));
 $ticket = $asUser->ticket()->find(42);
 

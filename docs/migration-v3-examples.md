@@ -352,6 +352,8 @@ $asUser->ticket()->find(42);
 ```
 
 > **Breaking:** v2 toggled impersonation on the client itself, so the state was global and had to be reset. v3 scopes it to a separate client instance — there is nothing to unset and nothing can leak between calls. A user ID, login or email all work (`int|string`).
+>
+> No credentials are passed to `ImpersonationHandler`: it decorates `$client`'s existing handler and inherits its authentication, adding only the `From` header.
 
 ---
 
