@@ -14,6 +14,7 @@
 - Authentication no longer depends on the HTTP client supporting client-level default headers. It is applied by `RequestHandler` when composing each request, so any PSR-18 transport authenticates the same way — the hand-written `AuthMiddleware` that the docs previously required for Symfony's `Psr18Client` is obsolete
 - `GuzzleClientFactory` takes `(string $url, Auth $auth, ?ConnectionConfig $config)` and no longer sets an `Authorization` default header on the Guzzle client. Its constructor was private before, so no caller is affected
 - Documentation: corrected examples that referenced `ZammadClient::withToken()` and the impersonation methods removed in 3.0.0 ([#168](https://github.com/zammad/zammad-api-client-php/issues/168))
+- **Fixed:** the Laravel override and custom-middleware examples in the custom HTTP client guide built a client with no credentials at all, so every request would have failed with HTTP 401. They now pass an `Auth` to the `RequestHandler`
 
 `GuzzleClientFactory::withToken()` / `withOAuth2()` / `withBasicAuth()` keep their signatures and now delegate to `Auth`; they are deprecated as of this release but remain functional until 4.0.
 
