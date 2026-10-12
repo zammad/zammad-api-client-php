@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ZammadAPIClient\Bridge;
 
 use Illuminate\Support\ServiceProvider;
-use ZammadAPIClient\Factory\GuzzleClientFactory;
+use ZammadAPIClient\Core\Auth;
 use ZammadAPIClient\ZammadClient;
 
 /**
@@ -71,7 +71,7 @@ use ZammadAPIClient\ZammadClient;
  * 2. `ZAMMAD_URL` / `ZAMMAD_TOKEN` environment variables (`.env`)
  * 3. Built-in defaults (`http://127.0.0.1:8098`, empty token)
  *
- * @see ZammadClient::withToken()
+ * @see ZammadClient::create()
  */
 final class LaravelServiceProvider extends ServiceProvider
 {
@@ -88,9 +88,7 @@ final class LaravelServiceProvider extends ServiceProvider
             $url = config('zammad.url') ?: env('ZAMMAD_URL', 'http://127.0.0.1:8098');
             $token = config('zammad.token') ?: env('ZAMMAD_TOKEN', '');
 
-            return new ZammadClient(
-                GuzzleClientFactory::withToken($url, $token),
-            );
+            return ZammadClient::create($url, Auth::token($token));
         });
     }
 }

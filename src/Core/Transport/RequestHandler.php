@@ -12,6 +12,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use ZammadAPIClient\Core\Auth;
 use ZammadAPIClient\Core\Contracts\RequestHandlerInterface;
 use ZammadAPIClient\Exceptions\AuthenticationException;
 use ZammadAPIClient\Exceptions\BadRequestException;
@@ -46,6 +47,7 @@ final class RequestHandler implements RequestHandlerInterface
     private StreamFactoryInterface $streamFactory;
     private string $baseUrl;
     private LoggerInterface $logger;
+    private ?Auth $auth;
     private ?ResponseInterface $lastResponse = null;
 
     /**
@@ -54,6 +56,9 @@ final class RequestHandler implements RequestHandlerInterface
      * @param string                  $baseUrl    Base URL; the API prefix (`/api/v1`) is appended if missing.
      * @param LoggerInterface         $logger     PSR-3 logger; defaults to NullLogger.
      * @param int                     $maxRetries Max retries on HTTP 429 (0 = disable).
+     * @param Auth|null               $auth       Credentials; sent as `Authorization` on every request.
+     *                                            Null leaves the header unset, e.g. when the PSR-18 client
+     *                                            already adds it.
      */
     public function __construct(
         ClientInterface $httpClient,
@@ -61,6 +66,7 @@ final class RequestHandler implements RequestHandlerInterface
         string $baseUrl,
         LoggerInterface $logger = new NullLogger(),
         int $maxRetries = 3,
+        ?Auth $auth = null,
     ) {
         if (!$factory instanceof StreamFactoryInterface) {
             throw new InvalidArgumentException(
@@ -74,6 +80,7 @@ final class RequestHandler implements RequestHandlerInterface
         $this->streamFactory = $factory;
         $this->baseUrl = self::normalizeBaseUrl($baseUrl);
         $this->logger = $logger;
+        $this->auth = $auth;
     }
 
     /**
@@ -234,6 +241,12 @@ final class RequestHandler implements RequestHandlerInterface
         try {
             $request = $this->requestFactory->createRequest($method, $fullUri)
                 ->withHeader('Accept', 'application/json');
+
+            // Set before the per-request headers below so callers keep the last word,
+            // matching how a client-level default header behaves.
+            if ($this->auth !== null) {
+                $request = $request->withHeader('Authorization', $this->auth->header());
+            }
 
             if (isset($options['headers']) && is_array($options['headers'])) {
                 foreach ($options['headers'] as $name => $value) {

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient;
 
+use ZammadAPIClient\Core\Auth;
+use ZammadAPIClient\Core\ConnectionConfig;
 use ZammadAPIClient\Core\Contracts\ClientFactoryInterface;
 use ZammadAPIClient\Core\Contracts\ClientInterface as ZammadClientInterface;
 use ZammadAPIClient\Core\Contracts\RequestHandlerInterface;
+use ZammadAPIClient\Factory\GuzzleClientFactory;
 use ZammadAPIClient\Core\Repository\AbstractRepository;
 use ZammadAPIClient\Core\Repository\RepositoryRegistry;
 use ZammadAPIClient\Core\Traits\RepositoryAccessors;
@@ -14,12 +17,16 @@ use ZammadAPIClient\Core\Traits\RepositoryAccessors;
 /**
  * Entry point for the Zammad API.
  *
- *   $client = new ZammadClient(
- *       GuzzleClientFactory::withToken('https://zammad.example', 'your-token'),
- *   );
+ *   $client = ZammadClient::create('https://zammad.example', Auth::token('your-token'));
  *
  *   $client->ticket()->find(1);
  *   $client->user()->all();
+ *
+ * To use a different HTTP transport, build the handler yourself and pass it to
+ * the constructor — credentials and retry behaviour work exactly the same:
+ *
+ *   $handler = new RequestHandler($psr18, $psr17, $url, auth: Auth::token('your-token'));
+ *   $client  = new ZammadClient($handler);
  *
  * @internal Prefer {@see ZammadClientInterface} for type hints.
  */
@@ -38,6 +45,23 @@ final class ZammadClient implements ZammadClientInterface
         $this->handler = $source instanceof ClientFactoryInterface
             ? $source->createHandler()
             : $source;
+    }
+
+    /**
+     * Creates a client for the given Zammad instance, using Guzzle as transport.
+     *
+     * This is the shortcut for the default transport, not the only full-featured
+     * way in: passing your own {@see RequestHandlerInterface} to the constructor
+     * supports the same credentials and options.
+     *
+     * @param string $url The Zammad base URL; `/api/v1` is appended if missing.
+     */
+    public static function create(
+        string $url,
+        Auth $auth,
+        ?ConnectionConfig $config = null,
+    ): self {
+        return new self(new GuzzleClientFactory($url, $auth, $config));
     }
 
     public function getHandler(): RequestHandlerInterface

@@ -7,49 +7,76 @@ namespace ZammadAPIClient\Factory;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Psr7\HttpFactory;
 use Psr\Log\NullLogger;
+use ZammadAPIClient\Core\Auth;
 use ZammadAPIClient\Core\ConnectionConfig;
 use ZammadAPIClient\Core\Contracts\RequestHandlerInterface;
 use ZammadAPIClient\Core\Contracts\ClientFactoryInterface;
 use ZammadAPIClient\Core\Transport\RequestHandler;
 
+/**
+ * Builds a Guzzle-backed {@see RequestHandler}.
+ *
+ * Most callers never touch this class — {@see \ZammadAPIClient\ZammadClient::create()}
+ * wires it up for them. Use it directly only to hand a pre-built factory to the
+ * `ZammadClient` constructor, e.g. in a DI container definition.
+ */
 final class GuzzleClientFactory implements ClientFactoryInterface
 {
     public const USER_AGENT = 'Zammad API PHP';
 
-    private function __construct(
+    public function __construct(
         private readonly string $url,
-        private readonly string $authHeader,
-        private ?ConnectionConfig $config = null,
+        private readonly Auth $auth,
+        private readonly ?ConnectionConfig $config = null,
     ) {
     }
 
+    /**
+     * @deprecated 3.2.0 Use the constructor with an {@see Auth} value instead:
+     *             `new GuzzleClientFactory($url, Auth::token($token))`.
+     *             Will be removed in v4.0.
+     */
     public static function withToken(
         string $url,
         string $token,
         ?ConnectionConfig $config = null,
     ): self {
-        return new self($url, "Token token={$token}", $config);
+        return new self($url, Auth::token($token), $config);
     }
 
+    /**
+     * @deprecated 3.2.0 Use the constructor with an {@see Auth} value instead:
+     *             `new GuzzleClientFactory($url, Auth::oauth2($token))`.
+     *             Will be removed in v4.0.
+     */
     public static function withOAuth2(
         string $url,
         string $token,
         ?ConnectionConfig $config = null,
     ): self {
-        return new self($url, "Bearer {$token}", $config);
+        return new self($url, Auth::oauth2($token), $config);
     }
 
+    /**
+     * @deprecated 3.2.0 Use the constructor with an {@see Auth} value instead:
+     *             `new GuzzleClientFactory($url, Auth::basic($user, $pass))`.
+     *             Will be removed in v4.0.
+     */
     public static function withBasicAuth(
         string $url,
         string $user,
         string $pass,
         ?ConnectionConfig $config = null,
     ): self {
-        return new self($url, 'Basic ' . base64_encode("{$user}:{$pass}"), $config);
+        return new self($url, Auth::basic($user, $pass), $config);
     }
 
     /**
      * Creates a request handler configured with this factory's credentials.
+     *
+     * The `Authorization` header is not set on the Guzzle client here — it is
+     * applied per request by {@see RequestHandler}, which keeps authentication
+     * working for any PSR-18 transport.
      */
     public function createHandler(): RequestHandlerInterface
     {
@@ -57,8 +84,7 @@ final class GuzzleClientFactory implements ClientFactoryInterface
 
         $httpClient = new GuzzleClient([
             'headers'         => [
-                'User-Agent'    => self::USER_AGENT,
-                'Authorization' => $this->authHeader,
+                'User-Agent' => self::USER_AGENT,
             ],
             'verify'          => $config->verifySsl,
             'timeout'         => $config->timeout,
@@ -72,6 +98,7 @@ final class GuzzleClientFactory implements ClientFactoryInterface
             $this->url,
             logger: $config->logger ?? new NullLogger(),
             maxRetries: $config->maxRetries,
+            auth: $this->auth,
         );
     }
 }

@@ -14,11 +14,12 @@ $client = new Client([
 
 **v3:**
 ```php
+use ZammadAPIClient\Core\Auth;
 use ZammadAPIClient\ZammadClient;
 
-$client = ZammadClient::withToken(
+$client = ZammadClient::create(
     'https://zammad.example',
-    'your-token',
+    Auth::token('your-token'),
 );
 ```
 
@@ -35,9 +36,9 @@ new Client(['url' => $url, 'username' => '...', 'password' => '...']); // Basic
 
 **v3:**
 ```php
-ZammadClient::withToken($url, '...');                          // Token
-ZammadClient::withOAuth2($url, '...');                         // OAuth2
-ZammadClient::withBasicAuth($url, '...', '...');               // Basic
+ZammadClient::create($url, Auth::token('...'));                // Token
+ZammadClient::create($url, Auth::oauth2('...'));               // OAuth2
+ZammadClient::create($url, Auth::basic('...', '...'));         // Basic
 ```
 
 ---
@@ -342,18 +343,15 @@ $client->unsetOnBehalfOfUser();
 
 **v3:**
 ```php
-// Temporary (auto-cleanup on callback return or exception)
-$client->performOnBehalfOf(1, function () use ($client) {
-    $client->ticket()->find(42);
-});
+use ZammadAPIClient\Core\Transport\ImpersonationHandler;
 
-// Persistent
-$client->setOnBehalfOfUser(1);
-// ... API calls ...
-$client->unsetOnBehalfOfUser();
+$asUser = new ZammadClient(new ImpersonationHandler($client->getHandler(), 1));
+$asUser->ticket()->find(42);
+
+// $client itself keeps acting as the authenticated user
 ```
 
-> **Breaking:** v2 used a username string (`'myuser'`). v3 requires a **numeric user ID**. Use `$client->user()->search('login:myuser')` to resolve a username to an ID if needed.
+> **Breaking:** v2 toggled impersonation on the client itself, so the state was global and had to be reset. v3 scopes it to a separate client instance — there is nothing to unset and nothing can leak between calls. A user ID, login or email all work (`int|string`).
 
 ---
 

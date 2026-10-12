@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace ZammadAPIClient\Tests\Unit;
 
 use Mockery\Adapter\Phpunit\MockeryTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use ReflectionProperty;
+use ZammadAPIClient\Core\Auth;
 use ZammadAPIClient\Core\Contracts\ClientInterface;
+use ZammadAPIClient\Core\Contracts\RequestHandlerInterface;
+use ZammadAPIClient\Core\Transport\RequestHandler;
 use ZammadAPIClient\Factory\GuzzleClientFactory;
 use ZammadAPIClient\ZammadClient;
 
@@ -41,5 +46,62 @@ final class GuzzleClientFactoryTest extends MockeryTestCase
         );
 
         self::assertInstanceOf(ClientInterface::class, $client);
+    }
+
+    /**
+     * The three static helpers are deprecated but supported until v4.0, so these
+     * calls are deliberate: they pin down that the transitional path stays
+     * equivalent to constructing the factory with an explicit {@see Auth}.
+     * Do not remove them as leftovers — they go when the helpers do.
+     *
+     * @return iterable<string, array{GuzzleClientFactory, GuzzleClientFactory}>
+     */
+    public static function equivalentFactories(): iterable
+    {
+        $url = 'https://zammad.example';
+
+        yield 'token' => [
+            GuzzleClientFactory::withToken($url, 'test-token'),
+            new GuzzleClientFactory($url, Auth::token('test-token')),
+        ];
+        yield 'oauth2' => [
+            GuzzleClientFactory::withOAuth2($url, 'oauth-token'),
+            new GuzzleClientFactory($url, Auth::oauth2('oauth-token')),
+        ];
+        yield 'basic' => [
+            GuzzleClientFactory::withBasicAuth($url, 'admin', 'test'),
+            new GuzzleClientFactory($url, Auth::basic('admin', 'test')),
+        ];
+    }
+
+    #[DataProvider('equivalentFactories')]
+    public function testLegacyHelperMatchesExplicitAuthConstructor(
+        GuzzleClientFactory $legacy,
+        GuzzleClientFactory $explicit,
+    ): void {
+        self::assertSame(
+            self::authHeaderOf($legacy->createHandler()),
+            self::authHeaderOf($explicit->createHandler()),
+        );
+    }
+
+    public function testZammadClientCreateUsesTheGivenAuth(): void
+    {
+        $client = ZammadClient::create('https://zammad.example', Auth::token('test-token'));
+
+        self::assertSame('Token token=test-token', self::authHeaderOf($client->getHandler()));
+    }
+
+    /**
+     * Reads the credential the handler will apply. White-box on purpose: the
+     * Guzzle-backed path cannot be observed without making a real request.
+     */
+    private static function authHeaderOf(RequestHandlerInterface $handler): string
+    {
+        $auth = (new ReflectionProperty(RequestHandler::class, 'auth'))->getValue($handler);
+
+        self::assertInstanceOf(Auth::class, $auth);
+
+        return $auth->header();
     }
 }

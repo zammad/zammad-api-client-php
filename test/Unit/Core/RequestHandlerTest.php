@@ -14,6 +14,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use ZammadAPIClient\Core\Auth;
 use ZammadAPIClient\Core\Transport\RequestHandler;
 use ZammadAPIClient\Exceptions\AuthenticationException;
 use ZammadAPIClient\Exceptions\BadRequestException;
@@ -365,5 +366,62 @@ final class RequestHandlerTest extends TestCase
         $result = $this->handler->delete('users/1');
 
         self::assertSame([], $result);
+    }
+
+    /**
+     * The recording client below is a plain PSR-18 implementation, not Guzzle —
+     * so this also demonstrates that authentication no longer depends on the
+     * transport offering client-level default headers.
+     */
+    public function testAuthorizationHeaderIsSentWhenAuthIsConfigured(): void
+    {
+        $handler = $this->createHandler($this->httpClient, auth: Auth::token('secret'));
+        $this->httpClient->response = new Response(200, [], '{}');
+
+        $handler->get('tickets');
+
+        self::assertSame(
+            'Token token=secret',
+            $this->httpClient->lastRequest?->getHeaderLine('Authorization'),
+        );
+    }
+
+    public function testNoAuthorizationHeaderWithoutAuth(): void
+    {
+        $this->httpClient->response = new Response(200, [], '{}');
+
+        $this->handler->get('tickets');
+
+        self::assertFalse($this->httpClient->lastRequest?->hasHeader('Authorization'));
+    }
+
+    /**
+     * getRaw() is the attachment path and used to rely on the client-level
+     * default header, so it is worth pinning down separately.
+     */
+    public function testAuthorizationHeaderIsSentOnRawRequests(): void
+    {
+        $handler = $this->createHandler($this->httpClient, auth: Auth::token('secret'));
+        $this->httpClient->response = new Response(200, [], 'binary-payload');
+
+        $handler->getRaw('ticket_attachment/1/2/3');
+
+        self::assertSame(
+            'Token token=secret',
+            $this->httpClient->lastRequest?->getHeaderLine('Authorization'),
+        );
+    }
+
+    public function testPerRequestHeaderOverridesConfiguredAuth(): void
+    {
+        $handler = $this->createHandler($this->httpClient, auth: Auth::token('secret'));
+        $this->httpClient->response = new Response(200, [], '{}');
+
+        $handler->request('GET', 'tickets', ['headers' => ['Authorization' => 'Bearer override']]);
+
+        self::assertSame(
+            'Bearer override',
+            $this->httpClient->lastRequest?->getHeaderLine('Authorization'),
+        );
     }
 }

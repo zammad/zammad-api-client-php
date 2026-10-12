@@ -6,6 +6,7 @@ namespace ZammadAPIClient\Tests\Unit\Core\Traits;
 
 use GuzzleHttp\Psr7\HttpFactory;
 use Psr\Http\Client\ClientInterface;
+use ZammadAPIClient\Core\Auth;
 use ZammadAPIClient\Core\Transport\RequestHandler;
 
 /**
@@ -22,8 +23,17 @@ trait CreatesRequestHandler
         $this->httpFactory = new HttpFactory();
     }
 
-    private function createHandler(ClientInterface $client, int $maxRetries = 0): RequestHandler
-    {
-        return new RequestHandler($client, $this->httpFactory, self::BASE_URL, maxRetries: $maxRetries);
+    private function createHandler(
+        ClientInterface $client,
+        int $maxRetries = 0,
+        ?Auth $auth = null,
+    ): RequestHandler {
+        return new RequestHandler(
+            $client,
+            $this->httpFactory,
+            self::BASE_URL,
+            maxRetries: $maxRetries,
+            auth: $auth,
+        );
     }
 }
