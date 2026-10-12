@@ -104,8 +104,8 @@ services:
     app.zammad_request_handler:
         class: ZammadAPIClient\Core\Transport\RequestHandler
         arguments:
-            $httpClient: '@Symfony\Component\HttpClient\Psr18Client'
-            $factory: '@Nyholm\Psr7\Factory\Psr17Factory'
+            $httpClient: '@Psr\Http\Client\ClientInterface'
+            $factory: '@nyholm.psr7.psr17_factory'
             $baseUrl: '%env(ZAMMAD_URL)%'
             $auth: '@app.zammad_auth'
 
@@ -113,6 +113,17 @@ services:
         class: ZammadAPIClient\ZammadClient
         arguments:
             - '@app.zammad_request_handler'
+```
+
+The two service IDs in the custom stack are the ones Symfony actually registers:
+FrameworkBundle aliases `Psr\Http\Client\ClientInterface` to its `psr18.http_client`
+service as soon as `symfony/http-client` is installed, and `nyholm.psr7.psr17_factory`
+comes from the `nyholm/psr7` Flex recipe. The class names are *not* service IDs — the
+package itself ships no DI configuration. If you installed it without Flex, declare the
+factory yourself:
+
+```yaml
+    Nyholm\Psr7\Factory\Psr17Factory: ~
 ```
 
 ## Custom PSR-18 Middleware Stack
