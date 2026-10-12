@@ -8,12 +8,12 @@ A runnable version of the setup below is in [`examples/cookbook/07-custom-http-c
 
 ## Symfony HttpClient
 
-Requires `composer require symfony/http-client nyholm/psr7` (or `guzzlehttp/psr7` for PSR-17 factories).
+Requires `composer require symfony/http-client nyholm/psr7`. Any PSR-17 factory works; `guzzlehttp/psr7` is already installed as a dependency if you prefer it.
 
 ```php
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\Psr18Client;
-use GuzzleHttp\Psr7\HttpFactory;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use ZammadAPIClient\Core\Auth;
 use ZammadAPIClient\Core\Transport\RequestHandler;
 use ZammadAPIClient\ZammadClient;
@@ -25,7 +25,7 @@ $handler = new RequestHandler(
         'verify_peer'     => true,
         'verify_host'     => true,
     ])),
-    new HttpFactory(),
+    new Psr17Factory(),
     'https://zammad.example',
     maxRetries: 3,
     auth: Auth::token('your-zammad-api-token'),
@@ -56,7 +56,7 @@ The `LaravelServiceProvider` binds `ZammadClient` as a singleton. To use Symfony
 ```php
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\Psr18Client;
-use GuzzleHttp\Psr7\HttpFactory;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use ZammadAPIClient\Core\Auth;
 use ZammadAPIClient\Core\Transport\RequestHandler;
 use ZammadAPIClient\ZammadClient;
@@ -70,9 +70,10 @@ class AppServiceProvider extends ServiceProvider
                 new Psr18Client(HttpClient::create([
                     'timeout' => config('zammad.timeout', 30),
                 ])),
-                new HttpFactory(),
+                new Psr17Factory(),
                 config('zammad.url'),
                 maxRetries: 3,
+                auth: Auth::token(config('zammad.token')),
             );
             return new ZammadClient($handler);
         });
@@ -100,6 +101,14 @@ services:
             $auth: '@app.zammad_auth'
 
     # Or with a custom PSR-18 stack:
+    app.zammad_request_handler:
+        class: ZammadAPIClient\Core\Transport\RequestHandler
+        arguments:
+            $httpClient: '@Symfony\Component\HttpClient\Psr18Client'
+            $factory: '@Nyholm\Psr7\Factory\Psr17Factory'
+            $baseUrl: '%env(ZAMMAD_URL)%'
+            $auth: '@app.zammad_auth'
+
     app.zammad_client:
         class: ZammadAPIClient\ZammadClient
         arguments:
@@ -110,7 +119,14 @@ services:
 
 `RequestHandler` internally applies rate-limit retry via `RetryAfterMiddleware`. You only need to compose your own middleware around the base client — retry behavior is added automatically (set `maxRetries: 0` to disable).
 
+`LoggingMiddleware` and `MetricsMiddleware` below stand in for your own decorators.
+
 ```php
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Symfony\Component\HttpClient\Psr18Client;
+use ZammadAPIClient\Core\Auth;
+use ZammadAPIClient\Core\Transport\RequestHandler;
+
 $http = new LoggingMiddleware(
     new MetricsMiddleware(
         new Psr18Client(),
@@ -118,12 +134,20 @@ $http = new LoggingMiddleware(
 );
 
 // Rate-limit retry is applied internally by RequestHandler
-$handler = new RequestHandler($http, new HttpFactory(), 'https://zammad.example', maxRetries: 5);
+$handler = new RequestHandler(
+    $http,
+    new Psr17Factory(),
+    'https://zammad.example',
+    maxRetries: 5,
+    auth: Auth::token('your-zammad-api-token'),
+);
 ```
 
 ## Important Security Notes
 
-- **Configure timeouts**: Always set `timeout` and connection timeout on your PSR-18 client. The factory methods default to 30s/10s respectively.
-- **Verify TLS**: Do not disable TLS verification in production. The factory methods default to `verifySsl = true`.
-- **Redirects**: The factory methods disable redirect following (`allow_redirects = false`). If using your own PSR-18 client, configure redirect behavior carefully — following redirects may leak the `Authorization` header to unintended hosts.
-- **Debug logging**: Use a PSR-3 logger via `ConnectionConfig`. Never enable raw HTTP debug output in production — it will expose API tokens in log files.
+Building the handler yourself means the defaults `ZammadClient::create()` applies are no longer applied for you. Each of these is now your responsibility:
+
+- **Configure timeouts**: Always set a request and a connection timeout on your PSR-18 client. `ZammadClient::create()` defaults to 30s and 10s (`ConnectionConfig::$timeout` / `$connectTimeout`).
+- **Verify TLS**: Do not disable TLS verification in production. `ZammadClient::create()` defaults to `verifySsl = true`.
+- **Redirects**: `ZammadClient::create()` disables redirect following (`allow_redirects = false`). Configure your own client carefully — following redirects may leak the `Authorization` header to unintended hosts.
+- **Debug logging**: Pass a PSR-3 logger as the `logger:` argument of `RequestHandler` (on the `create()` path it comes from `ConnectionConfig::$logger`). Never enable raw HTTP debug output in production — it will expose API tokens in log files.
