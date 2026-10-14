@@ -46,6 +46,14 @@ If you need credentials that change at runtime (an OAuth2 token being refreshed,
 say), wrap your PSR-18 client in a decorator that sets the header per request and
 leave `auth` unset.
 
+Constructing a `RequestHandler` with an `Auth` and a plain `http://` base URL
+throws an `InvalidArgumentException`, because the credential would travel the
+network in cleartext. Loopback hosts are exempt; for anything else that is
+already protected by other means — a VPN, a service mesh, an SSH tunnel — pass
+`allowInsecureHttp: true`. Note that the check sees only the `Auth` you hand it:
+a decorator that sets the header itself, as described above, is invisible to it
+and remains your responsibility.
+
 If you're migrating away from Guzzle, start with `ZammadClient::create()` and
 refactor step by step — the handler built above supports exactly the same options.
 
@@ -83,7 +91,15 @@ class AppServiceProvider extends ServiceProvider
 
 ## Symfony
 
-The `SymfonyBundle` can be extended or replaced entirely by defining your own service definition:
+The `SymfonyBundle` can be extended or replaced entirely by defining your own service definition.
+
+Both variants below register the client under the service ID `ZammadAPIClient\ZammadClient`,
+because that is the ID Symfony resolves when a service type-hints `ZammadClient`. Pick
+**one** of them, and remove `SymfonyBundle` from `config/bundles.php` — the bundle
+registers the very same ID, so leaving it enabled means one definition silently wins over
+the other.
+
+Either the default (Guzzle) transport:
 
 ```yaml
 # config/services.yaml
@@ -99,8 +115,21 @@ services:
         arguments:
             $url: '%env(ZAMMAD_URL)%'
             $auth: '@app.zammad_auth'
+```
 
-    # Or with a custom PSR-18 stack:
+…or your own PSR-18 stack. Note that the class service ID is the one that gets the custom
+handler — a separate `app.zammad_client` ID would be ignored by autowiring, and every
+service type-hinting `ZammadClient` would silently keep using the Guzzle definition above:
+
+```yaml
+# config/services.yaml
+services:
+    app.zammad_auth:
+        class: ZammadAPIClient\Core\Auth
+        factory: ['ZammadAPIClient\Core\Auth', 'token']
+        arguments:
+            $token: '%env(ZAMMAD_TOKEN)%'
+
     app.zammad_request_handler:
         class: ZammadAPIClient\Core\Transport\RequestHandler
         arguments:
@@ -109,8 +138,7 @@ services:
             $baseUrl: '%env(ZAMMAD_URL)%'
             $auth: '@app.zammad_auth'
 
-    app.zammad_client:
-        class: ZammadAPIClient\ZammadClient
+    ZammadAPIClient\ZammadClient:
         arguments:
             - '@app.zammad_request_handler'
 ```
@@ -161,4 +189,5 @@ Building the handler yourself means the defaults `ZammadClient::create()` applie
 - **Configure timeouts**: Always set a request and a connection timeout on your PSR-18 client. `ZammadClient::create()` defaults to 30s and 10s (`ConnectionConfig::$timeout` / `$connectTimeout`).
 - **Verify TLS**: Do not disable TLS verification in production. `ZammadClient::create()` defaults to `verifySsl = true`.
 - **Redirects**: `ZammadClient::create()` disables redirect following (`allow_redirects = false`). Configure your own client carefully — following redirects may leak the `Authorization` header to unintended hosts.
+- **Plain HTTP**: `RequestHandler` refuses an `Auth` over `http://` to a non-loopback host, and `allowInsecureHttp: true` turns that off. The check cannot see an `Authorization` header your own PSR-18 decorator adds — if you authenticate that way, make sure the URL is `https://` yourself.
 - **Debug logging**: Pass a PSR-3 logger as the `logger:` argument of `RequestHandler` (on the `create()` path it comes from `ConnectionConfig::$logger`). Never enable raw HTTP debug output in production — it will expose API tokens in log files.
