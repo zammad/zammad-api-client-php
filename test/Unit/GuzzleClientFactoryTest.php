@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Tests\Unit;
 
+use InvalidArgumentException;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use ReflectionProperty;
+use ZammadAPIClient\Core\ConnectionConfig;
 use ZammadAPIClient\Core\Auth;
 use ZammadAPIClient\Core\Contracts\ClientInterface;
 use ZammadAPIClient\Core\Contracts\RequestHandlerInterface;
@@ -87,6 +89,29 @@ final class GuzzleClientFactoryTest extends MockeryTestCase
     public function testZammadClientCreateUsesTheGivenAuth(): void
     {
         $client = ZammadClient::create('https://zammad.example', Auth::token('test-token'));
+
+        self::assertSame('Token token=test-token', self::authHeaderOf($client->getHandler()));
+    }
+
+    /**
+     * The cleartext guard lives in RequestHandler, but allowInsecureHttp has to
+     * travel ConnectionConfig → factory → handler to be reachable from
+     * ZammadClient::create(). These two pin down that wiring.
+     */
+    public function testCreateRejectsCredentialsOverPlainHttp(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        ZammadClient::create('http://zammad.example', Auth::token('test-token'));
+    }
+
+    public function testCreateForwardsTheInsecureHttpOptOut(): void
+    {
+        $client = ZammadClient::create(
+            'http://zammad.example',
+            Auth::token('test-token'),
+            new ConnectionConfig(allowInsecureHttp: true),
+        );
 
         self::assertSame('Token token=test-token', self::authHeaderOf($client->getHandler()));
     }

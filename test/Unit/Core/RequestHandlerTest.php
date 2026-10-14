@@ -7,6 +7,7 @@ namespace ZammadAPIClient\Tests\Unit\Core;
 use GuzzleHttp\Psr7\Response;
 use InvalidArgumentException;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -423,5 +424,88 @@ final class RequestHandlerTest extends TestCase
             'Bearer override',
             $this->httpClient->lastRequest?->getHeaderLine('Authorization'),
         );
+    }
+
+    public function testCredentialsOverPlainHttpAreRejected(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Refusing to send Zammad credentials in cleartext to "http://zammad.example"');
+
+        $this->createHandler(
+            $this->httpClient,
+            auth: Auth::token('secret'),
+            baseUrl: 'http://zammad.example',
+        );
+    }
+
+    public function testCredentialsOverPlainHttpArePermittedWithOptOut(): void
+    {
+        $handler = $this->createHandler(
+            $this->httpClient,
+            auth: Auth::token('secret'),
+            baseUrl: 'http://zammad.example',
+            allowInsecureHttp: true,
+        );
+        $this->httpClient->response = new Response(200, [], '{}');
+
+        $handler->get('tickets');
+
+        self::assertSame(
+            'Token token=secret',
+            $this->httpClient->lastRequest?->getHeaderLine('Authorization'),
+        );
+    }
+
+    /**
+     * A credential that never leaves the machine is not at risk, so the guard
+     * must not fire on the loopback defaults this library ships with.
+     */
+    #[DataProvider('loopbackUrlProvider')]
+    public function testCredentialsOverPlainHttpArePermittedOnLoopback(string $url): void
+    {
+        $handler = $this->createHandler($this->httpClient, auth: Auth::token('secret'), baseUrl: $url);
+        $this->httpClient->response = new Response(200, [], '{}');
+
+        $handler->get('tickets');
+
+        self::assertSame(
+            'Token token=secret',
+            $this->httpClient->lastRequest?->getHeaderLine('Authorization'),
+        );
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function loopbackUrlProvider(): iterable
+    {
+        yield 'localhost'           => ['http://localhost:3000'];
+        yield 'localhost subdomain' => ['http://zammad.localhost'];
+        yield 'IPv4 loopback'       => ['http://127.0.0.1:8098'];
+        yield 'IPv4 loopback range' => ['http://127.0.0.2:3000'];
+        yield 'IPv6 loopback'       => ['http://[::1]:3000'];
+    }
+
+    public function testHttpsIsNeverRejected(): void
+    {
+        $handler = $this->createHandler(
+            $this->httpClient,
+            auth: Auth::token('secret'),
+            baseUrl: 'https://zammad.example',
+        );
+
+        self::assertInstanceOf(RequestHandler::class, $handler);
+    }
+
+    /**
+     * The guard can only see credentials it was given. A handler built without
+     * an Auth is the documented case for a PSR-18 client that adds the header
+     * itself — invisible from here, and therefore not rejected.
+     */
+    public function testPlainHttpWithoutAuthIsNotRejected(): void
+    {
+        $handler = $this->createHandler($this->httpClient, baseUrl: 'http://zammad.example');
+
+        self::assertInstanceOf(RequestHandler::class, $handler);
     }
 }
