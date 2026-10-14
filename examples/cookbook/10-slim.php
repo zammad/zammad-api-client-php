@@ -10,7 +10,14 @@
  *
  * Requirements:
  *   composer require slim/slim slim/psr7 php-di/php-di zammad/zammad-api-client-php
- *   .env → ZAMMAD_URL=https://zammad.example ZAMMAD_TOKEN=xxx
+ *
+ * ZAMMAD_URL and ZAMMAD_TOKEN come from the environment — your php-fpm pool, your
+ * container, or `export` in the shell for the built-in server. Read with getenv(),
+ * like the other recipes: $_ENV is empty unless php.ini's variables_order includes
+ * E, and Slim loads no .env file of its own.
+ *
+ *   export ZAMMAD_URL=https://zammad.example
+ *   export ZAMMAD_TOKEN=xxx
  *
  * public/index.php:
  *
@@ -22,8 +29,8 @@
  *   $builder = new ContainerBuilder();
  *   $builder->addDefinitions([
  *       ZammadClient::class => fn (): ZammadClient => ZammadClient::create(
- *           $_ENV['ZAMMAD_URL'],
- *           Auth::token($_ENV['ZAMMAD_TOKEN']),
+ *           getenv('ZAMMAD_URL') ?: 'http://localhost:3000',
+ *           Auth::token(getenv('ZAMMAD_TOKEN') ?: ''),
  *       ),
  *   ]);
  *
