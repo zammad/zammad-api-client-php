@@ -27,13 +27,16 @@ trait CreatesRequestHandler
         ClientInterface $client,
         int $maxRetries = 0,
         ?Auth $auth = null,
+        ?string $baseUrl = null,
+        bool $allowInsecureHttp = false,
     ): RequestHandler {
         return new RequestHandler(
             $client,
             $this->httpFactory,
-            self::BASE_URL,
+            $baseUrl ?? self::BASE_URL,
             maxRetries: $maxRetries,
             auth: $auth,
+            allowInsecureHttp: $allowInsecureHttp,
         );
     }
 }
