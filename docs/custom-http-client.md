@@ -148,10 +148,12 @@ FrameworkBundle aliases `Psr\Http\Client\ClientInterface` to its `psr18.http_cli
 service as soon as `symfony/http-client` is installed, and `nyholm.psr7.psr17_factory`
 comes from the `nyholm/psr7` Flex recipe. The class names are *not* service IDs — the
 package itself ships no DI configuration. If you installed it without Flex, declare the
-factory yourself:
+factory under the ID referenced above — the reference is explicit, so autowiring will not
+bridge a differently named service:
 
 ```yaml
-    Nyholm\Psr7\Factory\Psr17Factory: ~
+    nyholm.psr7.psr17_factory:
+        class: Nyholm\Psr7\Factory\Psr17Factory
 ```
 
 ## Custom PSR-18 Middleware Stack
