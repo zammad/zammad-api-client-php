@@ -352,7 +352,7 @@ CSV format follows Zammad's import specification (header row with field names ma
 The primary example is the [`examples/cookbook/`](examples/cookbook/README.md) directory — runnable recipes covering tickets, stateful resources, pagination, error handling, impersonation, and search. Run them against any Zammad instance:
 
 ```bash
-ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL=http://your-zammad:3000 \
+ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_URL=https://your-zammad.example \
 ZAMMAD_PHP_API_CLIENT_UNIT_TESTS_TOKEN=your-token \
 php examples/cookbook/01-quick-start.php
 ```
@@ -392,6 +392,12 @@ $client = ZammadClient::create($url, Auth::token('your-token'),
 );
 ```
 
+The client refuses to send a credential in cleartext: a `http://` URL pointing at
+anything but the local machine throws an `InvalidArgumentException` instead of
+leaking the token to the network. Loopback is exempt, so the local defaults keep
+working. If the connection is protected by other means — a VPN, a service mesh, a
+tunnel — opt out with `new ConnectionConfig(allowInsecureHttp: true)`.
+
 The credential is applied per request by the transport layer, so it works the
 same with any PSR-18 client. Guzzle is only the default — to use another one,
 build the handler yourself:
@@ -413,6 +419,7 @@ Container wiring and security notes: [Custom HTTP client](docs/custom-http-clien
 | `timeout` | `int` | `30` | Total request timeout in seconds |
 | `connectTimeout` | `int` | `10` | Connection timeout in seconds |
 | `logger` | `?LoggerInterface` | `null` | PSR-3 Logger for HTTP request/retry logging |
+| `allowInsecureHttp` | `bool` | `false` | Permit credentials over plain `http://` to a non-loopback host |
 
 ## Framework integration
 

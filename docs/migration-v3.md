@@ -28,7 +28,7 @@
 ### 1. Update composer.json
 
 ```bash
-composer require zammad/zammad-api-client-php:^3.0
+composer require zammad/zammad-api-client-php:^3.2
 ```
 
 ### 2. Replace Client Instantiation
