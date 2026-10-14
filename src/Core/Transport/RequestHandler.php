@@ -35,6 +35,8 @@ use JsonException;
  *  - Maps HTTP error codes to typed domain exceptions before returning
  *    (see {@see self::dispatch()} and the private `mapError`/`validationError` methods).
  *  - Stores the last PSR-7 response so callers can inspect headers afterward.
+ *  - Applies the configured {@see Auth} credentials, and refuses to do so over an
+ *    unencrypted connection to a non-loopback host.
  *
  * HTTP 429 rate-limit retry is handled transparently — no manual wiring needed.
  */
@@ -59,6 +61,12 @@ final class RequestHandler implements RequestHandlerInterface
      * @param Auth|null               $auth       Credentials; sent as `Authorization` on every request.
      *                                            Null leaves the header unset, e.g. when the PSR-18 client
      *                                            already adds it.
+     * @param bool                    $allowInsecureHttp Permit credentials over plain `http://` to a
+     *                                            non-loopback host; see
+     *                                            {@see self::assertCredentialsAreNotSentInClear()}.
+     *
+     * @throws InvalidArgumentException If $factory is not also a StreamFactoryInterface, or if $auth would
+     *                                  be sent in cleartext (see $allowInsecureHttp).
      */
     public function __construct(
         ClientInterface $httpClient,
@@ -67,6 +75,7 @@ final class RequestHandler implements RequestHandlerInterface
         LoggerInterface $logger = new NullLogger(),
         int $maxRetries = 3,
         ?Auth $auth = null,
+        bool $allowInsecureHttp = false,
     ) {
         if (!$factory instanceof StreamFactoryInterface) {
             throw new InvalidArgumentException(
@@ -81,6 +90,80 @@ final class RequestHandler implements RequestHandlerInterface
         $this->baseUrl = self::normalizeBaseUrl($baseUrl);
         $this->logger = $logger;
         $this->auth = $auth;
+
+        if (!$allowInsecureHttp) {
+            self::assertCredentialsAreNotSentInClear($this->baseUrl, $auth);
+        }
+    }
+
+    /**
+     * Refuses to build a handler that would send credentials over an unencrypted
+     * connection to a host other than the local machine.
+     *
+     * `dispatch()` attaches the `Authorization` header to every request, and
+     * $baseUrl is fixed for the lifetime of the handler — so checking once here
+     * covers every request this handler will ever make.
+     *
+     * Loopback is exempt: a token sent to 127.0.0.1 never reaches a network. That
+     * covers the defaults shipped with this library and the usual local tunnel in
+     * front of a remote instance. For everything else, use `https://`, or pass
+     * `allowInsecureHttp: true` when the transport is already protected by other
+     * means (a VPN, a service mesh, an SSH tunnel on a non-loopback interface).
+     *
+     * The check keys on $auth, so it cannot see credentials that the PSR-18 client
+     * itself adds — a setup the $auth parameter explicitly allows. Those remain the
+     * caller's responsibility.
+     *
+     * @throws InvalidArgumentException If credentials would travel in cleartext.
+     */
+    private static function assertCredentialsAreNotSentInClear(string $baseUrl, ?Auth $auth): void
+    {
+        if ($auth === null) {
+            return;
+        }
+
+        $parts = parse_url($baseUrl);
+
+        if (!is_array($parts) || ($parts['scheme'] ?? null) !== 'http') {
+            return;
+        }
+
+        $host = $parts['host'] ?? '';
+
+        if (self::isLoopbackHost($host)) {
+            return;
+        }
+
+        throw new InvalidArgumentException(sprintf(
+            'Refusing to send Zammad credentials in cleartext to "http://%s". Use https://, or pass '
+            . 'allowInsecureHttp: true (ConnectionConfig(allowInsecureHttp: true)) if the connection '
+            . 'is already protected by other means.',
+            $host,
+        ));
+    }
+
+    /**
+     * Whether the host resolves to the local machine by definition, i.e. without
+     * a DNS lookup: `localhost` and any `.localhost` subdomain (RFC 6761), the
+     * whole 127.0.0.0/8 range, and the IPv6 loopback `::1`.
+     *
+     * A host that merely happens to point at 127.0.0.1 today is not loopback here.
+     * That would require resolving it, and the answer could differ by the time the
+     * request goes out.
+     */
+    private static function isLoopbackHost(string $host): bool
+    {
+        $host = strtolower(trim($host, '[]'));
+
+        if ($host === 'localhost' || str_ends_with($host, '.localhost')) {
+            return true;
+        }
+
+        if (filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
+            return str_starts_with($host, '127.');
+        }
+
+        return in_array($host, ['::1', '0:0:0:0:0:0:0:1'], true);
     }
 
     /**

@@ -93,6 +93,7 @@ final class GuzzleClientFactory implements ClientFactoryInterface
             logger: $config->logger ?? new NullLogger(),
             maxRetries: $config->maxRetries,
             auth: $this->auth,
+            allowInsecureHttp: $config->allowInsecureHttp,
         );
     }
 }
