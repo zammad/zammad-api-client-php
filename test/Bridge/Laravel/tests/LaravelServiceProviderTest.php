@@ -41,6 +41,8 @@ final class LaravelServiceProviderTest extends TestCase
 
     private const PACKAGED_CONFIG = __DIR__ . '/../../../../config/zammad.php';
 
+    private const ROOT_COMPOSER = __DIR__ . '/../../../../composer.json';
+
     /** @var array<string, mixed> */
     private array $serverBackup = [];
 
@@ -194,6 +196,40 @@ final class LaravelServiceProviderTest extends TestCase
             realpath((string) array_key_first($paths)),
         );
         self::assertSame($app->configPath('zammad.php'), reset($paths));
+    }
+
+    public function testPackageDiscoveryPointsAtAnExistingProvider(): void
+    {
+        // Laravel registers the bridge from composer.json's
+        // extra.laravel.providers. That entry is a plain string, and nothing
+        // else in the project reads it: PHPStan does not look at composer.json,
+        // and every test above constructs the provider directly rather than
+        // going through package discovery. A rename or a moved namespace would
+        // therefore leave it pointing at nothing, and the bridge would silently
+        // stop loading in every application that installs this package.
+        $raw = json_decode(
+            (string) file_get_contents(self::ROOT_COMPOSER),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
+
+        $providers = is_array($raw) ? ($raw['extra']['laravel']['providers'] ?? null) : null;
+
+        self::assertIsArray($providers, 'composer.json has no extra.laravel.providers entry');
+        self::assertContains(LaravelServiceProvider::class, $providers);
+
+        foreach ($providers as $provider) {
+            self::assertIsString($provider);
+            self::assertTrue(
+                class_exists($provider),
+                "Auto-discovered provider {$provider} does not exist",
+            );
+            self::assertTrue(
+                is_subclass_of($provider, ServiceProvider::class),
+                "Auto-discovered provider {$provider} is not a ServiceProvider",
+            );
+        }
     }
 
     public function testPackagedConfigDefaultsMatchTheProvider(): void
