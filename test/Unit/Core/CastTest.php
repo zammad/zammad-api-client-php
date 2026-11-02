@@ -11,6 +11,15 @@ use ZammadAPIClient\Core\Cast;
 #[Group('unit')]
 final class CastTest extends TestCase
 {
+    public function testDateTimeReturnsNullForAnUnparsableString(): void
+    {
+        // The class contract says these methods never throw. Before the catch
+        // was widened this only held from PHP 8.3 on, because
+        // DateMalformedStringException does not exist on 8.1 and 8.2 and the
+        // plain Exception escaped instead.
+        self::assertNull(Cast::dateTime(['created_at' => 'not a date at all'], 'created_at'));
+    }
+
     public function testDateTimeParsesIso8601(): void
     {
         $result = Cast::dateTime(['created_at' => '2024-01-15T10:30:00Z'], 'created_at');
