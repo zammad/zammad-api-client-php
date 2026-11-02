@@ -17,7 +17,7 @@ bridge-install: ## Install the isolated bridge test projects (test/Bridge/*)
 	@composer install -d test/Bridge/Laravel --no-interaction
 
 test-bridge: ## Run the Symfony + Laravel bridge suites (needs `make bridge-install`)
-	@for fw in Symfony Laravel; do \
+	@set -e; for fw in Symfony Laravel; do \
 		echo "→ $$fw bridge"; \
 		if [ -f test/Bridge/$$fw/vendor/bin/phpunit ]; then \
 			php -d memory_limit=1G test/Bridge/$$fw/vendor/bin/phpstan analyse -c test/Bridge/$$fw/phpstan.neon.dist --no-progress; \
