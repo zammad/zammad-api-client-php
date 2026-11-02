@@ -1,4 +1,4 @@
-.PHONY: help test test-integration coverage cookbook clean
+.PHONY: help test test-bridge bridge-install test-integration coverage cookbook clean
 
 help: ## Show available make targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
@@ -7,9 +7,25 @@ test: ## Run phpcs, phpstan, phpunit (same as CI)
 	@echo "→ phpcs (PSR-12)"
 	@if [ -f vendor/bin/phpcs ] && [ -d src ]; then vendor/bin/phpcs --standard=PSR12 src/; else echo "  Skip (src/ or vendor/ not present)"; fi
 	@echo "→ phpstan (level=max)"
-	@if [ -f vendor/bin/phpstan ] && [ -d src ]; then vendor/bin/phpstan analyse src/ --level=max; else echo "  Skip (src/ or vendor/ not present)"; fi
+	@if [ -f vendor/bin/phpstan ] && [ -d src ]; then vendor/bin/phpstan analyse --memory-limit=1G; else echo "  Skip (src/ or vendor/ not present)"; fi
 	@echo "→ phpunit (unit suite)"
 	@if [ -f vendor/bin/phpunit ] && [ -d test/Unit ]; then XDEBUG_MODE=off vendor/bin/phpunit --testsuite=unit --no-coverage; else echo "  Skip (test/Unit/ or vendor/ not present)"; fi
+	@$(MAKE) --no-print-directory test-bridge
+
+bridge-install: ## Install the isolated bridge test projects (test/Bridge/*)
+	@composer install -d test/Bridge/Symfony --no-interaction
+	@composer install -d test/Bridge/Laravel --no-interaction
+
+test-bridge: ## Run the Symfony + Laravel bridge suites (needs `make bridge-install`)
+	@for fw in Symfony Laravel; do \
+		echo "→ $$fw bridge"; \
+		if [ -f test/Bridge/$$fw/vendor/bin/phpunit ]; then \
+			php -d memory_limit=1G test/Bridge/$$fw/vendor/bin/phpstan analyse -c test/Bridge/$$fw/phpstan.neon.dist --no-progress; \
+			XDEBUG_MODE=off test/Bridge/$$fw/vendor/bin/phpunit -c test/Bridge/$$fw/phpunit.xml.dist --no-coverage; \
+		else \
+			echo "  Skip (run 'make bridge-install' first)"; \
+		fi; \
+	done
 
 test-integration: ## Run integration tests (needs Zammad instance)
 	@echo "→ Integration test setup"

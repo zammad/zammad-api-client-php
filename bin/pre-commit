@@ -5,7 +5,17 @@ echo "→ phpcs (PSR-12)"
 vendor/bin/phpcs --standard=PSR12 src/
 
 echo "→ phpstan (level=max)"
-vendor/bin/phpstan analyse src/ --level=max
+vendor/bin/phpstan analyse --memory-limit=1G
 
 echo "→ phpunit (unit suite)"
 XDEBUG_MODE=off php vendor/bin/phpunit --testsuite=unit --display-skipped --no-coverage
+
+# The bridges live in isolated Composer projects so that Symfony and Laravel
+# never resolve against each other. Skipped when they are not installed.
+for fw in Symfony Laravel; do
+    if [ -f "test/Bridge/$fw/vendor/bin/phpunit" ]; then
+        echo "→ $fw bridge"
+        php -d memory_limit=1G "test/Bridge/$fw/vendor/bin/phpstan" analyse -c "test/Bridge/$fw/phpstan.neon.dist" --no-progress
+        XDEBUG_MODE=off "test/Bridge/$fw/vendor/bin/phpunit" -c "test/Bridge/$fw/phpunit.xml.dist" --no-coverage
+    fi
+done
