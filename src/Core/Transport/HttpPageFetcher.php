@@ -54,9 +54,11 @@ final class HttpPageFetcher implements PageFetcherInterface
 
         $data = $this->handler->get($this->endpoint, $params);
 
+        $fields = ResponseParser::fields($data);
+
         return $isSearch
-            ? $this->extractSearchResults($data)
-            : $this->extractIndexResults($data);
+            ? $this->extractSearchResults($fields)
+            : $this->extractIndexResults($fields);
     }
 
     /**
@@ -92,16 +94,34 @@ final class HttpPageFetcher implements PageFetcherInterface
     }
 
     /**
-     * @param array<int, array<string, mixed>> $items
+     * Hydrates whatever item arrays are in $items, ignoring everything else.
+     *
+     * The parameter is deliberately as loose as the method's own filtering:
+     * search responses hand over a raw `records` value, and claiming a narrower
+     * type here would only move the unchecked cast to the caller.
+     *
+     * @param array<array-key, mixed> $items
      * @return list<T>
      */
     private function hydrateItems(array $items): array
     {
+        $hydrated = [];
+
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            $fields = [];
+            foreach ($item as $key => $value) {
+                $fields[(string) $key] = $value;
+            }
+
+            $hydrated[] = $this->dtoClass::fromArray($fields);
+        }
+
         /** @var list<T> */
-        return array_map(
-            fn(array $item): DTOInterface => $this->dtoClass::fromArray($item),
-            array_values(array_filter($items, 'is_array')),
-        );
+        return $hydrated;
     }
 
     private function inferListKey(): string

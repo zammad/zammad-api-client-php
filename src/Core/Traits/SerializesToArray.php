@@ -84,14 +84,26 @@ trait SerializesToArray
         $vars = get_object_vars($this);
         foreach ($vars as $key => $value) {
             if ($value !== null && $key !== 'customFields') {
-                $result[$key] = $value instanceof DateTimeImmutable ? $value->format('c') : $value;
+                // get_object_vars() is typed array<array-key, mixed>: a numeric
+                // property name would come back as an int key. Promoted readonly
+                // properties cannot be numeric, but the trait is generic, so the
+                // cast keeps the declared array<string, mixed> true either way.
+                $result[(string) $key] = $value instanceof DateTimeImmutable
+                    ? $value->format('c')
+                    : $value;
             }
         }
 
         if (array_key_exists('customFields', $vars) && is_array($vars['customFields'])) {
             foreach ($vars['customFields'] as $k => $v) {
-                if (!in_array($k, self::serverReadOnlyKeys(), true)) {
-                    $result[$k] = $v;
+                // Zammad field names are strings, but a plain array permits
+                // integer keys. Casting keeps the declared array<string, mixed>
+                // honest and makes the strict in_array() below meaningful for
+                // keys that arrived as integers.
+                $key = (string) $k;
+
+                if (!in_array($key, self::serverReadOnlyKeys(), true)) {
+                    $result[$key] = $v;
                 }
             }
         }

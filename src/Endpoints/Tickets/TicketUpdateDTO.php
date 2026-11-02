@@ -49,7 +49,16 @@ final class TicketUpdateDTO implements PatchableInterface
      */
     public function toPatchArray(): array
     {
-        $vars = get_object_vars($this);
-        return array_filter($vars, fn($v) => $v !== null);
+        $result = [];
+
+        // See the note in SerializesToArray::toArray(): get_object_vars() does
+        // not guarantee string keys, so build the array rather than filtering it.
+        foreach (get_object_vars($this) as $key => $value) {
+            if ($value !== null) {
+                $result[(string) $key] = $value;
+            }
+        }
+
+        return $result;
     }
 }

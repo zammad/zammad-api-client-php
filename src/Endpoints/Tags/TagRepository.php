@@ -7,6 +7,7 @@ namespace ZammadAPIClient\Endpoints\Tags;
 use Generator;
 use InvalidArgumentException;
 use ZammadAPIClient\Core\Repository\AbstractRepository;
+use ZammadAPIClient\Core\Repository\ResponseParser;
 
 /**
  * Repository for the `/api/v1/tags` endpoint.
@@ -83,7 +84,20 @@ final class TagRepository extends AbstractRepository
         );
 
         return array_map(
-            fn($v) => is_string($v) ? ['value' => $v] : $v,
+            static function (mixed $v): array {
+                if (is_string($v)) {
+                    return ['value' => $v];
+                }
+
+                // Tag payloads arrive as array<array-key, mixed>; re-key so the
+                // declared array<string, mixed> item shape holds.
+                $item = [];
+                foreach ((array) $v as $key => $value) {
+                    $item[(string) $key] = $value;
+                }
+
+                return $item;
+            },
             $filtered,
         );
     }
@@ -127,11 +141,11 @@ final class TagRepository extends AbstractRepository
         int $objectId,
         string $tag,
     ): array {
-        return $this->handler->post('tags/add', [
+        return ResponseParser::fields($this->handler->post('tags/add', [
             'object' => $objectType,
             'o_id' => $objectId,
             'item' => $tag,
-        ]);
+        ]));
     }
 
     /**
@@ -157,7 +171,7 @@ final class TagRepository extends AbstractRepository
             'item' => $tag,
         ]);
 
-        return $this->handler->delete($uri);
+        return ResponseParser::fields($this->handler->delete($uri));
     }
 
     /**
@@ -174,6 +188,6 @@ final class TagRepository extends AbstractRepository
      */
     public function tagSearch(string $term): array
     {
-        return $this->handler->get('tag_search', ['term' => $term]);
+        return ResponseParser::fields($this->handler->get('tag_search', ['term' => $term]));
     }
 }

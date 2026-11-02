@@ -87,7 +87,7 @@ abstract class AbstractRepository implements RepositoryInterface
     public function find(int $id): DTOInterface
     {
         return $this->dtoClass::fromArray(
-            $this->handler->get("{$this->resourcePath}/{$id}", ['expand' => 'true']),
+            ResponseParser::fields($this->handler->get("{$this->resourcePath}/{$id}", ['expand' => 'true'])),
         );
     }
 
@@ -198,7 +198,7 @@ abstract class AbstractRepository implements RepositoryInterface
             'per_page' => (string) $perPage,
         ]);
 
-        return $this->hydrateList($this->handler->get($this->resourcePath, $params));
+        return $this->hydrateList(ResponseParser::fields($this->handler->get($this->resourcePath, $params)));
     }
 
     /**
@@ -217,7 +217,7 @@ abstract class AbstractRepository implements RepositoryInterface
             'per_page' => (string) $perPage,
         ]);
 
-        return $this->hydrateList($this->handler->get("{$this->resourcePath}/search", $params));
+        return $this->hydrateList(ResponseParser::fields($this->handler->get("{$this->resourcePath}/search", $params)));
     }
 
     /**
@@ -247,7 +247,7 @@ abstract class AbstractRepository implements RepositoryInterface
 
         do {
             $params = array_merge($query, ['page' => (string) $page, 'per_page' => (string) $this->pageSize]);
-            $items = $this->extractItems($this->handler->get($endpoint, $params), $listKey);
+            $items = $this->extractItems(ResponseParser::fields($this->handler->get($endpoint, $params)), $listKey);
 
             foreach ($items as $item) {
                 yield $dtoClass::fromArray($item);
@@ -317,7 +317,9 @@ abstract class AbstractRepository implements RepositoryInterface
      */
     public function create(DTOInterface $dto): DTOInterface
     {
-        return $this->dtoClass::fromArray($this->handler->post($this->resourcePath, $dto->toArray()));
+        return $this->dtoClass::fromArray(
+            ResponseParser::fields($this->handler->post($this->resourcePath, $dto->toArray())),
+        );
     }
 
     /**
@@ -346,13 +348,23 @@ abstract class AbstractRepository implements RepositoryInterface
             $body = $changes->toArray();
         } elseif ($changes instanceof PatchableInterface) {
             $body = $changes->toPatchArray();
-        } elseif (is_object($changes)) {
-            $body = array_filter(get_object_vars($changes), fn($v) => $v !== null);
         } else {
-            $body = array_filter($changes, fn($v) => $v !== null);
+            // get_object_vars() and a caller-supplied array are both typed
+            // array<array-key, mixed>; rebuild with string keys so the declared
+            // body type holds. See SerializesToArray::toArray().
+            $body = [];
+            $source = is_object($changes) ? get_object_vars($changes) : $changes;
+
+            foreach ($source as $key => $value) {
+                if ($value !== null) {
+                    $body[(string) $key] = $value;
+                }
+            }
         }
 
-        return $this->dtoClass::fromArray($this->handler->put("{$this->resourcePath}/{$id}", $body));
+        return $this->dtoClass::fromArray(
+            ResponseParser::fields($this->handler->put("{$this->resourcePath}/{$id}", $body)),
+        );
     }
 
     /**
