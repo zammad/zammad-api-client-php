@@ -432,6 +432,9 @@ and [`examples/cookbook/09-symfony.php`](examples/cookbook/09-symfony.php).
 
 ### Laravel
 
+Supported: **Laravel 12 and 13**. Each of those is exercised in CI — see the
+`unit` job in [`.github/workflows/tests.yml`](.github/workflows/tests.yml).
+
 The service provider is auto-discovered (Laravel 5.5+). Publish the config and set
 your credentials in `.env`:
 
@@ -462,10 +465,23 @@ class TicketController
 // Or resolve manually: app(ZammadClient::class)
 ```
 
+The packaged config is merged automatically, so `ZAMMAD_URL` and `ZAMMAD_TOKEN`
+from `.env` work without publishing anything — and they keep working under
+`php artisan config:cache`, because the environment is read while the config is
+built rather than while the client is resolved.
+
+A published `config/zammad.php` takes precedence over the environment. An empty
+`url` there falls back to the built-in default; an empty `token` is an error —
+resolving `ZammadClient` then throws
+`InvalidArgumentException: API token must not be empty.`
+
 For older Laravel versions, register `ZammadAPIClient\Bridge\LaravelServiceProvider::class`
 in `config/app.php` manually.
 
 ### Symfony
+
+Supported: **Symfony 6.4 LTS, 7.x and 8.x**. Each of those is exercised in CI —
+see the `unit` job in [`.github/workflows/tests.yml`](.github/workflows/tests.yml).
 
 Register the bundle in `config/bundles.php`:
 
@@ -480,6 +496,11 @@ zammad:
     url: '%env(ZAMMAD_URL)%'
     token: '%env(ZAMMAD_TOKEN)%'
 ```
+
+The client is registered as a lazy service, so the container compiles whether or
+not credentials are present. A missing or empty token surfaces the first time
+something resolves `ZammadClient`, as
+`InvalidArgumentException: API token must not be empty.`
 
 Then type-hint `ZammadClient` in any service — autowiring injects the shared instance:
 
@@ -772,6 +793,27 @@ make test-integration # Integration tests (requires a running Zammad instance)
 ### Unit tests
 
 No environment variables needed. Unit tests mock the HTTP layer and run fully isolated.
+
+### Framework bridge tests
+
+The Laravel and Symfony bridges are tested from **separate Composer projects** under
+[`test/Bridge/`](test/Bridge), each with its own `vendor/`:
+
+```bash
+make bridge-install   # one-time: installs both bridge projects
+make test-bridge      # PHPStan (level max) + PHPUnit for both bridges
+```
+
+`make test` runs them too, and skips them with a hint when they are not installed.
+
+They are separate projects on purpose. Resolved together, the two frameworks
+deadlock: every Laravel release that tolerates PHPUnit 11 requires
+`symfony/http-kernel ^7` or newer, so a single lock file could never cover
+Symfony 6.4. Separate projects also keep the frameworks out of the root
+`require-dev`, so `composer install` for day-to-day work stays small.
+
+No Zammad instance and no HTTP traffic are involved — these exercise container
+wiring only.
 
 ### Integration tests
 
