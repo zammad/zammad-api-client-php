@@ -123,6 +123,12 @@ final class SymfonyBundle extends Bundle
                 $container->setAlias('zammad_client', ZammadClient::class)->setPublic(true);
             }
 
+            /**
+             * Required by ExtensionInterface up to Symfony 7.x, where an empty
+             * string means "no XML namespace". Symfony 8 dropped both this and
+             * getXsdValidationBasePath() from the interface; they are kept only
+             * for 6.4 and 7.x and can go once those are no longer supported.
+             */
             public function getNamespace(): string
             {
                 return '';
