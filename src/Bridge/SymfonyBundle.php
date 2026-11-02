@@ -67,6 +67,18 @@ use ZammadAPIClient\ZammadClient;
  * // $container->get('zammad_client')->ticket()->all();
  * ```
  *
+ * **Configuration precedence**
+ *
+ * 1. `config/packages/zammad.yaml` values
+ * 2. `ZAMMAD_URL` / `ZAMMAD_TOKEN` environment variables (`.env`)
+ * 3. Built-in default URL (`http://127.0.0.1:8098`)
+ *
+ * A token is required: there is no usable default for it. The client is
+ * registered as a lazy definition, so nothing is instantiated while the
+ * container is compiled — a missing token surfaces the first time something
+ * asks the container for {@see ZammadClient}, as an `InvalidArgumentException`
+ * from {@see Auth::token()}. This matches {@see LaravelServiceProvider}.
+ *
  * @see ZammadClient::create()
  */
 final class SymfonyBundle extends Bundle
@@ -87,9 +99,10 @@ final class SymfonyBundle extends Bundle
                 }
 
                 $container->setParameter('zammad.default_url', 'http://127.0.0.1:8098');
+                $container->setParameter('zammad.default_token', '');
 
                 $url   = $resolved['url']   ?? '%env(default:zammad.default_url:ZAMMAD_URL)%';
-                $token = $resolved['token'] ?? '%env(ZAMMAD_TOKEN)%';
+                $token = $resolved['token'] ?? '%env(default:zammad.default_token:ZAMMAD_TOKEN)%';
 
                 $auth = (new Definition(Auth::class))
                     ->setFactory([Auth::class, 'token'])
