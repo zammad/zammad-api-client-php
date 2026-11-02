@@ -29,7 +29,7 @@ interface RequestHandlerInterface
      * PSR-18 client, which allows setting custom headers or timeouts per call.
      *
      * @param array<string, mixed> $options  PSR-18 client options (e.g. `['json' => [...]]`).
-     * @return array<string, mixed>          JSON-decoded response body.
+     * @return array<array-key, mixed>          JSON-decoded response body.
      * @throws \ZammadAPIClient\Exceptions\AuthenticationException For 401 responses.
      * @throws \ZammadAPIClient\Exceptions\NotFoundException       For 404 responses.
      * @throws \ZammadAPIClient\Exceptions\ValidationException     For 422 responses.
@@ -59,7 +59,7 @@ interface RequestHandlerInterface
      * Performs a GET request and returns the decoded JSON body.
      *
      * @param array<string, mixed> $query URL query parameters appended to the URI.
-     * @return array<string, mixed>
+     * @return array<array-key, mixed>
      */
     public function get(string $uri, array $query = []): array;
 
@@ -67,7 +67,7 @@ interface RequestHandlerInterface
      * Performs a POST request with a JSON body and returns the decoded response.
      *
      * @param array<string, mixed> $body Request payload; serialised to JSON automatically.
-     * @return array<string, mixed>
+     * @return array<array-key, mixed>
      */
     public function post(string $uri, array $body = []): array;
 
@@ -75,7 +75,7 @@ interface RequestHandlerInterface
      * Performs a PUT request with a JSON body and returns the decoded response.
      *
      * @param array<string, mixed> $body Request payload; serialised to JSON automatically.
-     * @return array<string, mixed>
+     * @return array<array-key, mixed>
      */
     public function put(string $uri, array $body = []): array;
 
@@ -85,7 +85,7 @@ interface RequestHandlerInterface
      * Zammad's DELETE endpoints return the deleted resource's data, which
      * callers may use to confirm the operation.
      *
-     * @return array<string, mixed>
+     * @return array<array-key, mixed>
      */
     public function delete(string $uri): array;
 

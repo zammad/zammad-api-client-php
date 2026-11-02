@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Endpoints\TextModules;
 
-use ZammadAPIClient\Core\Repository\AbstractRepository;
 use ZammadAPIClient\Core\Contracts\DeletableInterface;
+use ZammadAPIClient\Core\Repository\AbstractRepository;
+use ZammadAPIClient\Core\Repository\ResponseParser;
 
 /**
  * Repository for the `/api/v1/text_modules` endpoint.
@@ -30,6 +31,6 @@ final class TextModuleRepository extends AbstractRepository implements Deletable
      */
     public function import(string $csv): array
     {
-        return $this->handler->post("{$this->resourcePath}/import", ['data' => $csv]);
+        return ResponseParser::fields($this->handler->post("{$this->resourcePath}/import", ['data' => $csv]));
     }
 }

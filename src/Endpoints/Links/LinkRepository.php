@@ -6,6 +6,7 @@ namespace ZammadAPIClient\Endpoints\Links;
 
 use InvalidArgumentException;
 use ZammadAPIClient\Core\Repository\AbstractRepository;
+use ZammadAPIClient\Core\Repository\ResponseParser;
 
 /**
  * Repository for the `/api/v1/links` endpoint.
@@ -71,13 +72,13 @@ final class LinkRepository extends AbstractRepository
         string $targetType,
         int $targetId,
     ): array {
-        return $this->handler->post('links/add', [
+        return ResponseParser::fields($this->handler->post('links/add', [
             'link_type'                  => $linkType,
             'link_object_source'         => $sourceType,
             'link_object_source_number'  => $sourceNumber,
             'link_object_target'         => $targetType,
             'link_object_target_value'   => $targetId,
-        ]);
+        ]));
     }
 
     /**
@@ -110,6 +111,6 @@ final class LinkRepository extends AbstractRepository
             'link_object_target_value'   => $targetId,
         ]);
 
-        return $this->handler->delete($uri);
+        return ResponseParser::fields($this->handler->delete($uri));
     }
 }

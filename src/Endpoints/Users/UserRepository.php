@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Endpoints\Users;
 
-use ZammadAPIClient\Core\Repository\AbstractRepository;
 use ZammadAPIClient\Core\Contracts\DeletableInterface;
+use ZammadAPIClient\Core\Repository\AbstractRepository;
+use ZammadAPIClient\Core\Repository\ResponseParser;
 
 /**
  * Repository for the `/api/v1/users` endpoint.
@@ -36,7 +37,7 @@ final class UserRepository extends AbstractRepository implements DeletableInterf
      */
     public function import(string $csv): array
     {
-        return $this->handler->post("{$this->resourcePath}/import", ['data' => $csv]);
+        return ResponseParser::fields($this->handler->post("{$this->resourcePath}/import", ['data' => $csv]));
     }
 
     public function delete(int $id): void

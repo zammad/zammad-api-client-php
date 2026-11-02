@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ZammadAPIClient\Core\Transport;
 
 use InvalidArgumentException;
+use JsonException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -14,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use ZammadAPIClient\Core\Auth;
 use ZammadAPIClient\Core\Contracts\RequestHandlerInterface;
+use ZammadAPIClient\Core\Repository\ResponseParser;
 use ZammadAPIClient\Exceptions\AuthenticationException;
 use ZammadAPIClient\Exceptions\BadRequestException;
 use ZammadAPIClient\Exceptions\ForbiddenException;
@@ -23,7 +25,6 @@ use ZammadAPIClient\Exceptions\RateLimitException;
 use ZammadAPIClient\Exceptions\ServerErrorException;
 use ZammadAPIClient\Exceptions\ValidationException;
 use ZammadAPIClient\Exceptions\ZammadException;
-use JsonException;
 
 /**
  * Concrete PSR-18 based HTTP transport for the Zammad REST API.
@@ -197,7 +198,7 @@ final class RequestHandler implements RequestHandlerInterface
      * Zammad DELETE endpoints return 200 with no body).
      *
      * @param array<string, mixed> $options Raw PSR-18 options forwarded verbatim to the HTTP client.
-     * @return array<string, mixed>
+     * @return array<array-key, mixed>
      */
     public function request(
         string $method,
@@ -252,7 +253,7 @@ final class RequestHandler implements RequestHandlerInterface
      * appended to the URI; they are not sent as a request body.
      *
      * @param array<string, mixed> $query URL query parameters.
-     * @return array<string, mixed>
+     * @return array<array-key, mixed>
      */
     public function get(string $uri, array $query = []): array
     {
@@ -270,7 +271,7 @@ final class RequestHandler implements RequestHandlerInterface
      * Use this for resource creation (Zammad convention: POST → 201 or 200 with body).
      *
      * @param array<string, mixed> $body Payload fields; serialised to JSON automatically.
-     * @return array<string, mixed>
+     * @return array<array-key, mixed>
      */
     public function post(string $uri, array $body = []): array
     {
@@ -287,7 +288,7 @@ final class RequestHandler implements RequestHandlerInterface
      * (patch), since Zammad uses PUT for both semantics.
      *
      * @param array<string, mixed> $body Payload fields; serialised to JSON automatically.
-     * @return array<string, mixed>
+     * @return array<array-key, mixed>
      */
     public function put(string $uri, array $body = []): array
     {
@@ -303,7 +304,7 @@ final class RequestHandler implements RequestHandlerInterface
      * Zammad's API returns the deleted resource's state in the response body,
      * which can be used as a confirmation receipt. An empty body returns `[]`.
      *
-     * @return array<string, mixed>
+     * @return array<array-key, mixed>
      */
     public function delete(string $uri): array
     {
@@ -333,11 +334,22 @@ final class RequestHandler implements RequestHandlerInterface
 
             if (isset($options['headers']) && is_array($options['headers'])) {
                 foreach ($options['headers'] as $name => $value) {
-                    $request = $request->withHeader($name, $value);
+                    // PSR-7 accepts string|array<string>. Passing anything else
+                    // raises an InvalidArgumentException from inside the message
+                    // implementation, which names the transport rather than the
+                    // caller's own input, so coerce what can be coerced.
+                    if (is_scalar($value)) {
+                        $request = $request->withHeader((string) $name, (string) $value);
+                    } elseif (is_array($value)) {
+                        $request = $request->withHeader(
+                            (string) $name,
+                            array_map(static fn(mixed $v): string => is_scalar($v) ? (string) $v : '', $value),
+                        );
+                    }
                 }
             }
 
-            if (isset($options['body']) && $options['body'] !== null) {
+            if (isset($options['body'])) {
                 $body = is_string($options['body'])
                     ? $options['body']
                     : json_encode($options['body'], JSON_THROW_ON_ERROR);
@@ -388,7 +400,7 @@ final class RequestHandler implements RequestHandlerInterface
     {
         return new ValidationException(
             $this->extractErrorMessage($raw) ?? $this->extractValidationMessage($raw),
-            $this->extractValidationErrors($this->decodeLenient($raw)),
+            $this->extractValidationErrors(ResponseParser::fields($this->decodeLenient($raw))),
         );
     }
 
@@ -442,7 +454,7 @@ final class RequestHandler implements RequestHandlerInterface
         return 'Validation failed — ' . substr($raw, 0, 200);
     }
 
-    /** @return array<string, mixed> */
+    /** @return array<array-key, mixed> */
     private function decodeLenient(string $body): array
     {
         if ($body === '') {

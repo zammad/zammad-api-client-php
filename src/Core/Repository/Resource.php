@@ -131,7 +131,7 @@ final class Resource
             return $this;
         }
 
-        $this->attributes = array_merge($this->attributes, $data);
+        $this->attributes = array_merge($this->attributes, ResponseParser::fields($data));
         $this->dto = $this->dto::fromArray($this->attributes);
         $this->changes = [];
         $this->newRecord = false;

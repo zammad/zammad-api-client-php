@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Endpoints\Organizations;
 
-use ZammadAPIClient\Core\Repository\AbstractRepository;
 use ZammadAPIClient\Core\Contracts\DeletableInterface;
+use ZammadAPIClient\Core\Repository\AbstractRepository;
+use ZammadAPIClient\Core\Repository\ResponseParser;
 
 /**
  * Repository for the `/api/v1/organizations` endpoint.
@@ -33,7 +34,7 @@ final class OrganizationRepository extends AbstractRepository implements Deletab
      */
     public function import(string $csv): array
     {
-        return $this->handler->post("{$this->resourcePath}/import", ['data' => $csv]);
+        return ResponseParser::fields($this->handler->post("{$this->resourcePath}/import", ['data' => $csv]));
     }
 
     public function delete(int $id): void

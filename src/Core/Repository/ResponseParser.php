@@ -18,6 +18,30 @@ namespace ZammadAPIClient\Core\Repository;
 final class ResponseParser
 {
     /**
+     * Narrows a decoded response body to the string-keyed shape DTOs expect.
+     *
+     * A JSON object decodes to string keys, but a decoded body is typed
+     * `array<array-key, mixed>` because Zammad answers some endpoints with a
+     * top-level JSON array, which decodes to integer keys. Single-resource
+     * endpoints always answer with an object, so this states that expectation
+     * at the one place it is made instead of asserting it silently at each
+     * call site.
+     *
+     * @param array<array-key, mixed> $data
+     * @return array<string, mixed>
+     */
+    public static function fields(array $data): array
+    {
+        $fields = [];
+
+        foreach ($data as $key => $value) {
+            $fields[(string) $key] = $value;
+        }
+
+        return $fields;
+    }
+
+    /**
      * Extracts item arrays from an API response.
      *
      * @param array<string, mixed> $data   Raw JSON-decoded API response.
