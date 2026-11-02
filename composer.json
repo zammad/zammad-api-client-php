@@ -24,12 +24,12 @@
         "squizlabs/php_codesniffer": "^4.0"
     },
     "suggest": {
-        "symfony/http-client": "Alternative PSR-18 transport",
-        "symfony/serializer": "Alternative DTO hydration (replaces manual fromArray)",
-        "symfony/cache": "PSR-6/16 cache for response caching",
-        "illuminate/support": "Laravel ServiceProvider integration",
-        "symfony/dependency-injection": "Symfony DI container integration",
-        "symfony/http-kernel": "Symfony Bundle integration"
+        "symfony/http-client": "^6.4 || ^7.0 || ^8.0 — alternative PSR-18 transport",
+        "symfony/serializer": "^6.4 || ^7.0 || ^8.0 — alternative DTO hydration (replaces manual fromArray)",
+        "symfony/cache": "^6.4 || ^7.0 || ^8.0 — PSR-6/16 cache for response caching",
+        "illuminate/support": "^12.0 || ^13.0 — Laravel ServiceProvider integration",
+        "symfony/dependency-injection": "^6.4 || ^7.0 || ^8.0 — Symfony Bundle integration",
+        "symfony/http-kernel": "^6.4 || ^7.0 || ^8.0 — Symfony Bundle integration"
     },
     "autoload": {
         "psr-4": { "ZammadAPIClient\\": "src/" }
@@ -40,10 +40,18 @@
     "scripts": {
         "cs": "phpcs",
         "cs:fix": "phpcbf",
-        "stan": "phpstan analyse src/ --level=max",
+        "stan": "phpstan analyse --memory-limit=1G",
         "test": "XDEBUG_MODE=off php vendor/bin/phpunit --testsuite=unit --no-coverage",
         "test:coverage": "php -d xdebug.mode=coverage vendor/bin/phpunit --testsuite=unit",
         "test:integration": "phpunit --testsuite=integration --group=integration",
+        "bridge:install": [
+            "composer install -d test/Bridge/Symfony --no-interaction",
+            "composer install -d test/Bridge/Laravel --no-interaction"
+        ],
+        "test:bridge": [
+            "XDEBUG_MODE=off test/Bridge/Symfony/vendor/bin/phpunit -c test/Bridge/Symfony/phpunit.xml.dist --no-coverage",
+            "XDEBUG_MODE=off test/Bridge/Laravel/vendor/bin/phpunit -c test/Bridge/Laravel/phpunit.xml.dist --no-coverage"
+        ],
         "post-install-cmd": [
             "php bin/install-git-hooks"
         ],
