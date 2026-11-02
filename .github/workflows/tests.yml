@@ -7,29 +7,128 @@ on:
 
 jobs:
   unit:
+    name: "Unit / PHP ${{ matrix.php }}"
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # No PHP 8.1 leg even though the library supports 8.1: PHPUnit 11
+        # requires PHP >= 8.2.
+        php: ["8.2", "8.3", "8.4"]
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.3"
+          php-version: "${{ matrix.php }}"
           extensions: xdebug
-      - run: composer install --no-interaction
-      - run: composer dump-autoload
+      - run: composer update --no-interaction
       - run: |
           if [ -d src ]; then vendor/bin/phpcs --standard=PSR12 src/; else echo "→ Skip (src/ not yet present)"; fi
       - run: |
-          if [ -d src ]; then vendor/bin/phpstan analyse src/ --level=max; else echo "→ Skip (src/ not yet present)"; fi
+          if [ -d src ]; then vendor/bin/phpstan analyse --memory-limit=1G; else echo "→ Skip (src/ not yet present)"; fi
       - run: |
           if [ -d test/Unit ]; then XDEBUG_MODE=coverage vendor/bin/phpunit --testsuite=unit --display-skipped --log-junit junit.xml; else echo "→ Skip (test/Unit/ not yet present)"; fi
       - name: Upload test artifacts
-        if: always()
+        if: always() && matrix.php == '8.3'
         uses: actions/upload-artifact@v7
         with:
           name: unit-test-results
           path: |
             junit.xml
             build/coverage/
+          if-no-files-found: ignore
+
+  # The two bridges are tested from isolated Composer projects under
+  # test/Bridge/, each with its own vendor tree, and therefore as separate jobs.
+  # Resolved together the frameworks deadlock: every Laravel release that
+  # tolerates PHPUnit 11 requires symfony/http-kernel ^7 or newer, so a single
+  # lock file could never also cover Symfony 6.4. Separate projects mean each
+  # axis gets the versions it needs without multiplying the other one's legs.
+  bridge-symfony:
+    name: "Symfony bridge / SF ${{ matrix.symfony }} / PHP ${{ matrix.php }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - symfony: "^6.4"
+            php: "8.2"
+          # ~7.0.0, not ^7.0: the latter resolves to 7.4 and duplicates the
+          # leg below instead of exercising the floor of the declared range.
+          - symfony: "~7.0.0"
+            php: "8.2"
+          - symfony: "^7.4"
+            php: "8.3"
+          - symfony: "^8.0"
+            php: "8.4"   # symfony 8 requires PHP >= 8.4.1
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "${{ matrix.php }}"
+          extensions: xdebug
+      - name: Install bridge project
+        run: |
+          composer require --dev --no-update --no-interaction -d test/Bridge/Symfony \
+            "symfony/config:${{ matrix.symfony }}" \
+            "symfony/dependency-injection:${{ matrix.symfony }}" \
+            "symfony/http-kernel:${{ matrix.symfony }}"
+          composer update --no-interaction -d test/Bridge/Symfony
+      - name: Static analysis
+        run: php -d memory_limit=1G test/Bridge/Symfony/vendor/bin/phpstan analyse -c test/Bridge/Symfony/phpstan.neon.dist --no-progress
+      - name: Tests
+        run: XDEBUG_MODE=coverage test/Bridge/Symfony/vendor/bin/phpunit -c test/Bridge/Symfony/phpunit.xml.dist --display-skipped --log-junit junit.xml
+      - name: Upload test artifacts
+        if: always() && matrix.symfony == '^7.4'
+        uses: actions/upload-artifact@v7
+        with:
+          name: bridge-symfony-test-results
+          path: |
+            junit.xml
+            test/Bridge/Symfony/build/
+          if-no-files-found: ignore
+
+  bridge-laravel:
+    name: "Laravel bridge / Laravel ${{ matrix.laravel }} / PHP ${{ matrix.php }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Laravel 10 and 11 are absent on purpose. 10 declares
+          # `conflict: phpunit/phpunit >=11.0.0`, and every 11.x release is
+          # covered by an unfixed security advisory (PKSA-mdq4-51ck-6kdq,
+          # affecting >=11.0.0,<12.0.0), so Composer's audit refuses to install
+          # one at all.
+          - laravel: "^12.0"
+            php: "8.2"
+          - laravel: "^12.0"
+            php: "8.3"
+          - laravel: "^13.0"
+            php: "8.4"   # laravel 13 requires PHP ^8.3
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "${{ matrix.php }}"
+          extensions: xdebug
+      - name: Install bridge project
+        run: |
+          composer require --dev --no-update --no-interaction -d test/Bridge/Laravel \
+            "laravel/framework:${{ matrix.laravel }}"
+          composer update --no-interaction -d test/Bridge/Laravel
+      - name: Static analysis
+        run: php -d memory_limit=1G test/Bridge/Laravel/vendor/bin/phpstan analyse -c test/Bridge/Laravel/phpstan.neon.dist --no-progress
+      - name: Tests
+        run: XDEBUG_MODE=coverage test/Bridge/Laravel/vendor/bin/phpunit -c test/Bridge/Laravel/phpunit.xml.dist --display-skipped --log-junit junit.xml
+      - name: Upload test artifacts
+        if: always() && matrix.laravel == '^12.0'
+        uses: actions/upload-artifact@v7
+        with:
+          name: bridge-laravel-test-results
+          path: |
+            junit.xml
+            test/Bridge/Laravel/build/
           if-no-files-found: ignore
 
   integration:
