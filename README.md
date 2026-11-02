@@ -497,10 +497,17 @@ zammad:
     token: '%env(ZAMMAD_TOKEN)%'
 ```
 
+The file is optional — leave it out and the bundle reads `ZAMMAD_URL` and
+`ZAMMAD_TOKEN` itself, falling back to `http://127.0.0.1:8098` for the URL.
+
 The client is registered as a lazy service, so the container compiles whether or
-not credentials are present. A missing or empty token surfaces the first time
-something resolves `ZammadClient`, as
-`InvalidArgumentException: API token must not be empty.`
+not credentials are present; a missing token surfaces the first time something
+resolves `ZammadClient`. Which error you get depends on the form above. With the
+`token` key omitted the bundle supplies an empty default, so you get
+`InvalidArgumentException: API token must not be empty.` — with an explicit
+`%env(ZAMMAD_TOKEN)%` Symfony itself raises
+`EnvNotFoundException: Environment variable not found: "ZAMMAD_TOKEN".` before
+the client is ever built.
 
 Then type-hint `ZammadClient` in any service — autowiring injects the shared instance:
 

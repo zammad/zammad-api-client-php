@@ -76,8 +76,12 @@ use ZammadAPIClient\ZammadClient;
  * A token is required: there is no usable default for it. The client is
  * registered as a lazy definition, so nothing is instantiated while the
  * container is compiled — a missing token surfaces the first time something
- * asks the container for {@see ZammadClient}, as an `InvalidArgumentException`
- * from {@see Auth::token()}. This matches {@see LaravelServiceProvider}.
+ * asks the container for {@see ZammadClient}. Which error that is depends on
+ * the configuration: omit the `token` key and this bundle's empty default makes
+ * {@see Auth::token()} raise an `InvalidArgumentException`, matching
+ * {@see LaravelServiceProvider}; keep the explicit `%env(ZAMMAD_TOKEN)%` shown
+ * above and Symfony raises `EnvNotFoundException` first, before the client is
+ * ever built.
  *
  * @see ZammadClient::create()
  */
