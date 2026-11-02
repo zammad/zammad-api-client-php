@@ -122,7 +122,9 @@ jobs:
       - name: Tests
         run: XDEBUG_MODE=coverage test/Bridge/Laravel/vendor/bin/phpunit -c test/Bridge/Laravel/phpunit.xml.dist --display-skipped --log-junit junit.xml
       - name: Upload test artifacts
-        if: always() && matrix.laravel == '^12.0'
+        # Both Laravel 12 legs would otherwise match and upload under the same
+        # name; v7 permits that, leaving two indistinguishable artifacts.
+        if: always() && matrix.laravel == '^12.0' && matrix.php == '8.3'
         uses: actions/upload-artifact@v7
         with:
           name: bridge-laravel-test-results
