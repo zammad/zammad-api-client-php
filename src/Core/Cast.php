@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ZammadAPIClient\Core;
 
 use DateTimeImmutable;
-use DateMalformedStringException;
+use Exception;
 
 /**
  * Stateless scalar coercions for hydrating DTOs from lenient API payloads.
@@ -42,7 +42,11 @@ final class Cast
 
         try {
             return new DateTimeImmutable($value);
-        } catch (DateMalformedStringException) {
+        } catch (Exception) {
+            // Not DateMalformedStringException: that class only exists from PHP
+            // 8.3 on, so catching it would leave this method throwing on 8.1 and
+            // 8.2 — both of which this library supports. From 8.3 on it extends
+            // Exception, so the behaviour there is unchanged.
             return null;
         }
     }
