@@ -87,7 +87,7 @@ use ZammadAPIClient\ZammadClient;
  */
 final class SymfonyBundle extends Bundle
 {
-    public function getContainerExtension(): ?ExtensionInterface
+    public function getContainerExtension(): ExtensionInterface
     {
         return new class implements ExtensionInterface {
             /**

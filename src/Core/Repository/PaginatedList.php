@@ -64,10 +64,6 @@ final class PaginatedList implements ArrayAccess, Countable, Iterator
     /** @return T|null */
     public function offsetGet(mixed $offset): mixed
     {
-        if (!is_int($offset)) {
-            return null;
-        }
-
         $page = (int) floor($offset / $this->perPage) + 1;
         $index = $offset % $this->perPage;
 
@@ -78,10 +74,6 @@ final class PaginatedList implements ArrayAccess, Countable, Iterator
 
     public function offsetExists(mixed $offset): bool
     {
-        if (!is_int($offset)) {
-            return false;
-        }
-
         $page = (int) floor($offset / $this->perPage) + 1;
 
         if (!isset($this->pageCache[$page])) {
