@@ -24,9 +24,13 @@ use ZammadAPIClient\ZammadClient;
  * surfaces — only exists once Laravel's container resolves the binding.
  *
  * No Zammad instance and no HTTP traffic are involved. `config()` reads from a
- * {@see Repository} bound into the test application; `env()` reads from
- * `$_SERVER`, which {@see setUp} snapshots and {@see tearDown} restores, so the
- * process-global state these helpers depend on does not leak between cases.
+ * {@see Repository} bound into the test application; `env()` goes through
+ * phpdotenv, which consults `$_SERVER`, `$_ENV` and the process environment in
+ * turn. {@see setUp} clears all three for {@see self::ENV_KEYS} and
+ * {@see tearDown} puts each back exactly as it was, including the difference
+ * between "unset" and "set to an empty string". Clearing only one source would
+ * let a `ZAMMAD_TOKEN` exported in the developer's shell decide the outcome —
+ * and the cookbook asks people to export exactly that.
  */
 #[Group('bridge')]
 final class LaravelServiceProviderTest extends TestCase
@@ -43,22 +47,59 @@ final class LaravelServiceProviderTest extends TestCase
 
     private const ROOT_COMPOSER = __DIR__ . '/../../../../composer.json';
 
+    /**
+     * The variables these tests take over, and must hand back untouched.
+     */
+    private const ENV_KEYS = ['ZAMMAD_URL', 'ZAMMAD_TOKEN'];
+
     /** @var array<string, mixed> */
     private array $serverBackup = [];
+
+    /** @var array<string, mixed> */
+    private array $envBackup = [];
+
+    /** @var array<string, string|false> */
+    private array $processEnvBackup = [];
 
     /** @var list<string> */
     private array $tempPaths = [];
 
     protected function setUp(): void
     {
-        $this->serverBackup = $_SERVER;
+        foreach (self::ENV_KEYS as $name) {
+            if (array_key_exists($name, $_SERVER)) {
+                $this->serverBackup[$name] = $_SERVER[$name];
+            }
+            if (array_key_exists($name, $_ENV)) {
+                $this->envBackup[$name] = $_ENV[$name];
+            }
+            $this->processEnvBackup[$name] = getenv($name);
 
-        unset($_SERVER['ZAMMAD_URL'], $_SERVER['ZAMMAD_TOKEN']);
+            unset($_SERVER[$name], $_ENV[$name]);
+            putenv($name);
+        }
     }
 
     protected function tearDown(): void
     {
-        $_SERVER = $this->serverBackup;
+        foreach (self::ENV_KEYS as $name) {
+            unset($_SERVER[$name], $_ENV[$name]);
+
+            if (array_key_exists($name, $this->serverBackup)) {
+                $_SERVER[$name] = $this->serverBackup[$name];
+            }
+            if (array_key_exists($name, $this->envBackup)) {
+                $_ENV[$name] = $this->envBackup[$name];
+            }
+
+            // false means it was unset before; putenv() without '=' unsets again.
+            $previous = $this->processEnvBackup[$name] ?? false;
+            putenv($previous === false ? $name : "{$name}={$previous}");
+        }
+
+        $this->serverBackup = [];
+        $this->envBackup = [];
+        $this->processEnvBackup = [];
 
         ServiceProvider::$publishes = [];
         ServiceProvider::$publishGroups = [];
