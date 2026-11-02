@@ -1,0 +1,6 @@
+parameters:
+    level: max
+    paths:
+        - ../../../src/Bridge/LaravelServiceProvider.php
+    scanDirectories:
+        - tests

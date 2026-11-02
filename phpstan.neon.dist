@@ -3,7 +3,13 @@ parameters:
     paths:
         - src/
     scanDirectories:
-        - test/
+        - test/Unit
+        - test/Integration
     excludePaths:
-        # Bridge classes require Laravel/Symfony packages at runtime only.
+        # The bridges are analysed at this same level, but from the isolated
+        # test projects that own their framework packages — see
+        # test/Bridge/Symfony/phpstan.neon.dist and
+        # test/Bridge/Laravel/phpstan.neon.dist. Keeping the framework packages
+        # out of the root require-dev is what lets Symfony and Laravel resolve
+        # independently of one another ([#169]).
         - src/Bridge/

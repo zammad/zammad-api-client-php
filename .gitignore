@@ -4,3 +4,9 @@
 /build/
 /.opencode/
 /playground.php
+
+# Isolated bridge test projects: each resolves its own framework versions.
+/test/Bridge/*/vendor/
+/test/Bridge/*/composer.lock
+/test/Bridge/*/.phpunit.cache/
+/test/Bridge/*/build/

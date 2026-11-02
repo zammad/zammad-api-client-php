@@ -1,0 +1,24 @@
+{
+    "name": "zammad/zammad-api-client-php-bridge-symfony-tests",
+    "description": "Isolated test project for the Symfony bundle. Not published.",
+    "type": "project",
+    "license": "AGPL-3.0-or-later",
+    "repositories": [
+        { "type": "path", "url": "../../..", "options": { "symlink": true } }
+    ],
+    "require-dev": {
+        "zammad/zammad-api-client-php": "@dev",
+        "phpunit/phpunit": "^11.0",
+        "phpstan/phpstan": "^1.12",
+        "symfony/config": "^6.4 || ^7.0 || ^8.0",
+        "symfony/dependency-injection": "^6.4 || ^7.0 || ^8.0",
+        "symfony/http-kernel": "^6.4 || ^7.0 || ^8.0"
+    },
+    "autoload-dev": {
+        "psr-4": { "ZammadAPIClient\\Tests\\Bridge\\Symfony\\": "tests/" }
+    },
+    "config": { "sort-packages": true },
+    "comment-stability": "stable only: an unreleased framework branch would make a red run say nothing about any version a user can install. The path package is dev by nature, hence its own @dev flag above.",
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
