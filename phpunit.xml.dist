@@ -22,6 +22,12 @@
         <include>
             <directory>src</directory>
         </include>
+        <exclude>
+            <!-- Covered to 100% by the isolated bridge projects under
+                 test/Bridge/, which own the framework packages. Counting them
+                 here would report a gap nothing in this suite can close. -->
+            <directory>src/Bridge</directory>
+        </exclude>
     </source>
     <coverage>
         <report>
