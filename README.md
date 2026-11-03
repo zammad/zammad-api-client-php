@@ -435,8 +435,8 @@ and [`examples/cookbook/09-symfony.php`](examples/cookbook/09-symfony.php).
 Supported: **Laravel 12 and 13**. Each of those is exercised in CI — see the
 `unit` job in [`.github/workflows/tests.yml`](.github/workflows/tests.yml).
 
-The service provider is auto-discovered (Laravel 5.5+). Publish the config and set
-your credentials in `.env`:
+The service provider is auto-discovered, so there is nothing to register. Publish
+the config and set your credentials in `.env`:
 
 ```bash
 php artisan vendor:publish --tag=zammad-config   # copies config to config/zammad.php
@@ -477,8 +477,9 @@ resolving `ZammadClient` then throws
 unset nor a string is an error too, and the message names the key:
 `InvalidArgumentException: config/zammad.php: "url" must be a string, array given.`
 
-For older Laravel versions, register `ZammadAPIClient\Bridge\LaravelServiceProvider::class`
-in `config/app.php` manually.
+Only if you opt this package out of package discovery: register
+`ZammadAPIClient\Bridge\LaravelServiceProvider::class` yourself in
+`bootstrap/providers.php`.
 
 ### Symfony
 
