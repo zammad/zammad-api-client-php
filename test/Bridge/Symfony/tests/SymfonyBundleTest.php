@@ -24,8 +24,14 @@ use ZammadAPIClient\ZammadClient;
  * container fail with *"has a dependency on a non-existent service"*.
  *
  * No Zammad instance and no HTTP traffic are involved. Environment variables are
- * injected as `env(...)` container parameters rather than through `putenv()`, so
- * the cases stay hermetic and order-independent.
+ * injected as `env(...)` container parameters rather than through `putenv()`.
+ * That alone does not make the cases hermetic: such a parameter is only the
+ * fallback Symfony's `EnvVarProcessor` reaches after `$_ENV`, `$_SERVER` and
+ * `getenv()`, so a real variable in the developer's shell wins over it. {@see
+ * setUp} therefore clears all three for {@see self::ENV_KEYS} and {@see tearDown}
+ * puts each back exactly as it was, including the difference between "unset" and
+ * "set to an empty string" — otherwise a `ZAMMAD_TOKEN` exported as the cookbook
+ * asks decides the outcome of {@see testMissingTokenFailsWithTheLibrarysOwnMessage}.
  */
 #[Group('bridge')]
 final class SymfonyBundleTest extends TestCase
@@ -37,6 +43,58 @@ final class SymfonyBundleTest extends TestCase
      * guard in {@see ZammadClient::create()} from rejecting the plain `http://`.
      */
     private const DEFAULT_URL = 'http://127.0.0.1:8098';
+
+    /**
+     * The variables these tests take over, and must hand back untouched.
+     */
+    private const ENV_KEYS = ['ZAMMAD_URL', 'ZAMMAD_TOKEN'];
+
+    /** @var array<string, mixed> */
+    private array $serverBackup = [];
+
+    /** @var array<string, mixed> */
+    private array $envBackup = [];
+
+    /** @var array<string, string|false> */
+    private array $processEnvBackup = [];
+
+    protected function setUp(): void
+    {
+        foreach (self::ENV_KEYS as $name) {
+            if (array_key_exists($name, $_SERVER)) {
+                $this->serverBackup[$name] = $_SERVER[$name];
+            }
+            if (array_key_exists($name, $_ENV)) {
+                $this->envBackup[$name] = $_ENV[$name];
+            }
+            $this->processEnvBackup[$name] = getenv($name);
+
+            unset($_SERVER[$name], $_ENV[$name]);
+            putenv($name);
+        }
+    }
+
+    protected function tearDown(): void
+    {
+        foreach (self::ENV_KEYS as $name) {
+            unset($_SERVER[$name], $_ENV[$name]);
+
+            if (array_key_exists($name, $this->serverBackup)) {
+                $_SERVER[$name] = $this->serverBackup[$name];
+            }
+            if (array_key_exists($name, $this->envBackup)) {
+                $_ENV[$name] = $this->envBackup[$name];
+            }
+
+            // false means it was unset before; putenv() without '=' unsets again.
+            $previous = $this->processEnvBackup[$name] ?? false;
+            putenv($previous === false ? $name : "{$name}={$previous}");
+        }
+
+        $this->serverBackup = [];
+        $this->envBackup = [];
+        $this->processEnvBackup = [];
+    }
 
     public function testExtensionAliasBindsTheZammadConfigurationKey(): void
     {
