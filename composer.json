@@ -49,7 +49,9 @@
             "composer install -d test/Bridge/Laravel --no-interaction"
         ],
         "test:bridge": [
+            "php -d memory_limit=1G test/Bridge/Symfony/vendor/bin/phpstan analyse -c test/Bridge/Symfony/phpstan.neon.dist --no-progress",
             "XDEBUG_MODE=off test/Bridge/Symfony/vendor/bin/phpunit -c test/Bridge/Symfony/phpunit.xml.dist --no-coverage",
+            "php -d memory_limit=1G test/Bridge/Laravel/vendor/bin/phpstan analyse -c test/Bridge/Laravel/phpstan.neon.dist --no-progress",
             "XDEBUG_MODE=off test/Bridge/Laravel/vendor/bin/phpunit -c test/Bridge/Laravel/phpunit.xml.dist --no-coverage"
         ],
         "post-install-cmd": [
