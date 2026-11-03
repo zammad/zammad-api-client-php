@@ -23,13 +23,15 @@ use ZammadAPIClient\ZammadClient;
  *
  * **Setup**
  *
- * - Add the provider to `config/app.php`:
+ * - Nothing to register: the provider is auto-discovered from this package's
+ *   `extra.laravel.providers`. Only if you opt the package out of discovery,
+ *   add it to `bootstrap/providers.php` yourself:
  *
  *   ```php
- *   'providers' => [
+ *   return [
  *       // ...
  *       ZammadAPIClient\Bridge\LaravelServiceProvider::class,
- *   ],
+ *   ];
  *   ```
  *
  * - Publish the configuration file:
