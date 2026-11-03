@@ -184,22 +184,29 @@ final class LaravelServiceProviderTest extends TestCase
         self::assertInstanceOf(ZammadClient::class, $app->make(ZammadClient::class));
     }
 
-    public function testNonStringConfigValueDoesNotReachTheClientAsTypeError(): void
+    public function testNonStringUrlIsRejectedByNameInsteadOfSilentlyFallingBack(): void
     {
         // Repository::get() is typed mixed and config/zammad.php is a plain PHP
         // file the application owns. A wrong type must not surface as a
-        // TypeError thrown from somewhere deep inside the client.
+        // TypeError thrown from somewhere deep inside the client — and must not
+        // be swallowed either: substituting the default would point a
+        // production client at loopback without a word.
         $app = $this->register(['url' => ['not', 'a', 'string'], 'token' => 'from-config']);
 
-        self::assertInstanceOf(ZammadClient::class, $app->make(ZammadClient::class));
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('config/zammad.php: "url" must be a string, array given.');
+
+        $app->make(ZammadClient::class);
     }
 
-    public function testNonStringTokenFailsWithTheLibrarysOwnMessage(): void
+    public function testNonStringTokenIsRejectedByNameRatherThanAsAnEmptyToken(): void
     {
-        $app = $this->register(['token' => ['not', 'a', 'string']]);
+        // "API token must not be empty." would be a lie here: the token is set,
+        // it just has the wrong type.
+        $app = $this->register(['token' => 123]);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('API token must not be empty.');
+        $this->expectExceptionMessage('config/zammad.php: "token" must be a string, int given.');
 
         $app->make(ZammadClient::class);
     }

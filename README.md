@@ -473,7 +473,9 @@ built rather than while the client is resolved.
 A published `config/zammad.php` takes precedence over the environment. An empty
 `url` there falls back to the built-in default; an empty `token` is an error —
 resolving `ZammadClient` then throws
-`InvalidArgumentException: API token must not be empty.`
+`InvalidArgumentException: API token must not be empty.` A value that is neither
+unset nor a string is an error too, and the message names the key:
+`InvalidArgumentException: config/zammad.php: "url" must be a string, array given.`
 
 For older Laravel versions, register `ZammadAPIClient\Bridge\LaravelServiceProvider::class`
 in `config/app.php` manually.
