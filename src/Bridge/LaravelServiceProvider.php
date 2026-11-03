@@ -7,6 +7,7 @@ namespace ZammadAPIClient\Bridge;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use InvalidArgumentException;
 use ZammadAPIClient\Core\Auth;
 use ZammadAPIClient\ZammadClient;
 
@@ -82,6 +83,7 @@ use ZammadAPIClient\ZammadClient;
  * A token is required: there is no usable default for it. If neither
  * `config('zammad.token')` nor `ZAMMAD_TOKEN` is set, resolving
  * {@see ZammadClient} from the container throws `InvalidArgumentException`.
+ * A value of the wrong type does the same, and names the key it came from.
  *
  * @see ZammadClient::create()
  */
@@ -113,8 +115,8 @@ final class LaravelServiceProvider extends ServiceProvider
             $config = $app->make('config');
 
             return ZammadClient::create(
-                self::setting($config->get('zammad.url'), self::DEFAULT_URL),
-                Auth::token(self::setting($config->get('zammad.token'), '')),
+                self::setting('url', $config->get('zammad.url'), self::DEFAULT_URL),
+                Auth::token(self::setting('token', $config->get('zammad.token'), '')),
             );
         });
     }
@@ -124,16 +126,33 @@ final class LaravelServiceProvider extends ServiceProvider
      *
      * `Repository::get()` returns `mixed`, and `config/zammad.php` is a plain PHP
      * file the application owns and is free to edit. Without this narrowing, an
-     * array or a `null` left in there under `declare(strict_types=1)` surfaces as
-     * a `TypeError` thrown from inside {@see Auth::token()} or
+     * array left in there under `declare(strict_types=1)` surfaces as a
+     * `TypeError` thrown from inside {@see Auth::token()} or
      * {@see ZammadClient::create()} — naming the client rather than the config
      * file the reader actually has to go and fix.
      *
-     * An empty string counts as unset, so the built-in default still applies to
-     * a published config file whose own `env()` call resolved to `''`.
+     * `null` and the empty string count as unset, so the built-in default still
+     * applies to a published config file whose own `env()` call resolved to `''`.
+     * Anything else of the wrong type is a mistake in that file and is reported
+     * as one: silently substituting the default would point a production client
+     * at `http://127.0.0.1:8098` without a word.
+     *
+     * @throws InvalidArgumentException if the value is neither unset nor a string
      */
-    private static function setting(mixed $value, string $default): string
+    private static function setting(string $key, mixed $value, string $default): string
     {
-        return is_string($value) && $value !== '' ? $value : $default;
+        if ($value === null || $value === '') {
+            return $default;
+        }
+
+        if (!is_string($value)) {
+            throw new InvalidArgumentException(sprintf(
+                'config/zammad.php: "%s" must be a string, %s given.',
+                $key,
+                get_debug_type($value),
+            ));
+        }
+
+        return $value;
     }
 }
