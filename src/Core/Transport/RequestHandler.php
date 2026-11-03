@@ -334,18 +334,10 @@ final class RequestHandler implements RequestHandlerInterface
 
             if (isset($options['headers']) && is_array($options['headers'])) {
                 foreach ($options['headers'] as $name => $value) {
-                    // PSR-7 accepts string|array<string>. Passing anything else
-                    // raises an InvalidArgumentException from inside the message
-                    // implementation, which names the transport rather than the
-                    // caller's own input, so coerce what can be coerced.
-                    if (is_scalar($value)) {
-                        $request = $request->withHeader((string) $name, (string) $value);
-                    } elseif (is_array($value)) {
-                        $request = $request->withHeader(
-                            (string) $name,
-                            array_map(static fn(mixed $v): string => is_scalar($v) ? (string) $v : '', $value),
-                        );
-                    }
+                    $request = $request->withHeader(
+                        (string) $name,
+                        self::headerValue((string) $name, $value),
+                    );
                 }
             }
 
@@ -369,6 +361,56 @@ final class RequestHandler implements RequestHandlerInterface
         }
 
         throw $this->mapError($status, $uri, $response);
+    }
+
+    /**
+     * Normalises one entry of the `headers` option into what PSR-7 accepts:
+     * a string, or a list of strings for a header sent more than once.
+     *
+     * Scalars are converted, since headers are often built from config values
+     * that arrive as ints or bools. Anything else — an object, a nested array,
+     * null — is rejected rather than dropped or flattened to an empty string:
+     * a header that silently goes missing, or silently arrives blank, surfaces
+     * much later as a puzzling API response instead of as a failed call here.
+     *
+     * @return string|list<string>
+     *
+     * @throws InvalidArgumentException If $value is neither a scalar nor a list of scalars.
+     */
+    private static function headerValue(string $name, mixed $value): string|array
+    {
+        if (is_scalar($value)) {
+            return (string) $value;
+        }
+
+        if (!is_array($value)) {
+            throw self::unsupportedHeaderValue($name, $value);
+        }
+
+        $values = [];
+
+        foreach ($value as $element) {
+            if (!is_scalar($element)) {
+                throw self::unsupportedHeaderValue($name, $element);
+            }
+
+            $values[] = (string) $element;
+        }
+
+        return $values;
+    }
+
+    /**
+     * Names the offending header and the type that was passed, so the message
+     * points at the caller's input rather than at this transport's internals.
+     */
+    private static function unsupportedHeaderValue(string $name, mixed $value): InvalidArgumentException
+    {
+        return new InvalidArgumentException(sprintf(
+            'Header "%s" must be a string or a list of strings, got %s.',
+            $name,
+            get_debug_type($value),
+        ));
     }
 
     /**

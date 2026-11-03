@@ -426,6 +426,53 @@ final class RequestHandlerTest extends TestCase
         );
     }
 
+    public function testScalarHeaderValuesAreConvertedToStrings(): void
+    {
+        $this->httpClient->response = new Response(200, [], '{}');
+
+        $this->handler->request('GET', 'tickets', ['headers' => ['X-Retry-Count' => 3]]);
+
+        self::assertSame('3', $this->httpClient->lastRequest?->getHeaderLine('X-Retry-Count'));
+    }
+
+    public function testArrayHeaderValueIsSentAsRepeatedHeader(): void
+    {
+        $this->httpClient->response = new Response(200, [], '{}');
+
+        $this->handler->request('GET', 'tickets', ['headers' => ['X-Tag' => ['a', 'b']]]);
+
+        self::assertSame(['a', 'b'], $this->httpClient->lastRequest?->getHeader('X-Tag'));
+    }
+
+    /**
+     * These used to be dropped (top level) or flattened to an empty string
+     * (inside an array), which turned a caller's mistake into a request that
+     * looked fine and behaved wrongly.
+     *
+     * @param mixed $value
+     */
+    #[DataProvider('unsupportedHeaderValues')]
+    public function testUnsupportedHeaderValuesAreRejected(mixed $value, string $expectedType): void
+    {
+        $this->httpClient->response = new Response(200, [], '{}');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            sprintf('Header "X-Bad" must be a string or a list of strings, got %s.', $expectedType),
+        );
+
+        $this->handler->request('GET', 'tickets', ['headers' => ['X-Bad' => $value]]);
+    }
+
+    /** @return iterable<string, array{mixed, string}> */
+    public static function unsupportedHeaderValues(): iterable
+    {
+        yield 'object' => [new \stdClass(), 'stdClass'];
+        yield 'null' => [null, 'null'];
+        yield 'nested array' => [[['a']], 'array'];
+        yield 'object inside array' => [[new \stdClass()], 'stdClass'];
+    }
+
     public function testCredentialsOverPlainHttpAreRejected(): void
     {
         $this->expectException(InvalidArgumentException::class);
