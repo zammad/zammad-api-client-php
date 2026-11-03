@@ -21,6 +21,8 @@ jobs:
         with:
           php-version: "${{ matrix.php }}"
           extensions: xdebug
+      # update, not install: this is a library, so the root composer.lock is
+      # git-ignored and each PHP leg resolves the versions it can actually run.
       - run: composer update --no-interaction
       - run: |
           if [ -d src ]; then vendor/bin/phpcs --standard=PSR12 src/; else echo "→ Skip (src/ not yet present)"; fi
