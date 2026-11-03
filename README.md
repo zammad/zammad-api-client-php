@@ -433,7 +433,7 @@ and [`examples/cookbook/09-symfony.php`](examples/cookbook/09-symfony.php).
 ### Laravel
 
 Supported: **Laravel 12 and 13**. Each of those is exercised in CI — see the
-`unit` job in [`.github/workflows/tests.yml`](.github/workflows/tests.yml).
+`bridge-laravel` job in [`.github/workflows/tests.yml`](.github/workflows/tests.yml).
 
 The service provider is auto-discovered, so there is nothing to register. Publish
 the config and set your credentials in `.env`:
@@ -484,7 +484,7 @@ Only if you opt this package out of package discovery: register
 ### Symfony
 
 Supported: **Symfony 6.4 LTS, 7.x and 8.x**. Each of those is exercised in CI —
-see the `unit` job in [`.github/workflows/tests.yml`](.github/workflows/tests.yml).
+see the `bridge-symfony` job in [`.github/workflows/tests.yml`](.github/workflows/tests.yml).
 
 Register the bundle in `config/bundles.php`:
 
