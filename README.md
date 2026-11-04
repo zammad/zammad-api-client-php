@@ -474,8 +474,9 @@ A published `config/zammad.php` takes precedence over the environment. An empty
 `url` there falls back to the built-in default; an empty `token` is an error —
 resolving `ZammadClient` then throws
 `InvalidArgumentException: API token must not be empty.` A value that is neither
-unset nor a string is an error too, and the message names the key:
-`InvalidArgumentException: config/zammad.php: "url" must be a string, array given.`
+unset nor a string is an error too, and the message names the key rather than a
+file that may never have been published:
+`InvalidArgumentException: config('zammad.url') must be a string, array given.`
 
 Only if you opt this package out of package discovery: register
 `ZammadAPIClient\Bridge\LaravelServiceProvider::class` yourself in
@@ -500,8 +501,12 @@ zammad:
     token: '%env(ZAMMAD_TOKEN)%'
 ```
 
-The file is optional — leave it out and the bundle reads `ZAMMAD_URL` and
-`ZAMMAD_TOKEN` itself, falling back to `http://127.0.0.1:8098` for the URL.
+The file itself is not optional: Symfony calls a bundle's extension only for an
+alias that has configuration, so without a `zammad:` section `ZammadClient` is
+never registered and injecting it fails. The keys under it are optional, though
+— a file containing nothing but `zammad: ~` is enough, and the bundle then reads
+`ZAMMAD_URL` and `ZAMMAD_TOKEN` itself, falling back to `http://127.0.0.1:8098`
+for the URL.
 
 The client is registered as a lazy service, so the container compiles whether or
 not credentials are present; a missing token surfaces the first time something

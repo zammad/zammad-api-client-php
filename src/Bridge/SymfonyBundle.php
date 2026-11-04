@@ -40,6 +40,11 @@ use ZammadAPIClient\ZammadClient;
  *     token: '%env(ZAMMAD_TOKEN)%'
  *   ```
  *
+ *   The section itself is required, its keys are not: Symfony runs an
+ *   extension's `load()` only for an alias that has configuration, so without a
+ *   `zammad:` section this bundle registers nothing. `zammad: ~` on its own is
+ *   enough to get the environment-variable defaults below.
+ *
  * - Set the environment variables (`.env` or `.env.local`):
  *
  *   ```env
