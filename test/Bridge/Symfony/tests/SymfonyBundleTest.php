@@ -173,6 +173,49 @@ final class SymfonyBundleTest extends TestCase
             ['ZAMMAD_URL' => 'https://from-env.example', 'ZAMMAD_TOKEN' => 'from-env'],
         );
 
+        // Both arguments, not just "a client came out": a bundle that read
+        // ZAMMAD_URL into the token would still build a ZammadClient, because
+        // Auth::token() takes any non-empty string.
+        $definition = $container->getDefinition(ZammadClient::class);
+
+        self::assertSame('https://from-env.example', $definition->getArgument(0));
+        self::assertSame('from-env', $definition->getArgument(1)->getArgument(0));
+        self::assertInstanceOf(ZammadClient::class, $container->get(ZammadClient::class));
+    }
+
+    public function testNoZammadSectionMeansNoClientAtAll(): void
+    {
+        // The compile() helper calls load() by hand, which no application-level
+        // path does: Symfony's MergeExtensionConfigurationPass runs an
+        // extension only for an alias that has configuration. So an application
+        // without config/packages/zammad.yaml gets no ZammadClient, however
+        // complete its environment is — the one case the direct load() can
+        // never show. The README documents this; this test holds it to it.
+        $container = $this->containerWithTheBundleRegistered(
+            ['ZAMMAD_URL' => 'https://from-env.example', 'ZAMMAD_TOKEN' => 'from-env'],
+        );
+
+        $container->compile(true);
+
+        self::assertFalse($container->has(ZammadClient::class));
+    }
+
+    public function testAnEmptyZammadSectionIsEnoughToReadTheEnvironment(): void
+    {
+        // The other half of the above: the section is required, its keys are
+        // not. `zammad: ~` is what the README offers instead of leaving the
+        // file out, so it has to carry the environment defaults all the way.
+        $container = $this->containerWithTheBundleRegistered(
+            ['ZAMMAD_URL' => 'https://from-env.example', 'ZAMMAD_TOKEN' => 'from-env'],
+        );
+
+        $container->loadFromExtension('zammad', []);
+        $container->compile(true);
+
+        $definition = $container->getDefinition(ZammadClient::class);
+
+        self::assertSame('https://from-env.example', $definition->getArgument(0));
+        self::assertSame('from-env', $definition->getArgument(1)->getArgument(0));
         self::assertInstanceOf(ZammadClient::class, $container->get(ZammadClient::class));
     }
 
@@ -221,6 +264,26 @@ final class SymfonyBundleTest extends TestCase
 
         $this->extension()->load([$config], $container);
         $container->compile(true);
+
+        return $container;
+    }
+
+    /**
+     * An uncompiled container that knows the bundle's extension but has not
+     * been told anything about `zammad` — the state a Symfony application is in
+     * before it reads `config/packages/`.
+     *
+     * @param array<string, string> $env
+     */
+    private function containerWithTheBundleRegistered(array $env = []): ContainerBuilder
+    {
+        $container = new ContainerBuilder();
+
+        foreach ($env as $name => $value) {
+            $container->setParameter('env(' . $name . ')', $value);
+        }
+
+        $container->registerExtension($this->extension());
 
         return $container;
     }
