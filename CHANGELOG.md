@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.2.0] — unreleased
+## [3.2.0] —  2026-11-04
 
 ### Added
 - `Auth` — credentials as a transport-independent value: `Auth::token()`, `Auth::oauth2()`, `Auth::basic()`. The constructor is private, so the set of valid schemes is closed by construction; empty tokens and usernames are rejected on creation instead of surfacing as a 401 later
