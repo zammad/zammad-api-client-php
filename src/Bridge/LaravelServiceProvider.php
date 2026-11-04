@@ -126,18 +126,20 @@ final class LaravelServiceProvider extends ServiceProvider
     /**
      * Narrows one configuration value to the string the client expects.
      *
-     * `Repository::get()` returns `mixed`, and `config/zammad.php` is a plain PHP
-     * file the application owns and is free to edit. Without this narrowing, an
-     * array left in there under `declare(strict_types=1)` surfaces as a
-     * `TypeError` thrown from inside {@see Auth::token()} or
-     * {@see ZammadClient::create()} — naming the client rather than the config
-     * file the reader actually has to go and fix.
+     * `Repository::get()` returns `mixed`, and the application is free to put
+     * anything under the `zammad` key — in a published `config/zammad.php`, in
+     * a `.env` value `env()` hands back as a bool, or in a runtime override.
+     * Without this narrowing, an array under `declare(strict_types=1)` surfaces
+     * as a `TypeError` thrown from inside {@see Auth::token()} or
+     * {@see ZammadClient::create()} — naming the client rather than the setting
+     * the reader actually has to go and fix. The message therefore names the
+     * configuration key, not a file: `config/zammad.php` need not exist.
      *
      * `null` and the empty string count as unset, so the built-in default still
      * applies to a published config file whose own `env()` call resolved to `''`.
-     * Anything else of the wrong type is a mistake in that file and is reported
-     * as one: silently substituting the default would point a production client
-     * at `http://127.0.0.1:8098` without a word.
+     * Anything else of the wrong type is a mistake and is reported as one:
+     * silently substituting the default would point a production client at
+     * `http://127.0.0.1:8098` without a word.
      *
      * @throws InvalidArgumentException if the value is neither unset nor a string
      */
@@ -149,7 +151,7 @@ final class LaravelServiceProvider extends ServiceProvider
 
         if (!is_string($value)) {
             throw new InvalidArgumentException(sprintf(
-                'config/zammad.php: "%s" must be a string, %s given.',
+                "config('zammad.%s') must be a string, %s given.",
                 $key,
                 get_debug_type($value),
             ));
