@@ -12,7 +12,11 @@ use Illuminate\Support\ServiceProvider;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 use ZammadAPIClient\Bridge\LaravelServiceProvider;
+use ZammadAPIClient\Core\Auth;
+use ZammadAPIClient\Core\Contracts\RequestHandlerInterface;
+use ZammadAPIClient\Core\Transport\RequestHandler;
 use ZammadAPIClient\ZammadClient;
 
 /**
@@ -151,6 +155,35 @@ final class LaravelServiceProviderTest extends TestCase
         self::assertSame('from-config', $config->get('zammad.token'));
     }
 
+    public function testConfiguredCredentialsReachTheResolvedClient(): void
+    {
+        // The cases around this one stop at the config repository, and a
+        // provider that read `zammad.url`, validated it and then handed
+        // ZammadClient::create() the built-in default would satisfy every one
+        // of them. White-box on purpose, as in GuzzleClientFactoryTest: the
+        // Guzzle-backed path cannot be observed without a real request.
+        $app = $this->register([
+            'url' => 'https://configured.example',
+            'token' => 'from-config',
+        ]);
+
+        $handler = $app->make(ZammadClient::class)->getHandler();
+
+        self::assertSame('https://configured.example/api/v1', self::baseUrlOf($handler));
+        self::assertSame('Token token=from-config', self::authHeaderOf($handler));
+    }
+
+    public function testEnvironmentCredentialsReachTheResolvedClient(): void
+    {
+        $_SERVER['ZAMMAD_URL'] = 'https://from-env.example';
+        $_SERVER['ZAMMAD_TOKEN'] = 'from-env';
+
+        $handler = $this->register([])->make(ZammadClient::class)->getHandler();
+
+        self::assertSame('https://from-env.example/api/v1', self::baseUrlOf($handler));
+        self::assertSame('Token token=from-env', self::authHeaderOf($handler));
+    }
+
     public function testBuiltInDefaultUrlAppliesWhenTheEnvironmentIsSilent(): void
     {
         $_SERVER['ZAMMAD_TOKEN'] = 'from-env';
@@ -194,7 +227,7 @@ final class LaravelServiceProviderTest extends TestCase
         $app = $this->register(['url' => ['not', 'a', 'string'], 'token' => 'from-config']);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('config/zammad.php: "url" must be a string, array given.');
+        $this->expectExceptionMessage('config(\'zammad.url\') must be a string, array given.');
 
         $app->make(ZammadClient::class);
     }
@@ -206,7 +239,7 @@ final class LaravelServiceProviderTest extends TestCase
         $app = $this->register(['token' => 123]);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('config/zammad.php: "token" must be a string, int given.');
+        $this->expectExceptionMessage('config(\'zammad.token\') must be a string, int given.');
 
         $app->make(ZammadClient::class);
     }
@@ -288,6 +321,30 @@ final class LaravelServiceProviderTest extends TestCase
 
         self::assertSame(self::DEFAULT_URL, $defaults['url']);
         self::assertSame('', $defaults['token']);
+    }
+
+    /**
+     * Reads the base URL the handler will call, `/api/v1` and all.
+     */
+    private static function baseUrlOf(RequestHandlerInterface $handler): string
+    {
+        $baseUrl = (new ReflectionProperty(RequestHandler::class, 'baseUrl'))->getValue($handler);
+
+        self::assertIsString($baseUrl);
+
+        return $baseUrl;
+    }
+
+    /**
+     * Reads the credential the handler will apply.
+     */
+    private static function authHeaderOf(RequestHandlerInterface $handler): string
+    {
+        $auth = (new ReflectionProperty(RequestHandler::class, 'auth'))->getValue($handler);
+
+        self::assertInstanceOf(Auth::class, $auth);
+
+        return $auth->header();
     }
 
     /**
