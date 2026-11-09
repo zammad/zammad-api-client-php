@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+- Guzzle 8 is supported: `guzzlehttp/guzzle` is now `^7.10 || ^8.0` and `guzzlehttp/psr7` is now `^2.7 || ^3.0`. Before, installing the client into a project already on Guzzle 8, such as every new Laravel 13 application, failed unless Composer was allowed to downgrade Guzzle ([#180](https://github.com/zammad/zammad-api-client-php/issues/180), [#181](https://github.com/zammad/zammad-api-client-php/issues/181))
+
 ## [3.2.0] — 2026-11-04
 
 ### Added
