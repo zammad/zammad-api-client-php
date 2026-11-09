@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.2.1] — unreleased
+## [3.2.1] — 2026-11-09
 
 ### Added
 - Symfony Flex recipe, published as assets of every GitHub release. With `releases/latest/download/index.json` added to `extra.symfony.endpoint`, `composer require` registers the bundle, creates `config/packages/zammad.yaml` and adds `ZAMMAD_URL` / `ZAMMAD_TOKEN` to `.env`; `composer remove` reverts it. Applications without Flex keep registering the bundle by hand ([#182](https://github.com/zammad/zammad-api-client-php/issues/182))
