@@ -1,0 +1,15 @@
+{
+    "bundles": {
+        "ZammadAPIClient\\Bridge\\SymfonyBundle": ["all"]
+    },
+    "copy-from-recipe": {
+        "config/": "%CONFIG_DIR%/"
+    },
+    "env": {
+        "ZAMMAD_URL": "https://zammad.example.com",
+        "ZAMMAD_TOKEN": ""
+    },
+    "post-install-output": [
+        "  * Set <fg=green>ZAMMAD_URL</> and <fg=green>ZAMMAD_TOKEN</> in <fg=green>.env.local</>"
+    ]
+}
