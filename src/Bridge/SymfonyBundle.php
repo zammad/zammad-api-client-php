@@ -21,7 +21,22 @@ use ZammadAPIClient\ZammadClient;
  * {@see ZammadClient} for autowiring, and exposes an `zammad_client` alias — so
  * any service can type-hint `ZammadClient` and get a ready-to-use instance.
  *
- * **Setup**
+ * **Setup with Symfony Flex**
+ *
+ * Every release ships a Flex recipe as release assets. Add it as a recipe
+ * source once, before requiring the package:
+ *
+ * ```bash
+ * composer config --json extra.symfony.endpoint \
+ *   '["https://github.com/zammad/zammad-api-client-php/releases/latest/download/index.json", "flex://defaults"]'
+ * composer require zammad/zammad-api-client-php
+ * ```
+ *
+ * The recipe registers the bundle, creates `config/packages/zammad.yaml` and
+ * adds `ZAMMAD_URL` / `ZAMMAD_TOKEN` to `.env` — the three steps below. The
+ * recipe source is `src/Bridge/Symfony/recipe/`.
+ *
+ * **Setup without Flex**
  *
  * - Register the bundle in `config/bundles.php`:
  *

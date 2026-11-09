@@ -485,7 +485,33 @@ Only if you opt this package out of package discovery: register
 ### Symfony
 
 Supported: **Symfony 6.4 LTS, 7.x and 8.x**. Each of those is exercised in CI —
-see the `bridge-symfony` job in [`.github/workflows/tests.yml`](.github/workflows/tests.yml).
+see the `bridge-symfony` and `install` jobs in [`.github/workflows/tests.yml`](.github/workflows/tests.yml).
+
+#### With Symfony Flex
+
+Every release ships a Flex recipe as release assets. Add it as a recipe source
+once, **before** requiring the package, then require it as usual:
+
+```bash
+composer config --json extra.symfony.endpoint \
+  '["https://github.com/zammad/zammad-api-client-php/releases/latest/download/index.json", "flex://defaults"]'
+composer require zammad/zammad-api-client-php
+```
+
+The recipe registers the bundle, creates `config/packages/zammad.yaml` and adds
+`ZAMMAD_URL` / `ZAMMAD_TOKEN` to `.env` — set the real values in `.env.local`.
+`composer remove` takes all of it out again.
+
+- Keep `flex://defaults` in the list, it is what serves Symfony's own recipes. If
+  your `composer.json` already has an `extra.symfony.endpoint` list, add the URL
+  to it instead of replacing it.
+- Already installed the package? `composer recipes:install zammad/zammad-api-client-php --force`
+  applies the recipe afterwards. `--force` overwrites an existing
+  `config/packages/zammad.yaml`, so back up a hand-written one first.
+- The recipe applies from 3.3.0 on. The source lives in
+  [`src/Bridge/Symfony/recipe/`](src/Bridge/Symfony/recipe).
+
+#### Without Flex
 
 Register the bundle in `config/bundles.php`:
 
