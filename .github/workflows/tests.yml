@@ -7,7 +7,7 @@ on:
 
 jobs:
   unit:
-    name: "Unit / PHP ${{ matrix.php }}"
+    name: "Unit / PHP ${{ matrix.php }} / Guzzle ${{ matrix.guzzle }}"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -15,6 +15,9 @@ jobs:
         # No PHP 8.1 leg even though the library supports 8.1: PHPUnit 11
         # requires PHP >= 8.2.
         php: ["8.2", "8.3", "8.4"]
+        # Both majors are allowed by composer.json, and the host application
+        # decides which one is installed (#180).
+        guzzle: ["^7.10", "^8.0"]
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
@@ -23,7 +26,7 @@ jobs:
           extensions: xdebug
       # update, not install: this is a library, so the root composer.lock is
       # git-ignored and each PHP leg resolves the versions it can actually run.
-      - run: composer update --no-interaction
+      - run: composer update --no-interaction --with "guzzlehttp/guzzle:${{ matrix.guzzle }}"
       - run: |
           if [ -d src ]; then vendor/bin/phpcs --standard=PSR12 src/; else echo "→ Skip (src/ not yet present)"; fi
       - run: |
@@ -31,7 +34,7 @@ jobs:
       - run: |
           if [ -d test/Unit ]; then XDEBUG_MODE=coverage vendor/bin/phpunit --testsuite=unit --display-skipped --log-junit junit.xml; else echo "→ Skip (test/Unit/ not yet present)"; fi
       - name: Upload test artifacts
-        if: always() && matrix.php == '8.3'
+        if: always() && matrix.php == '8.3' && matrix.guzzle == '^8.0'
         uses: actions/upload-artifact@v7
         with:
           name: unit-test-results
