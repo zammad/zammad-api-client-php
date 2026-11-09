@@ -1,4 +1,4 @@
-.PHONY: help test test-bridge bridge-install test-integration coverage cookbook clean
+.PHONY: help test test-bridge bridge-install test-install test-integration coverage cookbook clean
 
 help: ## Show available make targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
@@ -26,6 +26,10 @@ test-bridge: ## Run the Symfony + Laravel bridge suites (needs `make bridge-inst
 			echo "  Skip (run 'make bridge-install' first)"; \
 		fi; \
 	done
+
+test-install: ## Install the client into fresh Laravel + Symfony skeletons (needs network)
+	@test/Install/run.sh laravel
+	@test/Install/run.sh symfony
 
 test-integration: ## Run integration tests (needs Zammad instance)
 	@echo "→ Integration test setup"
