@@ -67,32 +67,28 @@ laravel)
     ok 'provider found by package discovery'
     ;;
 symfony)
+    # Serves the Flex recipe the way the release assets do (#182), built by the
+    # same script from the same source.
+    endpoint=$(mktemp -d)
+    php "$root/bin/build-flex-endpoint.php" "$endpoint" http://127.0.0.1:8099 >/dev/null
+    php -S 127.0.0.1:8099 -t "$endpoint" >/dev/null 2>&1 &
+    trap "kill $!" EXIT
+    until php -r 'exit(@fsockopen("127.0.0.1", 8099) ? 0 : 1);'; do sleep 0.2; done
+    composer config secure-http false   # the local endpoint is plain http
+    composer config --json extra.symfony.endpoint '["http://127.0.0.1:8099/index.json", "flex://defaults"]'
+
+    before=$(cksum config/bundles.php .env)
     composer require --quiet 'zammad/zammad-api-client-php:^3.2' \
         || fail 'composer require failed'
-    # Without a Flex recipe the bundle needs the two manual steps from the
-    # README. Once the recipe exists (#182) these branches are no longer taken.
-    if grep -q 'ZammadAPIClient\\Bridge\\SymfonyBundle::class' config/bundles.php; then
-        ok 'bundle registered by Flex'
-    else
-        php -r '
-            $file = "config/bundles.php";
-            $bundle = "    ZammadAPIClient\\Bridge\\SymfonyBundle::class => [\"all\" => true],\n];";
-            file_put_contents($file, preg_replace("/^\];/m", $bundle, file_get_contents($file)));
-        '
-        ok 'bundle registered by hand (no Flex recipe yet, #182)'
-    fi
-    if [ -f config/packages/zammad.yaml ]; then
-        ok 'config/packages/zammad.yaml created by Flex'
-    else
-        echo 'zammad: ~' > config/packages/zammad.yaml
-        ok 'config/packages/zammad.yaml created by hand (no Flex recipe yet, #182)'
-    fi
-    # `composer require` has just warmed the container cache, and the edits
-    # above land within the same second. Symfony compares modification times
-    # at one-second resolution and keeps the stale container, which even
-    # `cache:clear` reuses for its warm-up. A user editing by hand never hits
-    # this, so the cache is simply dropped.
-    rm -rf var/cache
+    grep -q 'ZammadAPIClient\\Bridge\\SymfonyBundle::class' config/bundles.php \
+        || fail 'bundle not registered by the recipe'
+    ok 'bundle registered by the recipe'
+    [ -f config/packages/zammad.yaml ] \
+        || fail 'config/packages/zammad.yaml not created by the recipe'
+    ok 'config/packages/zammad.yaml created by the recipe'
+    grep -q '^ZAMMAD_URL=' .env && grep -q '^ZAMMAD_TOKEN=' .env \
+        || fail 'ZAMMAD_URL / ZAMMAD_TOKEN not added to .env'
+    ok 'ZAMMAD_URL / ZAMMAD_TOKEN added to .env'
     ;;
 esac
 
@@ -100,3 +96,11 @@ printf '  guzzlehttp/guzzle %s\n' "$(composer show guzzlehttp/guzzle | sed -n 's
 [ "$(resolve_$framework)" = 'ZammadAPIClient\ZammadClient' ] \
     || fail 'ZammadClient does not resolve from the container'
 ok 'ZammadClient resolves from the container'
+
+if [ "$framework" = symfony ]; then
+    composer remove --quiet zammad/zammad-api-client-php \
+        || fail 'composer remove failed'
+    [ "$(cksum config/bundles.php .env)" = "$before" ] && [ ! -e config/packages/zammad.yaml ] \
+        || fail 'composer remove left recipe changes behind'
+    ok 'composer remove reverts the recipe'
+fi
