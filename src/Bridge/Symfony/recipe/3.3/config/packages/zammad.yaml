@@ -1,0 +1,3 @@
+zammad:
+    url: '%env(ZAMMAD_URL)%'
+    token: '%env(ZAMMAD_TOKEN)%'
