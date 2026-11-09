@@ -59,6 +59,10 @@ jobs:
           # leg below instead of exercising the floor of the declared range.
           - symfony: "~7.0.0"
             php: "8.2"
+            # 7.0 is out of support and Packagist lists advisories for it,
+            # which Composer refuses to install by default. This leg tests the
+            # floor of the declared range and never ships, so it alone may.
+            allow_insecure: true
           - symfony: "^7.4"
             php: "8.3"
           - symfony: "^8.0"
@@ -71,6 +75,9 @@ jobs:
           extensions: xdebug
       - name: Install bridge project
         run: |
+          if [ "${{ matrix.allow_insecure }}" = "true" ]; then
+            composer config -d test/Bridge/Symfony policy.advisories.block false
+          fi
           composer require --dev --no-update --no-interaction -d test/Bridge/Symfony \
             "symfony/config:${{ matrix.symfony }}" \
             "symfony/dependency-injection:${{ matrix.symfony }}" \
