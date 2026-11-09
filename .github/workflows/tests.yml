@@ -138,6 +138,10 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     continue-on-error: true
+    # zammad-ci preloads jemalloc for Ruby. The PHP that setup-php installs
+    # into the container crashes on start under it (#184).
+    env:
+      LD_PRELOAD: ""
     container:
       image: zammad/zammad-ci:latest
     services:
