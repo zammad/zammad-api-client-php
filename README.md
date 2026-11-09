@@ -508,7 +508,7 @@ The recipe registers the bundle, creates `config/packages/zammad.yaml` and adds
 - Already installed the package? `composer recipes:install zammad/zammad-api-client-php --force`
   applies the recipe afterwards. `--force` overwrites an existing
   `config/packages/zammad.yaml`, so back up a hand-written one first.
-- The recipe applies from 3.3.0 on. The source lives in
+- The recipe applies to 3.2.0 and later. The source lives in
   [`src/Bridge/Symfony/recipe/`](src/Bridge/Symfony/recipe).
 
 #### Without Flex
