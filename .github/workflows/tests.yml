@@ -145,6 +145,34 @@ jobs:
             test/Bridge/Laravel/build/
           if-no-files-found: ignore
 
+  # Installs the client into fresh framework skeletons with a plain
+  # `composer require`, the way an application would. The bridge jobs above
+  # build projects of their own and so cannot see conflicts with what a real
+  # skeleton locks, such as Guzzle 8 in Laravel 13 (#181).
+  install:
+    name: "Install / ${{ matrix.framework }} ${{ matrix.skeleton }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - framework: laravel
+            skeleton: "^12.0"
+          - framework: laravel
+            skeleton: "^13.0"
+          - framework: symfony
+            skeleton: "6.4.*"
+          - framework: symfony
+            skeleton: "7.4.*"
+          - framework: symfony
+            skeleton: "^8.0"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"   # the one version every skeleton above accepts
+      - run: test/Install/run.sh ${{ matrix.framework }} "${{ matrix.skeleton }}"
+
   integration:
     runs-on: ubuntu-latest
     continue-on-error: true
