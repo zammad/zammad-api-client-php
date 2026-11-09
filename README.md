@@ -830,6 +830,22 @@ Symfony 6.4. Separate projects also keep the frameworks out of the root
 No Zammad instance and no HTTP traffic are involved — these exercise container
 wiring only.
 
+### Install tests
+
+The bridge tests above build test projects of their own, so they cannot see a
+conflict between the client's dependencies and what a real application locks.
+[`test/Install/run.sh`](test/Install/run.sh) closes that gap: it creates a fresh
+`laravel/laravel` or `symfony/skeleton`, runs a plain `composer require` against
+this checkout and checks that `ZammadClient` resolves from the container:
+
+```bash
+make test-install                          # latest Laravel and Symfony
+test/Install/run.sh symfony "6.4.*"        # one framework, one skeleton version
+```
+
+Needs PHP, Composer and network access. CI runs it for Laravel 12/13 and
+Symfony 6.4/7.4/8.x in the `install` job.
+
 ### Integration tests
 
 These require a running Zammad instance and authentication credentials:
