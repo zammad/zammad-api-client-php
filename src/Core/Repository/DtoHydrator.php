@@ -86,6 +86,9 @@ final class DtoHydrator
                 ? Cast::boolOrNull($data, $name)
                 : self::requireBool($data, $name),
             'string' => $nullable ? Cast::stringOrNull($data, $name) : Cast::string($data, $name),
+            'float' => $nullable
+                ? Cast::floatOrNull($data, $name)
+                : self::requireFloat($data, $name),
             default => $data[$name] ?? null,
         };
     }
@@ -122,6 +125,28 @@ final class DtoHydrator
         }
 
         return (bool) $data[$name];
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private static function requireFloat(array $data, string $name): float
+    {
+        if (!array_key_exists($name, $data)) {
+            throw new \RuntimeException(
+                "Required field \"{$name}\" is missing from API response data.",
+            );
+        }
+
+        $value = $data[$name];
+
+        if (!is_numeric($value)) {
+            throw new \RuntimeException(
+                "Required field \"{$name}\" must be numeric, got " . get_debug_type($value) . '.',
+            );
+        }
+
+        return (float) $value;
     }
 
     /**
