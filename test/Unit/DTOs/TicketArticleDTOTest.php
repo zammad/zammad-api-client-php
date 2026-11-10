@@ -166,7 +166,8 @@ final class TicketArticleDTOTest extends TestCase
             'integer string'            => ['15', 15.0],
             'integer'                   => [15, 15.0],
             'float'                     => [5.5, 5.5],
-            'null'                      => [null, null],
+            'non-numeric string'        => ['abc', null],
+            'null'                      => [null, null]
         ];
     }
 
