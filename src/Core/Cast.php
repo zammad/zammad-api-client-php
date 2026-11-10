@@ -115,4 +115,17 @@ final class Cast
 
         return (bool) $value;
     }
+
+    /**
+     * Extracts a key from $data as float, or null if absent.
+     *
+     * @param array $data
+     * @param string $key
+     * @return float|null
+     */
+    public static function floatOrNull(array $data, string $key): ?float
+    {
+        $value = $data[$key] ?? null;
+        return is_numeric($value) ? (float) $value : null;
+    }
 }
