@@ -130,6 +130,53 @@ final class DtoHydratorTest extends TestCase
         $dtoClass::fromArray(['count' => ['nested']]);
     }
 
+    public function testRequireFloatThrowsWhenFieldMissing(): void
+    {
+        $dtoClass = new class(0.0) {
+            use HydratesFromArray;
+            public function __construct(
+                public float $amount,
+            ) {
+            }
+        };
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Required field "amount" is missing from API response data.');
+
+        $dtoClass::fromArray([]);
+    }
+
+    public function testRequireFloatThrowsWhenValueNotNumeric(): void
+    {
+        $dtoClass = new class(0.0) {
+            use HydratesFromArray;
+            public function __construct(
+                public float $amount,
+            ) {
+            }
+        };
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Required field "amount" must be numeric, got string.');
+
+        $dtoClass::fromArray(['amount' => 'abc']);
+    }
+
+    public function testRequireFloatCoercesNumericStringToFloat(): void
+    {
+        $dtoClass = new class(0.0) {
+            use HydratesFromArray;
+            public function __construct(
+                public float $amount,
+            ) {
+            }
+        };
+
+        $result = $dtoClass::fromArray(['amount' => '15.0']);
+
+        self::assertSame(15.0, $result->amount);
+    }
+
     public function testRequireBoolReturnsFalseWhenFieldMissing(): void
     {
         $dtoClass = new class(false) {
