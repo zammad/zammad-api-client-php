@@ -117,11 +117,12 @@ final class Cast
     }
 
     /**
-     * Extracts a key from $data as float, or null if absent.
+     * Extracts a key from $data as a float, or null if absent or not numeric.
      *
-     * @param array $data
-     * @param string $key
-     * @return float|null
+     * Numeric strings are cast to float, since Zammad returns decimal columns
+     * such as `time_unit` as strings (e.g. `"15.0"`).
+     *
+     * @param array<string, mixed> $data
      */
     public static function floatOrNull(array $data, string $key): ?float
     {
