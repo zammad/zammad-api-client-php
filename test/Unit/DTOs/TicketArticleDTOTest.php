@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZammadAPIClient\Tests\Unit\DTOs;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use ZammadAPIClient\Endpoints\TicketArticles\TicketArticleDTO;
@@ -143,5 +144,36 @@ final class TicketArticleDTOTest extends TestCase
         self::assertFalse($array['internal']);
         self::assertSame('<msg-xyz@example.com>', $array['in_reply_to']);
         self::assertSame(5, $array['origin_by_id']);
+    }
+
+    #[DataProvider('timeUnitProvider')]
+    public function testFromArrayCoercesTimeUnitToFloat(mixed $raw, ?float $expected): void
+    {
+        $dto = TicketArticleDTO::fromArray([
+            'id'        => 1,
+            'ticket_id' => 1,
+            'time_unit' => $raw,
+        ]);
+
+        self::assertSame($expected, $dto->time_unit);
+    }
+
+    public static function timeUnitProvider(): array
+    {
+        return [
+            'decimal string'            => ['15.0', 15.0],
+            'fractional decimal string' => ['0.5', 0.5],
+            'integer string'            => ['15', 15.0],
+            'integer'                   => [15, 15.0],
+            'float'                     => [5.5, 5.5],
+            'null'                      => [null, null],
+        ];
+    }
+
+    public function testFromArrayWithoutTimeUnitIsNull(): void
+    {
+        $dto = TicketArticleDTO::fromArray(['id' => 1, 'ticket_id' => 1]);
+
+        self::assertNull($dto->time_unit);
     }
 }
